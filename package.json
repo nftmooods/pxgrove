@@ -1,0 +1,19 @@
+{
+  "name": "pxgrove",
+  "version": "0.9.0-alpha",
+  "private": true,
+  "type": "module",
+  "description": "PxGrove — idle pixel-garden game linked to pixel NFT collections (Normies, OnChain Hoodies). One self-contained HTML file.",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "build:test": "node build/build.mjs --label 'TEST UI'",
+    "build:artifact": "node build/build.mjs --artifact",
+    "test": "node tests/unit/run.mjs",
+    "test:e2e": "npm run build && node tests/e2e/layout.mjs",
+    "serve": "npm run build && npx --yes serve dist -l 4173",
+    "deploy": "bash scripts/deploy.sh"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
+}

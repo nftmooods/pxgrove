@@ -1,0 +1,360 @@
+<title>PxGrove</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=IBM+Plex+Mono:wght@400;500;700&display=swap">
+<style>
+/*__CSS__*/
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <canvas class="logo" id="logoCanvas" width="17" height="17" aria-hidden="true"></canvas>
+      <h1 class="disp">PXGROVE <small id="tSub"></small></h1>
+    </div>
+    <span class="hamb" id="hdrMob">
+      <button class="btn sm" id="btnWs" type="button" aria-label="Workshop">🛠</button>
+      <button class="btn sm" id="btnHamb" type="button" aria-label="Menu">☰</button>
+    </span>
+    <div id="wsPanel" hidden></div>
+    <nav class="tabs" id="mainTabs" aria-label="Sections">
+      <button class="tab on" id="tabGarden" type="button">🌱 <span>Garden</span></button>
+      <button class="tab" id="btnBook" type="button">🛠️ <span>Crafting</span></button>
+      <button class="tab" id="btnBuild" type="button">🏠 <span>Layout</span></button>
+      <button class="tab" id="btnMarket" type="button">🪙 <span>Market</span></button>
+      <button class="tab" id="btnResearch" type="button">🧪 <span>Laboratory</span></button>
+      <button class="tab" id="btnAlmanac" type="button">📗 <span>Almanac</span></button>
+      <button class="tab" id="btnSeeds" type="button">🌰 <span>Seeds</span></button>
+      <button class="tab" id="btnJournalTab" type="button">📓 <span>Journal</span></button>
+    </nav>
+    <div class="hdr-right">
+      <select id="commSel" class="sel-comm" aria-label="NFT collection"></select>
+      <span class="chip" id="normieChip" hidden style="display:none!important"><span class="dot"></span><span id="normieChipTxt"></span></span>
+      <span id="topQB" style="display:inline-flex;gap:8px">
+      <button class="btn sm" id="btnQuests" type="button">🗓️ Quests</button>
+      <button class="btn sm" id="btnBadges" type="button">🏅</button>
+      <button class="btn sm" id="btnInfo" type="button" title="Info">ℹ️</button>
+      </span>
+      <span class="menu-wrap">
+        <button class="btn sm" id="btnMenu" type="button" aria-haspopup="true" aria-expanded="false">⚙️ ▾</button>
+        <div id="menuPanel" hidden>
+          <div class="menu-row"><span class="menu-lbl" id="mlTime">Speed</span>
+            <div class="toggle" role="group" aria-label="Time speed">
+              <button id="btnReal" class="on" type="button">Real time</button>
+              <button id="btnFast" type="button">Fast ×720</button>
+            </div>
+          </div>
+          <div class="menu-row"><span class="menu-lbl" id="mlLang">Language</span>
+            <div class="toggle" role="group" aria-label="Language">
+              <button id="btnEn" class="on" type="button">EN</button>
+              <button id="btnFr" type="button">FR</button>
+            </div>
+          </div>
+          <div class="menu-row"><button class="btn sm" id="btnSwitch" type="button" style="flex:1">Switch Normie</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnInfo" type="button" style="flex:1">ℹ️ Info</button></div>
+          <div class="menu-sep"></div>
+          <div class="menu-row"><span class="menu-lbl" id="tCheat">Cheat code</span></div>
+          <div class="idrow" style="margin:0">
+            <input id="cheatInput" type="password" autocomplete="off" placeholder="········" aria-label="Cheat code" style="width:8em;font-size:.72rem">
+            <button class="btn sm" id="btnCheat" type="button">OK</button>
+          </div>
+          <div class="msg" id="cheatMsg" role="status" style="margin:0"></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnResetGarden" type="button" style="flex:1">↺ Reset</button></div>
+          <div class="msg" id="resetMsg" role="status" style="margin:0"></div>
+        </div>
+      </span>
+    </div>
+  </header>
+
+  <!-- ═══ SCREEN 1 : pick your Normie ═══ -->
+  <section class="screen on" id="scrStart">
+    <div class="start-grid">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <h2 id="tPlantTitle" style="margin:0 0 10px">Plant your Normie</h2>
+          <button class="btn ghost sm" id="btnBack" type="button" hidden>← Back to the garden</button>
+        </div>
+        <div class="comm-row"><label for="commSelStart" id="tCommLbl">NFT collection</label><select id="commSelStart" class="sel-comm" aria-label="NFT collection"></select></div>
+        <p id="tPlantP1">Enter your Normie's number (<strong>0 to 9999</strong>). Its <strong>Type</strong> decides your plant's variety, its <strong>Pixel Count</strong> decides its size and flower production — locked in at planting time.</p>
+        <div class="idrow">
+          <input id="normieId" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="no. 0-9999" aria-label="Normie number">
+          <button class="btn primary" id="btnLookup" type="button">Find</button>
+          <button class="btn" id="btnRandom" type="button">Random</button>
+        </div>
+        <div class="hint" id="tRandomHint">“Random” picks from the embedded sample (42 Normies verified via api.normies.art on 2026-08-30).</div>
+        <div class="msg" id="lookupMsg" role="status"></div>
+
+        <div class="manual" id="manualBox" hidden>
+          <p id="tManualP1"><strong>This Normie isn't in the embedded sample.</strong> Grab its real data in 2 clicks:</p>
+          <p id="tManualP2">1. Open <a id="manualLink" href="#" target="_blank" rel="noopener">api.normies.art/normie/…/metadata</a> (new tab)<br>
+             2. Copy the whole page content and paste it here:</p>
+          <textarea id="manualJson" aria-label="Paste the metadata JSON" placeholder='{"name":"Normie #…","attributes":[…]}'></textarea>
+          <div class="idrow"><button class="btn primary sm" id="btnParse" type="button">Import</button></div>
+        </div>
+
+        <div class="manual">
+          <p class="hint"><span id="tNoNormie">No Normie at hand?</span> <button class="btn ghost sm" id="btnGeneric" type="button">Plant a common sprout</button></p>
+          <p class="hint" id="tGenericHint" style="margin-top:6px"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 id="tVarTitle">5 types → 5 varieties</h2>
+        <div class="vlist" id="varietyList"></div>
+        <p class="hint" style="margin-top:12px" id="tVarHint">Speed = growth time · Flowers = pixel richness of the flowers. The rarer the type, the more generous the variety.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SCREEN 2 : the garden ═══ -->
+  <section class="screen" id="scrGarden">
+    <div class="garden">
+      <div class="gcol-left">
+        <div class="stage">
+          <div class="sidebar" id="stageSidebar"></div>
+          <div class="cv-scroll">
+            <canvas id="plantCanvas" width="320" height="300" aria-label="Your plant"></canvas>
+          </div>
+          <div id="controlPanel" hidden></div>
+          <div id="roomNav" hidden></div>
+          <div class="stage-foot">
+            <span class="phase" id="phaseLbl">seed</span>
+            <span class="clock" id="clockLbl"></span>
+          </div>
+        </div>
+
+        <div id="belowStage">
+        <div class="card gearstrip" id="gearStrip"><span id="tEquip" class="gear-lbl">Active gear</span><div id="hotbar"></div><div id="genSlot"></div></div>
+        <div class="bottom">
+        <div class="card" id="resCard"><h2 id="tResTitle">Resources</h2><div class="resgrid restiles" id="resGrid"></div></div>
+        <div class="card" id="plantCard">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:32px">
+            <span style="display:flex;align-items:center;gap:6px;min-width:0"><h2 id="plantTitle" style="margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</h2>
+            <span class="idrow" id="nameRow" hidden style="margin:0;display:inline-flex;align-items:center;gap:6px">
+              <input id="nameInput" maxlength="18" class="disp" style="width:12em;font-size:.95rem;padding:4px 8px" aria-label="Plant name">
+              <button class="btn sm" id="btnNameOk" type="button">OK</button>
+            </span>
+            <button class="btn xs ghost" id="btnName" type="button" title="Name" hidden>✏️</button></span>
+            <span style="display:inline-flex;align-items:center;gap:10px">
+            <button class="btn sm" id="btnLamp" type="button" hidden>💡</button>
+            <span id="potSel" hidden style="display:inline-flex;align-items:center;gap:6px">
+              <button class="btn xs" id="btnPotPrev" type="button" aria-label="Previous pot">◀</button>
+              <span class="disp" id="potSelLbl" style="font-size:.6rem;white-space:nowrap"></span>
+              <button class="btn xs" id="btnPotNext" type="button" aria-label="Next pot">▶</button>
+            </span>
+            </span>
+          </div>
+          <div id="plantBadges"></div>
+          <div class="meters-row">
+          <div id="metersBox">
+            <div class="meter">
+              <div class="lab"><span id="tGrowth">Growth</span><b id="growthPct">0%</b></div>
+              <div class="bar"><i id="growthBar"></i></div>
+            </div>
+            <div class="meter">
+              <div class="lab"><span><span id="tHydration">Hydration</span> <span id="hydWarn"></span></span><b id="hydPct">100%</b></div>
+              <div class="bar hyd" id="hydBarBox"><i id="hydBar"></i></div>
+            </div>
+          </div>
+          <div class="notice" id="deathNotice" hidden></div>
+          <div class="actions actions-side">
+            <button class="btn primary" id="btnWater" type="button">💧 Water</button>
+            <div class="side-row"><button class="btn primary" id="btnHarvest" type="button" disabled>✂ Harvest & grind</button><button class="btn icon" id="btnUproot" type="button" disabled title="Uproot">🗑️</button></div>
+          </div>
+          </div>
+          <div class="statgrid">
+            <div class="stat"><div class="k" id="tStFlowers">Flowers ready</div><div class="v" id="stFlowers">0 <small id="stFlowersCap"></small></div></div>
+            <div class="stat"><div class="k" id="tStNext">Next flower</div><div class="v" id="stNext">—</div></div>
+          </div>
+          <div class="actions" id="bottomActions" style="margin-top:10px">
+            <button class="btn ghost sm" id="btnReplant" type="button">↺ Replant</button>
+          </div>
+          <p class="hint" id="soilHint" style="margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></p>
+        </div>
+        </div>
+        </div><!-- /belowStage -->
+      <div hidden aria-hidden="true"><h2 id="tWorkshop">Workshop</h2><p id="tWorkshopHint"></p></div>
+      </div>
+      <div id="sidePanels" hidden></div>
+    </div>
+  </section>
+
+  <div class="overlay" id="journalOverlay" role="dialog" aria-modal="true" aria-labelledby="tJournalCard">
+    <div class="book" style="max-width:560px">
+      <div class="book-head">
+        <h3 id="tJournalCard">📓 Journal</h3>
+        <button class="btn sm" id="btnJournalClose" type="button" style="margin-left:auto">✕</button>
+      </div>
+      <div class="book-body" id="journalCard">
+        <div id="journalList" style="font-size:.68rem;color:var(--muted);line-height:1.8;margin-top:6px"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="tFooter"></footer>
+
+  <!-- ═══ Recipe book modal ═══ -->
+  <div class="overlay" id="bookOverlay" role="dialog" aria-modal="true" aria-labelledby="bookTitle">
+    <div class="book">
+      <div class="book-head">
+        <h3 id="bookTitle">📖 Recipe book</h3>
+        <span class="book-nav" style="margin-left:auto">
+          <button class="btn sm" id="btnPgPrev" type="button">◀</button>
+          <button class="btn sm" id="btnPgNext" type="button">▶</button>
+        </span>
+        <button class="btn sm" id="btnBookClose" type="button">✕</button>
+      </div>
+      <div class="book-filter">
+        <input id="bookSearch" type="search" autocomplete="off" placeholder="Search…" aria-label="Search recipes">
+        <span class="ftabs" id="bookTierTabs"></span>
+        <button class="btn xs" id="bookCatPlant" type="button">🌿</button>
+        <button class="btn xs" id="bookCatBuild" type="button">🏠</button>
+        <button class="btn xs" id="bookFltOwned" type="button">🎒</button>
+        <button class="btn xs" id="bookFltDisc" type="button">Hide ❓</button>
+      </div>
+      <div class="book-body" style="overflow:hidden"><div id="bookBody"></div></div>
+      <div class="book-foot"><span class="pg" id="bookPageLbl"></span></div>
+    </div>
+  </div>
+
+  <!-- ═══ Pot picker for installed gear (which pot gets the device?) ═══ -->
+  <div class="overlay" id="potPickOverlay" role="dialog" aria-modal="true" aria-labelledby="potPickTitle">
+    <div class="book" style="max-width:460px">
+      <div class="book-head">
+        <h3 id="potPickTitle">Install</h3>
+        <button class="btn sm" id="btnPotPickClose" type="button">✕</button>
+      </div>
+      <div class="book-body"><div id="potPickList"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ Badges modal (player-profile rewards) ═══ -->
+  <div class="overlay" id="badgesOverlay" role="dialog" aria-modal="true" aria-labelledby="badgesTitleEl">
+    <div class="book" style="max-width:520px">
+      <div class="book-head">
+        <h3 id="badgesTitleEl">🏅 Badges</h3>
+        <button class="btn sm" id="btnBadgesClose" type="button">✕</button>
+      </div>
+      <div class="book-body"><div id="badgesBody"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ Daily quests modal ═══ -->
+  <div class="overlay" id="questsOverlay" role="dialog" aria-modal="true" aria-labelledby="questsTitleEl">
+    <div class="book" style="max-width:480px">
+      <div class="book-head">
+        <h3 id="questsTitleEl">🗓️ Daily quests</h3>
+        <span class="disp" id="streakLbl" style="font-size:.6rem;color:var(--accent);margin-left:auto"></span>
+        <button class="btn sm" id="btnQuestsClose" type="button">✕</button>
+      </div>
+      <div class="book-body"><div id="questList"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ Seed vault (typed seeds: properties, plant, sell, destroy) ═══ -->
+  <div class="overlay" id="seedOverlay" role="dialog" aria-modal="true" aria-labelledby="seedTitle">
+    <div class="book" style="height:min(620px,86vh)">
+      <div class="book-head">
+        <h3 id="seedTitle">🌰 Seed vault</h3>
+        <span class="book-nav" style="margin-left:auto">
+          <button class="btn sm" id="btnSeedPgPrev" type="button">◀</button>
+          <button class="btn sm" id="btnSeedPgNext" type="button">▶</button>
+        </span>
+        <button class="btn sm" id="btnSeedsClose" type="button">✕</button>
+      </div>
+      <div class="book-filter">
+        <span class="ftabs" id="seedCommTabs"></span>
+        <select id="seedRarSel" style="background:var(--ground);color:var(--paper);border:2px solid var(--line);font-family:inherit;font-size:.6rem;padding:4px"></select>
+        <select id="seedSortSel" style="background:var(--ground);color:var(--paper);border:2px solid var(--line);font-family:inherit;font-size:.6rem;padding:4px"></select>
+      </div>
+      <div class="book-body" style="overflow:hidden"><div id="seedBody"></div></div>
+      <div class="book-foot"><span class="pg" id="seedPageLbl"></span></div>
+    </div>
+  </div>
+
+  <!-- ═══ Seed picker (choose what to plant in the selected pot) ═══ -->
+  <div class="overlay" id="pickerOverlay" role="dialog" aria-modal="true" aria-labelledby="pickerTitle">
+    <div class="book" style="max-width:460px">
+      <div class="book-head">
+        <h3 id="pickerTitle">🌱 Plant what?</h3>
+        <button class="btn sm" id="btnPickerClose" type="button">✕</button>
+      </div>
+      <div class="book-body"><div class="picker-list" id="pickerList"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ Almanac modal ═══ -->
+  <div class="overlay" id="almanacOverlay" role="dialog" aria-modal="true" aria-labelledby="almanacTitle">
+    <div class="book" style="max-width:620px">
+      <div class="book-head">
+        <h3 id="almanacTitle">📗 Almanac</h3>
+        <button class="btn sm" id="btnAlmanacClose" type="button">✕</button>
+      </div>
+      <div class="book-body"><div id="almanacBody" style="padding:6px 2px 14px"></div></div>
+    </div>
+  </div>
+  <div id="noticeZone"><div id="toast" role="status"></div><div id="stagePop"></div><div id="stageNotice"></div></div>
+  <div class="overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+    <div class="book" style="max-width:640px">
+      <div class="book-head">
+        <h3 id="infoTitle">ℹ️ How it works</h3>
+        <button class="btn sm" id="btnInfoClose" type="button">✕</button>
+      </div>
+      <div class="book-body" style="overflow-y:auto"><p class="hint" id="infoHint" style="padding:8px 2px 0"></p><div id="infoList" style="padding:6px 2px 14px"></div></div>
+    </div>
+  </div>
+
+  <!-- ═══ Laboratory modal : research blocks + breeding ═══ -->
+  <div class="overlay" id="researchOverlay" role="dialog" aria-modal="true" aria-labelledby="researchTitle">
+    <div class="book">
+      <div class="book-head">
+        <h3 id="researchTitle">🧪 Laboratory</h3>
+        <span class="disp" id="researchCoins" style="font-size:.72rem;margin-left:auto"></span>
+        <button class="btn sm" id="btnResearchClose" type="button">✕</button>
+      </div>
+      <div class="book-filter">
+        <button class="btn xs" id="labTabResearch" type="button">🔬 Research</button>
+        <button class="btn xs" id="labTabBreed" type="button">🧬 Breeding</button>
+        <button class="btn xs" id="labTabTry" type="button">🧫 Experiment</button>
+      </div>
+      <div class="book-body">
+        <div class="rtree" id="researchTree"></div>
+        <div id="breedBody" hidden></div>
+        <div id="tryBody" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Intro / info modal ═══ -->
+  <div class="overlay" id="introOverlay" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <div class="book" style="max-width:560px">
+      <div class="book-head">
+        <h3 id="introTitle">🌱 PxGrove</h3>
+        <button class="btn sm" id="btnIntroClose" type="button">✕</button>
+      </div>
+      <div class="book-body">
+        <div id="introBody" style="font-size:.78rem;line-height:1.65;color:var(--paper);padding:8px 2px"></div>
+        <div class="actions" style="margin:10px 0 14px"><button class="btn primary" id="btnIntroGo" type="button">OK</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tooltip" role="tooltip"></div>
+
+  <!-- ═══ Market modal ═══ -->
+  <div class="overlay" id="marketOverlay" role="dialog" aria-modal="true" aria-labelledby="marketTitle">
+    <div class="book" style="max-width:640px">
+      <div class="book-head">
+        <h3 id="marketTitle">🪙 Market</h3>
+        <span class="disp" id="marketCoins" style="font-size:.72rem;margin-left:auto"></span>
+        <button class="btn sm" id="btnMarketClose" type="button">✕</button>
+      </div>
+      <div class="book-body">
+        <p class="hint" id="marketFeeLine" style="margin:10px 2px"></p>
+        <div class="recipes" id="marketBody"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/*__JS__*/
+</script>
