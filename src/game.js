@@ -3533,6 +3533,7 @@ function mixCol(a,b,t){ const A=hexRGB(a),B=hexRGB(b);
   return '#'+A.map((vv,i)=>Math.round(vv+(B[i]-vv)*t).toString(16).padStart(2,'0')).join(''); }
 let _selScrolled=-1; // last pot auto-centered in the mobile scroll view
 let _viewOffX=0; // canvas-px offset that centers the room slots in the widened desktop world
+let _slotBaseXform=null; // transform snapshot taken right before the per-slot loop — see drawOne()'s bloom-sprite branch
 let curRoom=0; // which room the stage shows (🏠 buttons switch it)
 let controlView=false; // 🖥️ Control desk: manage every room's bars from one screen
 function roomsCount(){ return 1+(S.inv.roomCount||0); }
@@ -3754,6 +3755,7 @@ function drawGarden(){
   _sceneW=worldW;
   drawScene(x,Math.ceil(worldW/CELL),th);
   x.translate(_viewOffX,0); // pots and bars draw centered in the widened world
+  _slotBaseXform=x.getTransform(); // snapshot: lets drawOne() drop back to plain world coordinates (bypassing the per-slot scale) to place full-size sprites, e.g. the bloom placeholder
   if(!drawBedSprite(x,sh)) for(let i=base;i<base+ROOM_SLOTS;i++) drawBed(x,(i-base)+sh,th); // one 3-slot bed sprite, else procedural stone beds
   // room walls: one divider every 3 slots (each built room adds 3 spaces)
   x.fillStyle=th.fenceD||'#5a5c5e';
@@ -3767,19 +3769,24 @@ function drawGarden(){
     x.restore();
   }
 }
-const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — replaces the procedural decor
-let _sceneImg=null;
+const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — the 3-slot bed is painted right into it
+const SCENE_BG_MOBILE=__ASSET__('bg-garden-mobile.jpg'); // same illustration MINUS the bed (bare grass/dirt clearing): used whenever the scene is fit+mirrored, since a baked-in bed would tile/mirror unpredictably there
+let _sceneImg=null, _sceneImgMobile=null, _sceneExactFit=false;
 function sceneImage(){ if(!SCENE_BG)return null; if(!_sceneImg){ _sceneImg=new Image(); _sceneImg.src=SCENE_BG; _sceneImg.onload=()=>render(true); } return _sceneImg.complete&&_sceneImg.naturalWidth?_sceneImg:null; }
+function sceneImageMobile(){ if(!SCENE_BG_MOBILE)return null; if(!_sceneImgMobile){ _sceneImgMobile=new Image(); _sceneImgMobile.src=SCENE_BG_MOBILE; _sceneImgMobile.onload=()=>render(true); } return _sceneImgMobile.complete&&_sceneImgMobile.naturalWidth?_sceneImgMobile:null; }
 function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees 30-46 · fence 46-53 · grass 53-GH
   const px=(cx,cy,col,w=1,h=1)=>{ x.fillStyle=col; x.fillRect(cx*CELL,cy*CELL,w*CELL,h*CELL); };
   const img=sceneImage();
   if(img){ const cw=W*CELL, ch=GH*CELL, iw=img.naturalWidth, ih=img.naturalHeight;
-    if(Math.abs(cw/ch-iw/ih)<0.03){ x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); if(th.night){ x.fillStyle='rgba(0,26,12,.62)'; x.fillRect(0,0,cw,ch); } return; } // same ratio: the whole illustration, undistorted
-    // otherwise (mobile): fit the lower 74 % (fence → ground) to the height and mirror sideways
-    const VIS=0.74, sc=Math.max(ch/(VIS*ih), cw/(3*iw)), dw=iw*sc, dh=ih*sc, y0=ch-dh, x0=(cw-dw)/2;
+    if(Math.abs(cw/ch-iw/ih)<0.03){ _sceneExactFit=true; x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); if(th.night){ x.fillStyle='rgba(0,26,12,.62)'; x.fillRect(0,0,cw,ch); } return; } // same ratio: the whole illustration, undistorted — the baked-in bed lands exactly where SCENE_BED_META expects it
+    // otherwise (mobile): fit the lower 74 % (fence → ground) to the height and mirror sideways — use the bed-less image, else the baked-in bed would tile/mirror across the screen
+    _sceneExactFit=false;
+    const mimg=sceneImageMobile()||img;
+    const miw=mimg.naturalWidth, mih=mimg.naturalHeight;
+    const VIS=0.74, sc=Math.max(ch/(VIS*mih), cw/(3*miw)), dw=miw*sc, dh=mih*sc, y0=ch-dh, x0=(cw-dw)/2;
     x.imageSmoothingEnabled=true;
-    x.drawImage(img,x0,y0,dw,dh);
-    x.save(); x.scale(-1,1); x.drawImage(img,-(x0),y0,dw,dh); x.drawImage(img,-(x0+2*dw),y0,dw,dh); x.restore(); // mirrored copies left & right
+    x.drawImage(mimg,x0,y0,dw,dh);
+    x.save(); x.scale(-1,1); x.drawImage(mimg,-(x0),y0,dw,dh); x.drawImage(mimg,-(x0+2*dw),y0,dw,dh); x.restore(); // mirrored copies left & right
     if(th.night){ x.fillStyle='rgba(0,26,12,.62)'; x.fillRect(0,0,cw,ch); } // night communities: dark green wash
     return; }
   const HZ=46, FENCE0=46, GR=53;
@@ -3804,33 +3811,51 @@ function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees
     const lx=W-8, ly=GR-24; px(lx,ly,th.post,2,24); px(lx-4,ly,th.post,6,1); px(lx-5,ly+1,th.fenceD,3,4); px(lx-4,ly+2,th.lantern,1,2); px(lx-6,ly+2,mixCol(th.lantern,th.skyBot,.6),1,2); px(lx-2,ly+2,mixCol(th.lantern,th.skyBot,.6),1,2);
   }
 }
-const BED_SPRITE=__ASSET__('bed-3slots.webp'); // Martin's 3-compartment stone bed (webp with alpha, 1200×349)
-const BED_META={cx:[257,591,929],bottom:346,soilFront:262,spacing:336}; // measured on the sprite: compartment midpoints, soil front edge, wall bottom // compartment centres & soil bottom in sprite px — one compartment per slot
-let _bedImg=null, _bedSpriteOn=false;
-function bedImage(){ if(!BED_SPRITE)return null; if(!_bedImg){ _bedImg=new Image(); _bedImg.src=BED_SPRITE; _bedImg.onload=()=>render(true); } return _bedImg.complete&&_bedImg.naturalWidth?_bedImg:null; }
-const BED_W_FRAC=0.615, BED_BOTTOM_FRAC=0.83; // bed = 61.5 % of the scene width, centred, its front wall bottom at 83 % of the height (Martin's reference)
-function bedGroundY(){ // world y of the pots' ground line = the bed's soil front edge (fallback: the classic ground row)
-  const img=bedImage(); if(!img||isMobile())return (GH-8)*CELL;
-  const sc=bedScale(); return BED_BOTTOM_FRAC*GH*CELL-(BED_META.bottom-BED_META.soilFront)*sc;
-}
+// the 3-compartment stone bed is now painted directly INTO bg-garden.jpg (no separate sprite to composite) —
+// SCENE_BED_META is measured on that illustration itself (1600×900 base px): each compartment's soil centre,
+// the soil's front edge (= the pots' ground line) and the pitch between compartments.
+const SCENE_BED_META={cx:[505,805,1085],groundY:660,spacing:290};
+let _bedSpriteOn=false;
+function bedActive(){ return _sceneExactFit; } // only when the scene was drawn as a single undistorted copy (set by drawScene) — otherwise (mobile, or a desktop box whose ratio drifts from the illustration's) the baked-in bed's on-screen position isn't predictable
+function sceneScaleX(){ return _sceneW/1600; }
+const SCENE_SCALE_Y=(GH*CELL)/900;
+function bedGroundY(){ return bedActive()?SCENE_BED_META.groundY*SCENE_SCALE_Y:(GH-8)*CELL; } // world y of the pots' ground line = the bed's soil front edge (fallback: the classic ground row)
 let _sceneW=GW*CELL*3;
-function bedScale(){ const img=bedImage(); if(!img)return 1; return Math.min((GW*CELL)/BED_META.spacing, BED_W_FRAC*_sceneW/img.naturalWidth); }
-function slotPitch(){ return (isMobile()||!bedImage())?GW*CELL:BED_META.spacing*bedScale(); } // desktop: the 3 slots are drawn at the bed's compartment pitch (narrower than a logical slot), centred on the middle slot
-function slotCenterX(slot){ // world-px centre of a drawn slot: on the bed sprite, each slot sits on its compartment (measured offsets); otherwise the logical grid
-  const W=GW*CELL; if(isMobile()||!bedImage()) return (slot+0.5)*W;
-  const sc=bedScale(), k=((slot%3)+3)%3, base=slot-k; return (base+1.5)*W+(BED_META.cx[k]-BED_META.cx[1])*sc;
+function slotPitch(){ return bedActive()?SCENE_BED_META.spacing*sceneScaleX():GW*CELL; } // desktop: the 3 slots are drawn at the bed's compartment pitch (narrower than a logical slot), centred on the middle slot
+function slotCenterX(slot){ // world-px centre of a drawn slot: on the baked-in bed, each slot sits on its compartment (measured offsets); otherwise the logical grid
+  const W=GW*CELL; if(!bedActive()) return (slot+0.5)*W;
+  const sx=sceneScaleX(), k=((slot%3)+3)%3, base=slot-k; return (base+1.5)*W+(SCENE_BED_META.cx[k]-SCENE_BED_META.cx[1])*sx;
 }
-function slotOxCells(slot){ return (slotCenterX(slot)-GW*CELL/2)/CELL; } // drawing origin (in cells) — fractional on the sprite
+function slotOxCells(slot){ return (slotCenterX(slot)-GW*CELL/2)/CELL; } // drawing origin (in cells) — fractional on the bed
 function slotScale(){ // pots/plants shrink so a pot spans ~80 % of a compartment's soil (compartment inner width ≈ 78 % of the pitch)
-  if(isMobile()||!bedImage())return 1; return clamp((0.8*0.78*slotPitch())/(22*CELL),0.35,1);
+  if(!bedActive())return 1; return clamp((0.8*0.78*slotPitch())/(22*CELL),0.35,1);
 }
 function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++){ const d=Math.abs(wx-slotCenterX(k)); if(d<bd){ bd=d; best=k; } } return bd<=slotPitch()/2?best:-99; }
-function drawBedSprite(x,firstSlot){ // the whole 3-slot bed in one sprite: its middle compartment is centred on the middle slot, its soil front edge is the pots' ground line
-  const img=bedImage(); if(!img)return false;
-  const sc=bedScale(), dw=img.naturalWidth*sc, dh=img.naturalHeight*sc;
-  const midX=(firstSlot+1.5)*GW*CELL, x0=midX-BED_META.cx[1]*sc, y0=BED_BOTTOM_FRAC*GH*CELL-BED_META.bottom*sc; // bed anchored by its bottom edge; pots stand on its soil front (bedGroundY)
-  _bedSpriteOn=true;
-  x.imageSmoothingEnabled=true; x.drawImage(img,x0,y0,dw,dh); return true;
+// growth-stage plant art: one painted sprite per stage (placeholder — single neutral colour; per-variety tints come
+// later). Same canvas convention across all of them (soil mound baked into the bottom edge, stem centred), so they
+// can share one anchor/scale formula. Only used for ground-planted slots (no pot): the mound doesn't make sense
+// inside a potted plant's own rim/soil graphic, so potted plants keep the procedural renderer for now.
+const PLANT_STAGE_SPRITES={
+  seed:__ASSET__('plant-seed.png'),
+  germ:__ASSET__('plant-germ.png'),
+  young:__ASSET__('plant-young.png'),
+  mature1:__ASSET__('plant-mature1.png'), // 55–67.5 %
+  mature2:__ASSET__('plant-mature2.png'), // 67.5–80 %: fuller/taller, right before bloom
+  bloom:__ASSET__('plant-bloom.png'),
+};
+let _plantStageImgs={};
+function plantSpriteStage(P){ // which sprite covers this growth fraction — mirrors phaseName()'s thresholds, with "mature" split in two for a smoother run-up to bloom
+  if(P<0.05)return'seed'; if(P<0.25)return'germ'; if(P<0.55)return'young'; if(P<0.675)return'mature1'; if(P<0.80)return'mature2'; return'bloom';
+}
+function plantStageImage(stage){
+  const src=PLANT_STAGE_SPRITES[stage]; if(!src)return null;
+  if(!_plantStageImgs[stage]){ const im=new Image(); im.src=src; im.onload=()=>render(true); _plantStageImgs[stage]=im; }
+  const im=_plantStageImgs[stage];
+  return im.complete&&im.naturalWidth?im:null;
+}
+function drawBedSprite(x,firstSlot){ // nothing to draw: the bed is already painted into the scene background — just flag it active so the soil plot isn't drawn twice
+  if(!bedActive())return false;
+  _bedSpriteOn=true; return true;
 }
 function drawBed(x,slot,th){ // raised stone bed under a slot: border ring + dark soil (the pot or the ground plot sits inside)
   const ox=slotOxCells(slot), baseY=GH-8, w=42, h=15, x0=Math.floor((GW-w)/2), y0=baseY-h+2;
@@ -3953,6 +3978,16 @@ function drawOne(x,idx,slot){
     const r3=mulberry32(p.seed+3);
     for(let i=0;i<4;i++) px(potX0+2+Math.floor(r3()*(potW-4)),soilY-1,v.accent);
     return;
+  }
+  if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
+    const img=plantStageImage(plantSpriteStage(P));
+    if(img&&_slotBaseXform){
+      const realSlot=slot==null?idx:slot, cx0=slotCenterX(realSlot), gy=bedGroundY()-20, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
+      x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
+      x.drawImage(img,cx0-dW/2,gy-dH,dW,dH);
+      x.restore();
+      return;
+    }
   }
   if(P<0.05&&!p.dead){
     px(topX,soilY-1,v.accent);
