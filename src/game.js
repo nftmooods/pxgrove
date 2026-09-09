@@ -462,6 +462,9 @@ en:{
   slotPickTitle:nm=>'Place: '+nm+' — pick a slot', matPickOk:'click to change this pot to that material', slotN:n=>'Slot '+n, slotEmpty:'free slot', slotPickOk:'click to place the pot here', slotPickTaken:'a pot already stands here',
   zonePickTitle:nm=>'Install: '+nm+' — pick a zone', zonePickOk:'click to install in this zone', zoneGenLvl:l=>'generator lvl '+l, zoneLbl:'Zone',
   potEmpty:'empty pot', plotEmpty:'bare plot', plotDefault:n=>'Plot '+n, groundMade:n=>'🟫 Plot '+n+' in the ground — pick a seed',
+  pcLockedTitle:'Locked', pcLockedSub:'Upgrade your garden', pcEmptyTitle:'Empty', pcEmptySub:'Choose a seed',
+  pcUnlockFreeQ:'Unlock this plot?', pcUnlockCostQ:cost=>'Unlock this plot for '+cost+'?', pcUnlockFree:'Unlock — free', pcUnlockCost:cost=>'Unlock — '+cost,
+  pcNoRes:'Not enough resources to unlock this plot.',
   secondSeedToast:'🌰 2nd harvest: guaranteed 2nd seed — plant it in the ground!', potPickOk:'click to install here', potPickNo:'not a valid target for this device',
   potPickRepl:'♻ will REPLACE the current device — half its materials come back to your inventory',
   potPickConfirm:'⚠ Click again to confirm: the old device is recycled (50% of materials) and the new one installed.',
@@ -519,7 +522,7 @@ en:{
   growthLeft:t=>'growth: '+t+' left', grown:'fully grown', deadClock:'plant dead',
   cutClock:'plant harvested — replant a seed',
   driesIn:t=>' · dries out in '+t, diesIn:t=>' · DIES in '+t,
-  grindFirst:'harvest first', atPct:p=>'at '+p+' %',
+  grindFirst:'harvest first',
   deathNotice:(n,st)=>'💀 Your '+n+' died of thirst. <b>Collect the dead wood</b> to clear the pot — you salvage <b>1/3 of the wood</b>'+(st?' (no seed: hybrids are sterile)':' and recover <b>the seed</b>')+'.',
   cutShort:'✂ Harvested — <b>replant</b> a seed when ready.',
   cutNotice:(n,px,wood,seeds,dbl)=>'✂ Your '+n+' was cut: <b>'+px+' pixels</b> ground, <b>'+wood+' wood</b> collected'+(seeds===0?' — <b>no seed</b>: hybrid varieties are sterile.':(dbl?' and <b>DOUBLE SEED</b> — 2 seeds recovered!':' and 1 seed recovered.'))+' <b>Replant</b> when ready.',
@@ -742,6 +745,9 @@ fr:{
   slotPickTitle:nm=>'Poser : '+nm+' — choisis un emplacement', matPickOk:'clique pour passer ce pot dans cette matière', slotN:n=>'Emplacement '+n, slotEmpty:'emplacement libre', slotPickOk:'clique pour poser le pot ici', slotPickTaken:'un pot occupe déjà cet emplacement',
   zonePickTitle:nm=>'Installer : '+nm+' — choisis une zone', zonePickOk:'clique pour installer dans cette zone', zoneGenLvl:l=>'générateur niv. '+l, zoneLbl:'Zone',
   potEmpty:'pot vide', plotEmpty:'parcelle nue', plotDefault:n=>'Parcelle '+n, groundMade:n=>'🟫 Parcelle '+n+' en pleine terre — choisis une graine',
+  pcLockedTitle:'Verrouillé', pcLockedSub:'Améliore ton jardin', pcEmptyTitle:'Vide', pcEmptySub:'Choisis une graine',
+  pcUnlockFreeQ:'Déverrouiller cet emplacement ?', pcUnlockCostQ:cost=>'Déverrouiller cet emplacement pour '+cost+' ?', pcUnlockFree:'Déverrouiller — gratuit', pcUnlockCost:cost=>'Déverrouiller — '+cost,
+  pcNoRes:'Pas assez de ressources pour déverrouiller cet emplacement.',
   secondSeedToast:'🌰 2ᵉ récolte : 2ᵉ graine garantie — plante-la en pleine terre !', potPickOk:'clique pour installer ici', potPickNo:'cible invalide pour cet équipement',
   potPickRepl:'♻ REMPLACERA l\'équipement actuel — la moitié de ses matériaux retourne dans l\'inventaire',
   potPickConfirm:'⚠ Reclique pour confirmer : l\'ancien est recyclé (50 % des matériaux) et le nouveau installé.',
@@ -799,7 +805,7 @@ fr:{
   growthLeft:t=>'pousse : '+t+' restantes', grown:'pousse terminée', deadClock:'plante morte',
   cutClock:'plante récoltée — replante une graine',
   driesIn:t=>' · sèche dans '+t, diesIn:t=>' · MORTE dans '+t,
-  grindFirst:'récolter d\'abord', atPct:p=>'à '+p+' %',
+  grindFirst:'récolter d\'abord',
   deathNotice:(n,st)=>'💀 Ta '+n+' est morte de soif. <b>Récolte le bois mort</b> pour libérer le pot — tu sauves <b>1/3 du bois</b>'+(st?' (aucune graine : les hybrides sont stériles)':' et tu récupères <b>la graine</b>')+'.',
   cutShort:'✂ Récoltée — <b>replante</b> une graine quand tu veux.',
   cutNotice:(n,px,wood,seeds,dbl)=>'✂ Ta '+n+' a été coupée : <b>'+px+' pixels</b> broyés, <b>'+wood+' bois</b> récupéré'+(seeds===0?' — <b>aucune graine</b> : les variétés hybrides sont stériles.':(dbl?' et <b>DOUBLE GRAINE</b> — 2 graines récupérées !':' et 1 graine récupérée.'))+' <b>Replanter</b> quand tu veux.',
@@ -824,7 +830,7 @@ function freshInv(){
           equip:'hands', waterMode:'hand', dripOn:true, strainSeeds:{},
           genLvlRoom:[0,0,0], energyRoom:[0,0,0], tankRoom:[false,false,false], tankLevelRoom:[0,0,0], tankCount:0,
           research:{}, discovered:[],
-          potCrafts:0, potAt:[true,false,false,false,false,false,false,false,false], potMatAt:Array(9).fill('clay'), ceramicCount:0, ceramicBigCount:0, terraCount:0, plasticCount:0, concreteCount:0, selfWaterCount:0, roomCount:0, controlDesk:0, lampCount:0, lampLvl2Count:0, lampLvl3Count:0, genCount:0, genLvl2Count:0, genLvl3Count:0, dripCount:0, dripPlusCount:0, dripElecCount:0,
+          potCrafts:0, potAt:[true,false,false,false,false,false,false,false,false], potMatAt:['ground',...Array(8).fill('clay')], ceramicCount:0, ceramicBigCount:0, terraCount:0, plasticCount:0, concreteCount:0, selfWaterCount:0, roomCount:0, controlDesk:0, lampCount:0, lampLvl2Count:0, lampLvl3Count:0, genCount:0, genLvl2Count:0, genLvl3Count:0, dripCount:0, dripPlusCount:0, dripElecCount:0,
           dripTierAt:[0,0,0,0,0,0,0,0,0], lampLvlAt:Array(9).fill(0), lampOnArr:Array(9).fill(true),
           genLvlAt:Array(9).fill(0), energyAt:Array(9).fill(0)};
 }
@@ -1086,6 +1092,16 @@ function groundPlantAt(i){ // click on a free slot: dig the plot, select it and 
   showToast(T().groundMade(i+1));
   seedPickMode=true; seedPage=0; renderSeedVault(); $('seedOverlay').classList.add('on');
 }
+function plotUnlockCost(i){ return (i%ROOM_SLOTS)<2?null:{stone:40}; } // the first 2 plots of every room are free; the rest cost the same as a crafted pot
+function canAffordCost(cost){ if(!cost)return true; for(const k in cost) if((S.inv[k]||0)<cost[k]) return false; return true; }
+function unlockPlot(i){ // confirmed from the "Locked" plot card
+  if(i<0||i>=potSlots()||hasPot(i)||roomOf(i)!==curRoom)return;
+  if(!canReplant()){ showToast(T().noSeed); return; } // check BEFORE spending: groundPlantAt bails out here too, but only after the cost would already be gone
+  const cost=plotUnlockCost(i);
+  if(!canAffordCost(cost)){ showToast(T().pcNoRes); return; }
+  if(cost) for(const k in cost) S.inv[k]-=cost[k];
+  groundPlantAt(i);
+}
 const DRY_LOVERS=['Cat','Alien','Flipper']; // varieties that like it dry
 function potType(i){ const m=S.inv.potMatAt&&S.inv.potMatAt[i]; return POT_MAT[m]?m:'clay'; }
 function potMat(i){ return POT_MAT[potType(i)]; }
@@ -1171,7 +1187,7 @@ function snapshotGarden(){
 }
 function freshGarden(){
   return {plants:[null],sel:0,normie:null,lastTs:Date.now(),
-          seedsVar:{Generic:1},potCrafts:0,potAt:[true,false,false,false,false,false,false,false,false],potMatAt:Array(9).fill('clay'),ceramicCount:0,ceramicBigCount:0,terraCount:0,plasticCount:0,concreteCount:0,selfWaterCount:0,roomCount:0,controlDesk:0,lampCount:0,lampLvl2Count:0,lampLvl3Count:0,genCount:0,genLvl2Count:0,genLvl3Count:0,dripCount:0,dripPlusCount:0,dripElecCount:0,dripOn:true,
+          seedsVar:{Generic:1},potCrafts:0,potAt:[true,false,false,false,false,false,false,false,false],potMatAt:['ground',...Array(8).fill('clay')],ceramicCount:0,ceramicBigCount:0,terraCount:0,plasticCount:0,concreteCount:0,selfWaterCount:0,roomCount:0,controlDesk:0,lampCount:0,lampLvl2Count:0,lampLvl3Count:0,genCount:0,genLvl2Count:0,genLvl3Count:0,dripCount:0,dripPlusCount:0,dripElecCount:0,dripOn:true,
           genLvlRoom:[0,0,0],energyRoom:[0,0,0],tankRoom:[false,false,false],tankLevelRoom:[0,0,0],tankCount:0,
           dripTierAt:[0,0,0,0,0,0,0,0,0],lampLvlAt:Array(9).fill(0),lampOnArr:Array(9).fill(true),
           genLvlAt:Array(9).fill(0),energyAt:Array(9).fill(0)};
@@ -2221,7 +2237,7 @@ function render(force){
   if(!inactive&&P>=BLOOM_P){
     next = p.pending.length>=flowerCap(p,S.sel) ? t.grindFirst : fmtDur((flowerEveryH(p,S.sel)-p.bloomAccH)/speedMult(p,S.sel));
   } else if(!inactive){
-    next = t.atPct(Math.round(BLOOM_P*100));
+    next = fmtDur((BLOOM_P*GROWTH_H-p.growthH)/speedMult(p,S.sel)); // time left before the plant reaches bloom and its first flower
   }
   $('stNext').textContent=next;
   const capH=hydCapH(p);
@@ -3460,10 +3476,17 @@ function applyLangManual(){
   const link=$('manualLink').outerHTML;
   $('tManualP2').innerHTML=t.manualP2a+link+t.manualP2b;
 }
+function updateWeatherClock(){ // header widget: sunny for now (placeholder — real weather later), date/time in the visitor's own local clock
+  const d=$('wcDate'), tm=$('wcTime'); if(!d||!tm)return;
+  const now=new Date(), locale=S.lang==='fr'?'fr-FR':'en-US';
+  d.textContent=now.toLocaleDateString(locale,{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+  tm.textContent=now.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false});
+}
 function setLang(l){
   S.lang=l; save();
   const t=T();
   document.documentElement.lang=l;
+  updateWeatherClock();
   $('btnEn').classList.toggle('on',l==='en');
   $('btnFr').classList.toggle('on',l==='fr');
   $('tSub').textContent=t.sub;
@@ -3768,6 +3791,53 @@ function drawGarden(){
     if(hasPot(i)) drawOne(x,i,slot); else drawEmptySlot(x,slot);
     x.restore();
   }
+  renderPlotCards();
+}
+function worldToCss(wx,wy){ // world (canvas-unit) point → viewport px, via the same transform drawOne()'s sprites use to escape the per-slot scale
+  const cv=$('plantCanvas'); if(!cv||!_slotBaseXform||!cv.width)return null;
+  const p=_slotBaseXform.transformPoint(new DOMPoint(wx,wy));
+  const rect=cv.getBoundingClientRect(); if(!rect.width)return null;
+  return {x:rect.left+p.x*(rect.width/cv.width), y:rect.top+p.y*(rect.height/cv.height)};
+}
+let _unlockConfirmSlot=-1, _plotCardsRoom=-1;
+function renderPlotCards(){
+  const box=$('plotCards'); if(!box)return;
+  if(controlView||isMobile()){ box.innerHTML=''; return; } // control desk / mobile: the classic in-canvas view stays there for now
+  if(curRoom!==_plotCardsRoom){ _plotCardsRoom=curRoom; _unlockConfirmSlot=-1; }
+  const base=curRoom*ROOM_SLOTS, t=T(), cards=[];
+  for(let k=0;k<ROOM_SLOTS;k++){
+    const i=base+k;
+    const cx0=slotCenterX(k), gy=bedGroundY(), pitch=slotPitch();
+    const L=worldToCss(cx0-pitch/2,gy), R=worldToCss(cx0+pitch/2,gy), TP=worldToCss(cx0,gy);
+    if(!L||!R||!TP)continue;
+    const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2, top=TP.y+3; // narrower than the compartment: leaves a visible gap either side, like the stone dividers already do
+    let nameCls='pc-name-card', barsHtml='', nameHtml='';
+    if(!hasPot(i)){
+      nameCls+=' locked';
+      if(_unlockConfirmSlot===i){
+        const cost=plotUnlockCost(i), ok=canAffordCost(cost);
+        nameHtml='<div class="pc-confirm"><span class="pc-name">'+(cost?t.pcUnlockCostQ(costStr(cost)):t.pcUnlockFreeQ)+'</span>'+
+          '<span class="pc-unlock-row"><button type="button" class="pc-unlock-btn" data-unlock="'+i+'"'+(ok?'':' disabled')+'>'+(cost?t.pcUnlockCost(costStr(cost)):t.pcUnlockFree)+'</button>'+
+          '<button type="button" class="pc-cancel-btn" data-cancelunlock="1">✕</button></span></div>';
+      }else{
+        nameHtml='<span class="pc-lock-ic">🔒</span><span class="pc-name">'+t.pcLockedTitle+'</span><span class="pc-status">'+t.pcLockedSub+'</span>';
+      }
+    }else{
+      const p=S.plants[i];
+      if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
+      else{
+        const v=vOf(p), Pv=progress(p), Hv=hydration(p), inactive=p.dead||p.cut;
+        nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>';
+        if(!inactive) barsHtml='<div class="pc-bars-widget">'+
+          '<div class="pc-bar"><span class="pc-ic">🌱</span><span class="pc-track"><span class="pc-fill grow" style="width:'+Math.round(Pv*100)+'%"></span></span></div>'+
+          '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.25?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
+        '</div>';
+      }
+    }
+    const html=barsHtml+'<div class="'+nameCls+'" data-plotcard="'+i+'">'+nameHtml+'</div>';
+    cards.push('<div class="plot-card" style="left:'+Math.round(left)+'px;top:'+Math.round(top)+'px;width:'+Math.round(width)+'px">'+html+'</div>');
+  }
+  box.innerHTML=cards.join('');
 }
 const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — the 3-slot bed is painted right into it
 const SCENE_BG_MOBILE=__ASSET__('bg-garden-mobile.jpg'); // same illustration MINUS the bed (bare grass/dirt clearing): used whenever the scene is fit+mirrored, since a baked-in bed would tile/mirror unpredictably there
@@ -3814,7 +3884,7 @@ function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees
 // the 3-compartment stone bed is now painted directly INTO bg-garden.jpg (no separate sprite to composite) —
 // SCENE_BED_META is measured on that illustration itself (1600×900 base px): each compartment's soil centre,
 // the soil's front edge (= the pots' ground line) and the pitch between compartments.
-const SCENE_BED_META={cx:[505,805,1085],groundY:660,spacing:290};
+const SCENE_BED_META={cx:[511,791,1080],groundY:660,spacing:285}; // cx/groundY re-measured from Martin's dot markers (pixel-clustered, not eyeballed)
 let _bedSpriteOn=false;
 function bedActive(){ return _sceneExactFit; } // only when the scene was drawn as a single undistorted copy (set by drawScene) — otherwise (mobile, or a desktop box whose ratio drifts from the illustration's) the baked-in bed's on-screen position isn't predictable
 function sceneScaleX(){ return _sceneW/1600; }
@@ -3833,8 +3903,8 @@ function slotScale(){ // pots/plants shrink so a pot spans ~80 % of a compartmen
 function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++){ const d=Math.abs(wx-slotCenterX(k)); if(d<bd){ bd=d; best=k; } } return bd<=slotPitch()/2?best:-99; }
 // growth-stage plant art: one painted sprite per stage (placeholder — single neutral colour; per-variety tints come
 // later). Same canvas convention across all of them (soil mound baked into the bottom edge, stem centred), so they
-// can share one anchor/scale formula. Only used for ground-planted slots (no pot): the mound doesn't make sense
-// inside a potted plant's own rim/soil graphic, so potted plants keep the procedural renderer for now.
+// can share one anchor/scale formula. Ground-planted slots draw the sprite whole; potted plants draw it cropped
+// (mound sliced off — PLANT_STAGE_MOUND_FRAC below) since a painted soil mound doesn't fit a pot's own rim graphic.
 const PLANT_STAGE_SPRITES={
   seed:__ASSET__('plant-seed.png'),
   germ:__ASSET__('plant-germ.png'),
@@ -3843,6 +3913,12 @@ const PLANT_STAGE_SPRITES={
   mature2:__ASSET__('plant-mature2.png'), // 67.5–80 %: fuller/taller, right before bloom
   bloom:__ASSET__('plant-bloom.png'),
 };
+// fraction of each sprite's own height that is plant, not mound (measured per stage: taller plants have proportionally
+// less mound). No entry for 'seed' — that sprite IS the mound (seed resting on it), so pots keep the procedural dot for it.
+const PLANT_STAGE_MOUND_FRAC={germ:0.86,young:0.88,mature1:0.89,mature2:0.92,bloom:0.92};
+// where each sprite's mound actually sits inside its own canvas (measured: bottom-most opaque row / horizontal centre of
+// the mound), so every stage roots at the same soil point — the seed's canvas has more empty space under it than the rest.
+const PLANT_STAGE_ALIGN={seed:{b:0.929,cx:0.518},germ:{b:0.968,cx:0.525},young:{b:0.975,cx:0.524},mature1:{b:0.987,cx:0.520},mature2:{b:0.994,cx:0.519},bloom:{b:0.987,cx:0.502}};
 let _plantStageImgs={};
 function plantSpriteStage(P){ // which sprite covers this growth fraction — mirrors phaseName()'s thresholds, with "mature" split in two for a smoother run-up to bloom
   if(P<0.05)return'seed'; if(P<0.25)return'germ'; if(P<0.55)return'young'; if(P<0.675)return'mature1'; if(P<0.80)return'mature2'; return'bloom';
@@ -3864,11 +3940,13 @@ function drawBed(x,slot,th){ // raised stone bed under a slot: border ring + dar
   for(let c=x0+3;c<x0+w-3;c+=6){ px(c,y0+1,th.stoneD,1,1); px(c+3,y0+h-2,th.stoneL,1,1); }
   px(x0+2,y0+2,th.soil,w-4,h-4); for(let c=x0+3;c<x0+w-3;c+=4) px(c,y0+3+((c*7)%(h-6)),th.soilL,1,1);
 }
-function drawEmptySlot(x,slot){ // a free slot: faint dotted footprint where a pot could go
-  const ox=slotOxCells(slot), baseY=GH-8; // no frame: a lone + marks the free slot
-  const cx=Math.floor(GW/2), cy=baseY-8; // a bigger, bright + on the bed's soil (with a dark shadow so it reads on dirt)
-  x.fillStyle='rgba(0,0,0,.45)'; for(let d=-3;d<=3;d++){ x.fillRect((ox+cx+d)*CELL+2,cy*CELL+2,CELL,CELL); x.fillRect((ox+cx)*CELL+2,(cy+d)*CELL+2,CELL,CELL); }
-  x.fillStyle='#efe9dc'; for(let d=-3;d<=3;d++){ x.fillRect((ox+cx+d)*CELL,cy*CELL,CELL,CELL); x.fillRect((ox+cx)*CELL,(cy+d)*CELL,CELL,CELL); }
+function drawEmptySlot(x,slot){ // a locked slot (not yet unlocked): a padlock on the bed's soil — the plot card below explains how to unlock it
+  const ox=slotOxCells(slot), baseY=GH-8;
+  const cx=(ox+GW/2)*CELL, cy=(baseY-9)*CELL;
+  x.textAlign='center'; x.textBaseline='middle'; x.font=(CELL*7)+'px sans-serif';
+  x.fillStyle='rgba(0,0,0,.4)'; x.fillText('🔒',cx+CELL*0.5,cy+CELL*0.5);
+  x.fillText('🔒',cx,cy);
+  x.textAlign='left'; x.textBaseline='alphabetic'; // restore the defaults other draw calls rely on
 }
 function drawOne(x,idx,slot){
   const ox=slotOxCells(slot==null?idx:slot);
@@ -3980,11 +4058,13 @@ function drawOne(x,idx,slot){
     return;
   }
   if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
-    const img=plantStageImage(plantSpriteStage(P));
+    const stage=plantSpriteStage(P), img=plantStageImage(stage);
     if(img&&_slotBaseXform){
-      const realSlot=slot==null?idx:slot, cx0=slotCenterX(realSlot), gy=bedGroundY()-20, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
+      const realSlot=slot==null?idx:slot, al=PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5};
+      // gy = the root point on the soil (Martin's dot markers, ~16 base px below the seed's centre so the seed lands ON the dot); the mound's bottom sits there for every stage
+      const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
-      x.drawImage(img,cx0-dW/2,gy-dH,dW,dH);
+      x.drawImage(img,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
       x.restore();
       return;
     }
@@ -3993,6 +4073,16 @@ function drawOne(x,idx,slot){
     px(topX,soilY-1,v.accent);
     if(Math.floor(Date.now()/600)%2) px(topX,soilY-2,'#9b9ea0');
     return;
+  }
+  if(mat!=='ground'&&!p.dead&&hyd>0){ // same painted sprite, potted: cropped to drop the mound (PLANT_STAGE_MOUND_FRAC), anchored on the pot's own soil line
+    const stage=plantSpriteStage(P), mf=PLANT_STAGE_MOUND_FRAC[stage], img=mf&&plantStageImage(stage);
+    if(img){
+      const sW=img.naturalWidth, sH=Math.round(img.naturalHeight*mf);
+      const dWc=potW*1.2, dHc=dWc*(sH/sW);
+      x.imageSmoothingEnabled=true;
+      x.drawImage(img,0,0,sW,sH,(ox+topX-dWc/2)*CELL,(soilY-dHc)*CELL,dWc*CELL,dHc*CELL);
+      return;
+    }
   }
   const rng=mulberry32(p.seed);
   const mut=p.mutRevealed?p.mutation:'none';
@@ -4212,7 +4302,16 @@ function init(){
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
     if(hasPot(i)) selectPot(i);
-    else if(e.detail<=1) groundPlantAt(i); // a free slot: dig a plot and pick the seed (the dblclick's 2nd click is ignored)
+    else if(e.detail<=1) unlockPlot(i); // a locked slot: unlock it (free for the first 2 of a room, priced beyond that) — mobile/control-desk views have no plot card to confirm through, so this is the direct path there
+  });
+  $('plotCards').addEventListener('click',e=>{
+    const unlockBtn=e.target.closest('[data-unlock]'), cancelBtn=e.target.closest('[data-cancelunlock]'), card=e.target.closest('[data-plotcard]');
+    if(unlockBtn){ unlockPlot(+unlockBtn.dataset.unlock); _unlockConfirmSlot=-1; renderPlotCards(); return; }
+    if(cancelBtn){ _unlockConfirmSlot=-1; renderPlotCards(); return; }
+    if(!card)return;
+    const i=+card.dataset.plotcard;
+    if(!hasPot(i)){ _unlockConfirmSlot=i; renderPlotCards(); }
+    else selectPot(i);
   });
   // double-click on a pot: waters the plant — or harvests it when its flowers are FULL
   $('plantCanvas').addEventListener('dblclick',e=>{
@@ -4244,5 +4343,7 @@ function init(){
   if(!S.introSeen) openIntro(); // first visit: explain the game
   setInterval(tick,250);
   setInterval(save,5000);
+  updateWeatherClock(); setInterval(updateWeatherClock,30000);
+  for(const s in PLANT_STAGE_SPRITES) plantStageImage(s); // decode every stage up front: otherwise a plant flashes its procedural pixel fallback the first time it reaches a new stage
 }
 init();

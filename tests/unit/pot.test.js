@@ -1,12 +1,13 @@
 let pass=0, fail=0;
 const ok=(c,m)=>{ if(c){pass++;} else {fail++; console.log('FAIL:',m);} };
 
-// fresh state: 1 clay pot
+// fresh state: 1 ground plot (no pot yet — the player starts with a seed straight in the soil)
 S=freshState(); ensurePlants();
-ok(potCount()===1, 'fresh: 1 pot');
-ok(potType(0)==='clay', 'fresh: pot 1 is clay');
+ok(potCount()===1, 'fresh: 1 plot');
+ok(potType(0)==='ground', 'fresh: plot 1 is ground, no pot');
 
-// potUp goes through the pot picker (clay pots only)
+// potUp goes through the pot picker (clay pots only) — craft one on slot 1 to test the upgrade path
+S.inv.potMatAt[0]='clay';
 ok(!!POT_EQUIP.potUp, 'potUp is a per-pot install');
 ok(POT_EQUIP.potUp.ok(0), 'potUp ok on clay pot');
 S.inv.stone=100; S.inv.tools.workbench=true; S.inv.research={b_stone:true};

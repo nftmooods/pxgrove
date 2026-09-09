@@ -1,6 +1,7 @@
 // hydration coherence suite
 let pass=0,fail=0; const ok=(c,m)=>{ if(c){pass++;} else {fail++; console.log('✗',m);} };
 S=freshState(); S.inv.lampLvlAt=[0,0,0]; S.inv.lampOnArr=[true,true,true];
+S.inv.potMatAt[0]='clay'; // this suite calibrates the base hydration multiplier itself, so pin a neutral (clay) pot rather than the fresh-game ground plot
 const mk=(type)=>{ const p=makePlant(type?{type,id:1,px:400}:null); return p; };
 const H=p=>+hydCapH(p).toFixed(2);
 let p=mk('Human'); S.plants[0]=p; ok(H(p)===8, 'Human base 8h got '+H(p));

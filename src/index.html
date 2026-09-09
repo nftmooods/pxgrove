@@ -33,6 +33,7 @@
       <button class="btn sm" id="btnBadges" type="button">🏅</button>
       <button class="btn sm" id="btnInfo" type="button" title="Info">ℹ️</button>
       </span>
+      <div class="weather-clock" id="weatherClock" aria-hidden="true"><span class="wc-ic">☀️</span><span class="wc-text"><b id="wcDate"></b><span id="wcTime"></span></span></div>
       <span class="menu-wrap">
         <button class="btn sm" id="btnMenu" type="button" aria-haspopup="true" aria-expanded="false">⚙️ ▾</button>
         <div id="menuPanel" hidden>
@@ -292,6 +293,7 @@
     </div>
   </div>
   <div id="noticeZone"><div id="toast" role="status"></div><div id="stagePop"></div><div id="stageNotice"></div></div>
+  <div id="plotCards"></div>
   <div class="overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
     <div class="book" style="max-width:640px">
       <div class="book-head">
