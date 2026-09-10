@@ -3053,7 +3053,7 @@ function renderSeedVault(){
       '<button class="btn xs" data-sv-kill="'+ei+'" type="button">🗑</button>'+
       '</span>';
     }else if(canPlant&&allowed){
-      d.style.cursor='pointer'; d.dataset.svRow=ei; // the whole row plants on click
+      d.style.cursor='var(--cur-click,pointer)'; d.dataset.svRow=ei; // the whole row plants on click
     }else{
       d.classList.add('locked');
     }
@@ -4459,9 +4459,15 @@ function init(){
     const k=slotFromWorldX(wx); if(k<-50)return -1;
     return curRoom*ROOM_SLOTS + k-potShift();
   };
+  { const rs=document.documentElement&&document.documentElement.style; if(rs&&rs.setProperty){ // the design's cursors, hotspots as in its CSS
+      rs.setProperty('--cur-hand',"url('"+__ASSET__('cursor-hand-default.png')+"') 22 3, auto");
+      rs.setProperty('--cur-click',"url('"+__ASSET__('cursor-click.png')+"') 22 3, pointer");
+      rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer"); } }
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / double-click to water or harvest) — even the only one
-    e.currentTarget.style.cursor=(i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'pointer':'default'; // pots select; free slots plant in the ground
+    const p=(i>=0&&hasPot(i))?S.plants[i]:null;
+    e.currentTarget.style.cursor=(p&&!p.dead&&!p.cut)?'var(--cur-drop,pointer)' // a living plant: the droplet (double-click waters it)
+      :(i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // pots select; free slots plant in the ground
   });
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
