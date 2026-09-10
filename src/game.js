@@ -2535,20 +2535,40 @@ function renderTryPage(box,t){
     }
   });
 }
-/* ── Stage sidebar: harvest tools, watering systems, consumables ── */
-let sbOpen={harv:false,water:false,fert:false};
+/* ── Stage sidebar: harvest tools, watering systems, consumables, rooms ── */
+let sbOpen={harv:false,water:false,fert:false,room:false};
 const WATER_ICONS={hand:'✋',bucketWood:'🪣',bucketMetal:'🪣',arrosoir:'🚿'};
+// painted icons from the Claude Design handoff (downscaled to 128px). Anything without an entry falls back to its emoji.
+const SB_ICONS={
+  hands:__ASSET__('icon-hand.png'), shears:__ASSET__('icon-cut-tools.png'), shearsUp2:__ASSET__('icon-cut-tools.png'),
+  gloves:__ASSET__('icon-gant.png'), glovesUp2:__ASSET__('icon-gant.png'),
+  hand:__ASSET__('icon-water-bowl.png'), bucketWood:__ASSET__('icon-seau.png'), bucketMetal:__ASSET__('icon-seau.png'),
+  arrosoir:__ASSET__('icon-arrosoire.png'), drip:__ASSET__('icon-goutte.png'), dripPlus:__ASSET__('icon-goutte.png'), dripElec:__ASSET__('icon-goutte.png'),
+  compost:__ASSET__('icon-leaf-pile.png'), fert:__ASSET__('icon-manure.png'), fertPlus:__ASSET__('icon-manure-upgraded.png'),
+  fertHuman:__ASSET__('icon-fertilizer-green.png'), fertZombie:__ASSET__('icon-fertilizer-purple.png'),
+  fertAgent:__ASSET__('icon-serum-green.png'), fertCat:__ASSET__('icon-compost.png'), fertAlien:__ASSET__('icon-serum-purple.png'),
+  room:__ASSET__('icon-parcel.png'), lock:__ASSET__('icon-lock-gray.png'), lockOpen:__ASSET__('icon-lock-yellow.png'),
+  map:__ASSET__('icon-map.png'), market:__ASSET__('icon-market.png'), workshop:__ASSET__('icon-workshop.png'), journal:__ASSET__('icon-journal.png'),
+};
+function sbIc(key,emoji){ return SB_ICONS[key]?'<img class="sbic" src="'+SB_ICONS[key]+'" alt="">':'<span class="sbem">'+emoji+'</span>'; }
 function tip(nm,fx){ return (nm+'§'+fx).replace(/"/g,'&quot;'); }
-function sbGroup(box,key,mainIc,mainTip,itemsHtml){
+function sbGroup(box,key,mainIc,mainTip,itemsHtml,badge){
   const g=document.createElement('div'); g.className='fgroup'+(sbOpen[key]?' open':'');
-  g.innerHTML='<span class="slot mini owned" data-sbg="'+key+'" data-tip="'+mainTip+'" role="button" tabindex="0">'+mainIc+
-    '<span class="qty">'+(sbOpen[key]?'◂':'▸')+'</span></span><span class="fitems">'+itemsHtml+'</span>';
+  g.innerHTML='<span class="slot mini owned sbmain" data-sbg="'+key+'" data-tip="'+mainTip+'" role="button" tabindex="0">'+mainIc+(badge||'')+
+    '<span class="sbarrow">'+(sbOpen[key]?'◂':'▸')+'</span></span><span class="fitems">'+itemsHtml+'</span>';
   box.appendChild(g);
+}
+function gotoRoom(r){
+  controlView=false; curRoom=r; _navSig=''; sbOpen.room=false;
+  const fl=potList().filter(x=>roomOf(x)===r);
+  if(fl.length) selectPot(fl[0]); else { renderGen(); renderHotbar(); render(true); }
+  renderSidebar();
 }
 function sidebarClick(e){ // ONE delegated handler: survives re-renders, whole slot is clickable
   const q=sel=>e.target.closest&&e.target.closest(sel);
   const eq=q('[data-eq]');         if(eq){ e.stopPropagation(); selectEquip(eq.dataset.eq); return; }
   const wm=q('[data-wm]');         if(wm){ e.stopPropagation(); setWaterMode(wm.dataset.wm); return; }
+  const rm=q('[data-room]');       if(rm){ e.stopPropagation(); gotoRoom(+rm.dataset.room); return; }
   const dt=q('[data-driptoggle]'); if(dt){ e.stopPropagation(); S.inv.dripOn=!(S.inv.dripOn!==false); save(); renderSidebar(); renderHotbar();
     const tn=T().recipes[S.inv.dripElecCount>0?'dripElec':(S.inv.dripPlusCount>0?'dripPlus':'drip')].nm;
     showToast((S.inv.dripOn!==false?'✓ ':'⏸ ')+tn); return; }
@@ -2570,8 +2590,8 @@ function lockSlot(rid,t){ // padlocked item inside a fold: click → Laboratory 
   if(LOCK_AFTER[rid]&&!S.inv.tools[LOCK_AFTER[rid]])return ''; // one step at a time: level II appears once level I is crafted
   const vis=recipeVisible(r);
   return '<span class="slot mini dis lockslot" data-golock="'+rid+'" data-tip="'+
-    tip(vis?t.recipes[rid].nm:'❓ ???',(vis?t.tipCraftable:t.tipLocked))+'" role="button" tabindex="0" style="position:relative">'+
-    r.ic+'<span class="lockmark">'+(vis?'🛠':'🔒')+'</span></span>';
+    tip(vis?t.recipes[rid].nm:'❓ ???',(vis?t.tipCraftable:t.tipLocked))+'" role="button" tabindex="0">'+
+    sbIc(rid,r.ic)+'<img class="lockmark" src="'+(vis?SB_ICONS.lockOpen:SB_ICONS.lock)+'" alt=""></span>';
 }
 function renderSidebar(){
   const t=T(), box=$('stageSidebar'); if(!box)return; box.innerHTML='';
@@ -2590,10 +2610,11 @@ function renderSidebar(){
     const cur=harvOpts.find(o=>o[0]===S.inv.equip)||harvOpts[0];
     let items='';
     for(const [k,ic,nm,fx] of harvOpts){
-      items+='<span class="slot mini owned'+(S.inv.equip===k?' sel':'')+'" data-eq="'+k+'" data-tip="'+tip(nm,fx)+'" role="button" tabindex="0">'+ic+'</span>';
+      if(k===cur[0])continue; // the active tool is the main slot; the fold lists the alternatives
+      items+='<span class="slot mini owned" data-eq="'+k+'" data-tip="'+tip(nm,fx)+'" role="button" tabindex="0">'+sbIc(k,ic)+'</span>';
     }
     items+=lockSlot('shears',t)+lockSlot('shearsUp2',t)+lockSlot('gloves',t)+lockSlot('glovesUp2',t);
-    sbGroup(box,'harv',cur[1],tip(t.equipHarvest,cur[2]),items);
+    sbGroup(box,'harv',sbIc(cur[0],cur[1]),tip(t.equipHarvest,cur[2]),items);
   }
   // 💦 watering systems — click to select; drip is an on/off toggle
   const wOpts=[['hand','✋',t.equipHands,t.tipHandWater]];
@@ -2604,34 +2625,72 @@ function renderSidebar(){
     const mode=waterModeEffective();
     let items='';
     for(const [k,ic,nm,fx] of wOpts){
-      items+='<span class="slot mini owned'+(mode===k?' sel':'')+'" data-wm="'+k+'" data-tip="'+tip(nm,fx)+'" role="button" tabindex="0">'+ic+'</span>';
+      if(k===mode)continue;
+      items+='<span class="slot mini owned" data-wm="'+k+'" data-tip="'+tip(nm,fx)+'" role="button" tabindex="0">'+sbIc(k,ic)+'</span>';
     }
     if(S.inv.dripCount>0){
       const on=S.inv.dripOn!==false;
       const tierK=S.inv.dripElecCount>0?'dripElec':(S.inv.dripPlusCount>0?'dripPlus':'drip');
       const tierNm=t.recipes[tierK].nm, tierFx=t.recipes[tierK].fx;
-      items+='<span class="slot mini owned'+(on&&dripActive()?' sel':'')+(on?'':' dis')+'" data-driptoggle="1" data-tip="'+tip(tierNm,(on?t.dripToggleOn:t.dripToggleOff)+' — '+tierFx)+'" role="button" tabindex="0">'+dripTierIcon()+'</span>';
+      items+='<span class="slot mini owned'+(on&&dripActive()?' sel':'')+(on?'':' dis')+'" data-driptoggle="1" data-tip="'+tip(tierNm,(on?t.dripToggleOn:t.dripToggleOff)+' — '+tierFx)+'" role="button" tabindex="0">'+sbIc(tierK,dripTierIcon())+'</span>';
     }
     items+=lockSlot('bucketWood',t)+lockSlot('bucketMetal',t)+lockSlot('arrosoir',t)+lockSlot('tank',t);
     if(S.inv.dripCount<=0) items+=lockSlot('drip',t);
-    sbGroup(box,'water',WATER_ICONS[mode],tip(t.equipWater,waterLabel()),items);
+    sbGroup(box,'water',sbIc(mode,WATER_ICONS[mode]),tip(t.equipWater,waterLabel()),items);
   }
-  // 🧪 consumables — click to use on the selected plant; the rest waits behind padlocks
+  // 🧪 consumables — the main slot shows the first one in stock (click the fold to use any of them); the rest waits behind padlocks
   {
-    let items='';
+    let items='', main=null;
     for(const k of Object.keys(FERT_FX)){
+      const r=RECIPES.find(x=>x.gives&&Object.keys(x.gives)[0]===k);
       if(S.inv[k]>0){
-        const r=RECIPES.find(x=>x.gives&&Object.keys(x.gives)[0]===k);
         const fx=FERT_FX[k];
         const usable=p&&!p.dead&&!p.cut&&(!fx.only||baseTypeOf(p)===fx.only);
-        items+='<span class="slot mini owned'+(usable?'':' dis')+'" data-sbuse="'+k+'" data-tip="'+tip(t.recipes[r.id].nm,t.recipes[r.id].fx)+'" role="button" tabindex="0">'+r.ic+'<span class="qty">×'+S.inv[k]+'</span></span>';
-      }else{
-        const r=RECIPES.find(x=>x.gives&&Object.keys(x.gives)[0]===k);
-        if(r) items+=lockSlot(r.id,t);
-      }
+        if(!main) main=[k,r.ic];
+        items+='<span class="slot mini owned'+(usable?'':' dis')+'" data-sbuse="'+k+'" data-tip="'+tip(t.recipes[r.id].nm,t.recipes[r.id].fx)+'" role="button" tabindex="0">'+sbIc(k,r.ic)+'<span class="qty">'+S.inv[k]+'</span></span>';
+      }else if(r) items+=lockSlot(r.id,t);
     }
-    sbGroup(box,'fert','🧪',tip(t.res.fert,t.tipFertGroup),items);
+    sbGroup(box,'fert',main?sbIc(main[0],main[1]):sbIc('compost','🧪'),tip(t.res.fert,t.tipFertGroup),items,main?'<span class="qty">'+S.inv[main[0]]+'</span>':'');
   }
+  // 🏠 rooms — the zone on screen is the main slot; the fold lists the other zones, padlocks for those not built yet
+  {
+    const R=roomsCount(); let items='';
+    for(let r=0;r<3;r++){
+      if(r===curRoom)continue;
+      if(r<R) items+='<span class="slot mini owned" data-room="'+r+'" data-tip="'+tip(t.zoneLbl,roomName(r))+'" role="button" tabindex="0">'+sbIc('room','🏠')+'<span class="qty disp">R'+(r+1)+'</span></span>';
+      else { const vis=recipeVisible(RECIPES.find(x=>x.id==='room'));
+        items+='<span class="slot mini dis lockslot" data-golock="room" data-tip="'+tip(vis?t.recipes.room.nm:'❓ ???',(vis?t.tipCraftable:t.tipLocked))+'" role="button" tabindex="0">'+
+          sbIc('room','🏠')+'<span class="qty disp">R'+(r+1)+'</span><img class="lockmark" src="'+(vis?SB_ICONS.lockOpen:SB_ICONS.lock)+'" alt=""></span>'; }
+    }
+    sbGroup(box,'room',sbIc('room','🏠'),tip(t.zoneLbl,roomName(curRoom)),items,'<span class="qty disp">R'+(curRoom+1)+'</span>');
+  }
+}
+/* ── bottom-right quick cluster: map (→ market, workshop) and journal ── */
+let mapOpen=false;
+function renderStageQuick(){
+  const t=T(), box=$('stageQuick'); if(!box)return;
+  box.innerHTML='<span class="fgroup sq-map'+(mapOpen?' open':'')+'">'+
+      '<span class="slot mini sq" data-sq="map" data-tip="'+tip(t.market+' · '+t.book,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.map+'" alt=""></span>'+
+      '<span class="fitems">'+
+        '<span class="slot mini sq" data-sq="market" data-tip="'+tip(t.market,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.market+'" alt=""></span>'+
+        '<span class="slot mini sq" data-sq="workshop" data-tip="'+tip(t.book,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.workshop+'" alt=""></span>'+
+      '</span></span>'+
+    '<span class="slot mini sq" data-sq="journal" data-tip="'+tip('📓 '+t.journalTitle,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.journal+'" alt=""></span>';
+}
+function stageQuickClick(e){
+  const el=e.target.closest&&e.target.closest('[data-sq]'); if(!el)return;
+  e.stopPropagation();
+  const k=el.dataset.sq;
+  if(k==='map'){ mapOpen=!mapOpen; renderStageQuick(); return; }
+  mapOpen=false; renderStageQuick(); closeMenu();
+  if(k==='market') openMarket();
+  else if(k==='workshop'){ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); }
+  else if(k==='journal'){ renderJournal(); $('journalOverlay').classList.add('on'); }
+}
+function closeStageFolds(){ // click anywhere else: every fold shuts, like the design's outside-click refs
+  let any=mapOpen; mapOpen=false;
+  for(const k in sbOpen){ if(sbOpen[k]){ any=true; sbOpen[k]=false; } }
+  if(any){ renderSidebar(); renderStageQuick(); }
 }
 /* ── Pixel tooltip (hover bonuses) ── */
 function initTooltip(){
@@ -3571,7 +3630,7 @@ function setLang(l){
   updateCommUI();
   $('tFooter').innerHTML=t.footer;
   layoutTabs();
-  renderVarieties(); renderWorkshop(); lastRes=''; renderResources(); render(true);
+  renderVarieties(); renderWorkshop(); renderStageQuick(); lastRes=''; renderResources(); render(true);
 }
 
 /* ── Pixel rendering of the garden (all pots side by side) ── */
@@ -3677,8 +3736,7 @@ function renderControlPanel(){ // one card per room: energy, water and harvest s
   }));
   el.querySelectorAll('[data-cview]').forEach(b=>b.addEventListener('click',()=>{
     const r=Number(b.dataset.cview), first=r*ROOM_SLOTS;
-    controlView=false; curRoom=r; _navSig='';
-    { const fl=potList().filter(x=>roomOf(x)===r); if(fl.length) selectPot(fl[0]); else { renderGen(); renderHotbar(); render(true); } }
+    gotoRoom(r);
   }));
 }
 let _navSig='';
@@ -3690,6 +3748,7 @@ function renderRoomNav(){
   if(_navSig==='lock')return; // a rename input is open in the panel
   if(sig===_navSig)return;
   _navSig=sig;
+  renderSidebar(); // the sidebar's room slot mirrors the zone on screen
   el.hidden=false; // the zone panel always lives in the top-right corner: it names the zone and lets you rename it
   el.innerHTML='';
   if(!controlView){ const t=T(), hd=document.createElement('div'); hd.className='zone-hd'; // no zone header on the control desk: it would sit over the 3rd room card's buttons
@@ -3711,9 +3770,7 @@ function renderRoomNav(){
     b.innerHTML='🏠<span>'+(r+1)+'</span>'+(alerts[r]==='1'?'<i class="rb-alert">!</i>':''); b.title=roomName(r);
     b.className+= (r===curRoom&&!controlView?'':'').length?'':''; // (state handled below)
     b.addEventListener('click',()=>{
-      controlView=false; curRoom=r; _navSig='';
-      const first=r*ROOM_SLOTS;
-      { const fl=potList().filter(x=>roomOf(x)===r); if(fl.length) selectPot(fl[0]); else { renderGen(); renderHotbar(); render(true); } }
+      gotoRoom(r);
     });
     if(controlView) b.classList.remove('on');
     el.appendChild(b);
@@ -4346,6 +4403,9 @@ function init(){
   });
   initTooltip();
   $('stageSidebar').addEventListener('click',sidebarClick);
+  $('stageQuick').addEventListener('click',stageQuickClick);
+  document.addEventListener('click',closeStageFolds);
+  renderStageQuick();
   document.addEventListener('visibilitychange',()=>{ if(document.hidden)save(); });
   window.addEventListener('beforeunload',save);
   setLang(S.lang||'en');

@@ -176,7 +176,7 @@
   /* on desktop/tablet, belowStage rides on top of the scene instead of pushing it smaller — the image stays maximized */
   @media(min-width:821px){
     #belowStage{position:absolute;left:0;right:0;bottom:0;max-height:46%;overflow-y:auto;z-index:6;
-      padding:12px 14px 10px;border-radius:0 0 12px 12px;pointer-events:none;
+      padding:12px 150px 10px 88px;border-radius:0 0 12px 12px;pointer-events:none; /* side gutters keep the plant card clear of the sidebar and the map/journal slots */
       background:linear-gradient(to top, rgba(15,16,14,.94) 0%, rgba(15,16,14,.8) 60%, rgba(15,16,14,0) 100%)}
     #belowStage>*{pointer-events:auto}
   }
@@ -268,7 +268,8 @@
   #plantCanvas{max-height:68vh;width:100%;height:auto;max-width:100%;margin:0 auto}
 
   .stage{background:var(--panel);border:1px solid rgba(255,255,255,.08);padding:0;position:relative;border-radius:12px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.35)}
-  .stage .sidebar,.stage #roomNav,.stage .stage-foot{z-index:2}
+  .stage #roomNav,.stage .stage-foot{z-index:2}
+  .stage .sidebar,.stage #stageQuick{z-index:7} /* above the #belowStage overlay (z 6): the folds open across it */
   .stage-foot{position:absolute;left:12px;right:12px;bottom:8px;background:transparent;pointer-events:none;display:flex;justify-content:flex-end}
   .stage-foot>*{background:rgba(0,0,0,.55);padding:3px 8px;border-radius:6px}
   #phaseLbl,#clockLbl{display:none} /* redundant now: phase/status and growth-time countdown already show on each plot's own card */
@@ -495,16 +496,33 @@
   .book-nav .pg{font-family:'Silkscreen',monospace;font-size:.6rem;color:var(--muted);white-space:nowrap}
 
   /* stage sidebar (quick-use consumables) */
-  .sidebar{position:absolute;left:8px;top:8px;bottom:8px;display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;gap:6px;z-index:5;pointer-events:none}
+  /* quick-use sidebar (Claude Design shell): a column of 56×58 painted slots, bottom-left; each fold opens to the right */
+  .sidebar{position:absolute;left:14px;bottom:2%;display:flex;flex-direction:column;align-items:center;gap:8px;z-index:7;width:59px;pointer-events:none}
   .sidebar>*{pointer-events:auto}
-  .fgroup{display:flex;gap:6px;align-items:flex-start}
-  .fgroup .fitems{display:none;gap:6px}
+  .fgroup{position:relative;display:flex}
+  .fgroup .fitems{position:absolute;left:66px;top:0;display:none;gap:8px}
   .fgroup.open .fitems{display:flex}
-  .sidebar .slot.mini{background:var(--panel);box-shadow:2px 2px 0 0 rgba(0,0,0,.4)}
-  .sidebar .slot.mini.dis{opacity:.35;cursor:not-allowed}
-  .sidebar .slot.mini.lockslot{opacity:.55;cursor:pointer}
-  .sidebar .slot.mini.lockslot:hover{opacity:.9;border-color:var(--accent)}
-  .slot.mini .lockmark{position:absolute;right:-4px;bottom:-4px;font-size:.55rem}
+  .sidebar .slot.mini,#stageQuick .slot.mini{width:56px;height:58px;border-radius:12px;border:1px solid #8a8f8a;background:rgba(0,0,0,.5);
+    box-shadow:0 0 0 3px rgba(0,0,0,.33);overflow:visible}
+  .sidebar .slot.mini.sbmain{border-color:#8FD14F;box-shadow:0 0 0 3px rgba(0,0,0,.5)}
+  .sidebar .slot.mini.sel{border-color:#8FD14F}
+  .sidebar .slot.mini:hover{border-color:#c8e6a8}
+  .slot.mini .sbic{width:40px;height:42px;object-fit:contain;image-rendering:auto}
+  .slot.mini .sbic.big{width:46px;height:50px}
+  .slot.mini .sbem{font-size:1.5rem;line-height:1}
+  .sidebar .slot.mini.dis{opacity:1;cursor:not-allowed}
+  .sidebar .slot.mini.dis .sbic,.sidebar .slot.mini.dis .sbem{filter:grayscale(1) brightness(.8);opacity:.85}
+  .sidebar .slot.mini.lockslot{cursor:pointer}
+  .sidebar .slot.mini.lockslot:hover{border-color:#8FD14F}
+  .slot.mini .lockmark{position:absolute;right:-2px;bottom:-2px;width:16px;height:16px;object-fit:contain}
+  .sidebar .slot.mini .qty{left:2px;bottom:1px;right:auto;font-size:.5rem;background:rgba(0,0,0,.65);border-radius:4px;padding:0 3px;text-shadow:none;color:#eceded}
+  .sbarrow{position:absolute;right:-5px;bottom:-5px;width:16px;height:16px;background:#8FD14F;border:2px solid #fff;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 1px 3px rgba(0,0,0,.6);font-size:13px;line-height:1;font-weight:700;color:#1a2e10;font-family:'IBM Plex Mono',monospace}
+  /* bottom-right: map (folds left into market + workshop) and journal */
+  #stageQuick{position:absolute;right:1.4%;bottom:2%;display:flex;align-items:center;gap:8px;z-index:7}
+  #stageQuick .slot.mini{border-color:transparent;background:rgba(0,0,0,.4);box-shadow:none}
+  #stageQuick .slot.mini:hover{border-color:#8FD14F}
+  #stageQuick .sq-map .fitems{left:auto;right:66px}
 
   /* unlock toast */
   #toast{display:none;background:var(--panel-2);border:3px solid var(--ok);color:var(--paper);
