@@ -2578,7 +2578,7 @@ function sidebarClick(e){ // ONE delegated handler: survives re-renders, whole s
     return; }
   const gb=q('[data-sbg]');        if(gb){ e.stopPropagation(); sbOpen[gb.dataset.sbg]=!sbOpen[gb.dataset.sbg]; renderSidebar(); return; }
 }
-const LOCK_AFTER={shearsUp2:'shears',glovesUp2:'gloves',bucketMetal:'bucketWood',arrosoir:'bucketMetal'}; // upgrades stay hidden until their base item is owned
+const LOCK_AFTER={shearsUp2:'shears',glovesUp2:'gloves',bucketMetal:'bucketWood'}; // upgrades stay hidden until their base item is owned — arrosoir is its own separate tool, not an upgrade of the metal bucket, so it's never hidden behind it
 function lockSlot(rid,t){ // padlocked item inside a fold: click → Laboratory or Crafting
   const r=RECIPES.find(x=>x.id===rid); if(!r||recipeQty(r)>0)return '';
   if(LOCK_AFTER[rid]&&!S.inv.tools[LOCK_AFTER[rid]])return ''; // one step at a time: level II appears once level I is crafted
