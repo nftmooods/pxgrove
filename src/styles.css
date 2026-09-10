@@ -329,6 +329,28 @@
   .pd-stat-k{font-size:.62rem;color:#8b8d8f;white-space:nowrap}
   .pd-stat-v{font-size:.8rem;color:#f2f2f2;white-space:nowrap}
   .pd-vsep{width:1px;height:28px;background:rgba(255,255,255,.12);flex:none}
+  /* locked compartment (design): round padlock on the soil + "Unlock the plot" card above it */
+  .pc-lockwrap{position:relative;display:flex;justify-content:center;pointer-events:none}
+  .pc-lockbtn{pointer-events:auto;width:38px;height:38px;border-radius:99px;background:rgba(20,20,22,.85);border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .pc-lockbtn img{width:22px;height:22px;object-fit:contain}
+  .pc-lockbtn:hover{border-color:rgba(255,255,255,.4)}
+  .pc-unlock{position:absolute;bottom:44px;left:50%;transform:translateX(-50%);width:250px;pointer-events:auto;text-align:left;cursor:default;
+    background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:3}
+  .pc-unlock .pd-head{justify-content:space-between}
+  .pc-unlock-t{font-size:.85rem;text-transform:uppercase;white-space:normal;line-height:1.25}
+  .pc-unlock .pd-btn{width:24px;height:24px;border-radius:7px;font-size:.7rem}
+  .pc-unlock-txt{font-size:.68rem;color:#a9abad;margin-top:6px;line-height:1.4}
+  .pc-unlock .pc-req{margin-top:12px;text-align:left}
+  .pc-mats{display:flex;gap:6px;margin-top:6px}
+  .pc-mat{flex:1;background:#26272a;border-radius:9px;padding:7px 4px;text-align:center;min-width:0}
+  .pc-mat-ic{font-size:1.1rem}
+  .pc-mat-v{font-size:.68rem;margin-top:3px;white-space:nowrap}
+  .pc-mat-k{font-size:.58rem;color:#8b8d8f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pc-unlock-go{margin-top:12px;width:100%;background:#5fb04d;border:0;border-radius:9px;padding:9px;color:#f2f2f2;cursor:pointer;font-family:inherit;font-size:.85rem;
+    display:flex;align-items:center;justify-content:center;gap:6px}
+  .pc-unlock-go .disp{font-size:.72rem}
+  .pc-unlock-go img{width:16px;height:16px;object-fit:contain}
+  .pc-unlock-go.off,.pc-unlock-go:disabled{background:#3a3a3d;color:#a9abad;cursor:not-allowed}
   .plot-card .pc-bars-widget{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:rgba(0,0,0,.5);border:0;font:inherit;color:inherit;align-self:center;width:max-content;min-width:72px;position:relative;
     border-radius:8px;padding:6px 8px}
   .plot-card .pc-bars-widget:hover,.plot-card .pc-bars-widget.sel{outline:1px solid rgba(255,255,255,.25)}

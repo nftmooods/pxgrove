@@ -469,6 +469,7 @@ en:{
   pcLockedTitle:'Locked', pcLockedSub:'Upgrade your garden', pcEmptyTitle:'Empty', pcEmptySub:'Choose a seed',
   pcUnlockFreeQ:'Unlock this plot?', pcUnlockCostQ:cost=>'Unlock this plot for '+cost+'?', pcUnlockFree:'Unlock — free', pcUnlockCost:cost=>'Unlock — '+cost,
   pcNoRes:'Not enough resources to unlock this plot.',
+  pcUnlockTitle:'Unlock the plot', pcUnlockTxt:'Unlock this plot to grow your garden.', pcReqLbl:'REQUIRED RESOURCES', pcUnlockFreeBtn:'Unlock for free', pcUnlockBtn:'Unlock the plot',
   secondSeedToast:'🌰 2nd harvest: guaranteed 2nd seed — plant it in the ground!', potPickOk:'click to install here', potPickNo:'not a valid target for this device',
   potPickRepl:'♻ will REPLACE the current device — half its materials come back to your inventory',
   potPickConfirm:'⚠ Click again to confirm: the old device is recycled (50% of materials) and the new one installed.',
@@ -756,6 +757,7 @@ fr:{
   pcLockedTitle:'Verrouillé', pcLockedSub:'Améliore ton jardin', pcEmptyTitle:'Vide', pcEmptySub:'Choisis une graine',
   pcUnlockFreeQ:'Déverrouiller cet emplacement ?', pcUnlockCostQ:cost=>'Déverrouiller cet emplacement pour '+cost+' ?', pcUnlockFree:'Déverrouiller — gratuit', pcUnlockCost:cost=>'Déverrouiller — '+cost,
   pcNoRes:'Pas assez de ressources pour déverrouiller cet emplacement.',
+  pcUnlockTitle:'Débloquer la parcelle', pcUnlockTxt:'Débloquez cette parcelle pour agrandir votre jardin.', pcReqLbl:'RESSOURCES REQUISES', pcUnlockFreeBtn:'Débloquer gratuitement', pcUnlockBtn:'Débloquer la parcelle',
   secondSeedToast:'🌰 2ᵉ récolte : 2ᵉ graine garantie — plante-la en pleine terre !', potPickOk:'clique pour installer ici', potPickNo:'cible invalide pour cet équipement',
   potPickRepl:'♻ REMPLACERA l\'équipement actuel — la moitié de ses matériaux retourne dans l\'inventaire',
   potPickConfirm:'⚠ Reclique pour confirmer : l\'ancien est recyclé (50 % des matériaux) et le nouveau installé.',
@@ -2686,6 +2688,7 @@ function commitDetailsRename(i){
 }
 function closeStageFolds(){ // click anywhere else: every fold shuts, like the design's outside-click refs
   closeDetails();
+  if(_unlockConfirmSlot>=0){ _unlockConfirmSlot=-1; renderPlotCards(); }
   let any=mapOpen; mapOpen=false;
   for(const k in sbOpen){ if(sbOpen[k]){ any=true; sbOpen[k]=false; } }
   if(any){ renderSidebar(); renderStageQuick(); }
@@ -3962,18 +3965,23 @@ function renderPlotCards(){
     if(!L||!R||!TP)continue;
     const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2;
     const growing=hasPot(i)&&S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut;
-    const top=growing?TP.y-20:TP.y+3; // bars pill: straddles the soil's front edge at the plant's foot (design); name cards: just under the compartment
+    const top=growing?TP.y-20:(!hasPot(i)?TP.y-40:TP.y+3); // bars pill straddles the soil's front edge; the padlock sits on the soil; name cards just under the compartment
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
-    if(!hasPot(i)){
-      nameCls+=' locked';
+    if(!hasPot(i)){ // locked compartment (design): a round padlock on the soil; click → the "Unlock the plot" card above it
+      nameCls='';
+      const cost=plotUnlockCost(i), ok=canAffordCost(cost)&&canReplant();
+      let pop='';
       if(_unlockConfirmSlot===i){
-        const cost=plotUnlockCost(i), ok=canAffordCost(cost);
-        nameHtml='<div class="pc-confirm"><span class="pc-name">'+(cost?t.pcUnlockCostQ(costStr(cost)):t.pcUnlockFreeQ)+'</span>'+
-          '<span class="pc-unlock-row"><button type="button" class="pc-unlock-btn" data-unlock="'+i+'"'+(ok?'':' disabled')+'>'+(cost?t.pcUnlockCost(costStr(cost)):t.pcUnlockFree)+'</button>'+
-          '<button type="button" class="pc-cancel-btn" data-cancelunlock="1">✕</button></span></div>';
-      }else{
-        nameHtml='<span class="pc-lock-ic">🔒</span><span class="pc-name">'+t.pcLockedTitle+'</span><span class="pc-status">'+t.pcLockedSub+'</span>';
+        const need=Object.assign({},cost||{}); const mats=Object.keys(need).map(k=>{ const have=S.inv[k]||0;
+          return '<div class="pc-mat"><div class="pc-mat-ic">'+(t.resIc[k]||'')+'</div><div class="pc-mat-v disp" style="color:'+(have>=need[k]?'#8fd14f':'#e07a5f')+'">'+fmtCoins(have)+' / '+need[k]+'</div><div class="pc-mat-k">'+(t.res[k]||k)+'</div></div>'; });
+        { const have=totalBaseSeeds(); mats.push('<div class="pc-mat"><div class="pc-mat-ic">'+t.resIc.seeds+'</div><div class="pc-mat-v disp" style="color:'+(canReplant()?'#8fd14f':'#e07a5f')+'">'+have+' / 1</div><div class="pc-mat-k">'+t.res.seeds+'</div></div>'); }
+        pop='<div class="pc-unlock"><div class="pd-head"><h3 class="pd-title pc-unlock-t">'+t.pcUnlockTitle+'</h3><button type="button" class="pd-btn" data-cancelunlock="1">✕</button></div>'+
+          '<div class="pc-unlock-txt">'+t.pcUnlockTxt+'</div>'+
+          (cost?'<div class="cp-mats-lbl disp pc-req">'+t.pcReqLbl+'</div><div class="pc-mats">'+mats.join('')+'</div>':'')+
+          '<button type="button" class="pc-unlock-go'+(ok?'':' off')+'" data-unlock="'+i+'"'+(ok?'':' disabled')+'>'+
+            (ok?'<span>🔓</span>':'<img src="'+SB_ICONS.lock+'" alt="">')+'<span class="disp">'+(cost?t.pcUnlockBtn:t.pcUnlockFreeBtn)+'</span></button></div>';
       }
+      barsHtml='<div class="pc-lockwrap">'+pop+'<button type="button" class="pc-lockbtn" data-plotcard="'+i+'" title="'+t.pcLockedTitle+'"><img src="'+(ok?SB_ICONS.lockOpen:SB_ICONS.lock)+'" alt=""></button></div>';
     }else{
       const p=S.plants[i];
       if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
@@ -4460,7 +4468,7 @@ function init(){
   });
   $('plotCards').addEventListener('click',e=>{
     const q=sel=>e.target.closest&&e.target.closest(sel);
-    if(q('.pc-details')||q('[data-bars]')) e.stopPropagation(); // keep the document-level "close every fold" from undoing what this click opens
+    if(q('.pc-details')||q('[data-bars]')||q('.pc-lockwrap')) e.stopPropagation(); // keep the document-level "close every fold" from undoing what this click opens
     const bars=q('[data-bars]'); if(bars){ const i=+bars.dataset.bars; if(i!==S.sel) selectPot(i); _detailsSlot=(_detailsSlot===i?-1:i); _detailsEditing=false; renderPlotCards(); return; }
     if(q('[data-detclose]')){ closeDetails(); return; }
     const rn=q('[data-detrename]'); if(rn){ _detailsEditing=true; renderPlotCards(); return; }
