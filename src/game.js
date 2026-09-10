@@ -4488,7 +4488,8 @@ function init(){
   { const rs=document.documentElement&&document.documentElement.style; if(rs&&rs.setProperty){ // the design's cursors, hotspots as in its CSS
       rs.setProperty('--cur-hand',"url('"+__ASSET__('cursor-hand-default.png')+"') 22 3, auto");
       rs.setProperty('--cur-click',"url('"+__ASSET__('cursor-click.png')+"') 22 3, pointer");
-      rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer"); } }
+      rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer");
+      rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 20 20, pointer"); } }
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / double-click to water or harvest) — even the only one
     const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
