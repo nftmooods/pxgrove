@@ -4121,6 +4121,24 @@ function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++)
 const DIRT_HOLE_SRC=__ASSET__('icon-dirt-hole.png'); // a harvested plant leaves this little hole where the seed hint used to sit
 let _dirtHoleImg=null;
 function dirtHoleImage(){ if(!_dirtHoleImg){ _dirtHoleImg=new Image(); _dirtHoleImg.src=DIRT_HOLE_SRC; _dirtHoleImg.onload=()=>render(true); } return _dirtHoleImg.complete&&_dirtHoleImg.naturalWidth?_dirtHoleImg:null; }
+const DEAD_PLANT_SRC=__ASSET__('plant-dead.png'); // withered stems + fallen dry leaves, same shared canvas/anchor as the 13 growth frames
+let _deadPlantImg=null;
+function deadPlantImage(){ if(!_deadPlantImg){ _deadPlantImg=new Image(); _deadPlantImg.src=DEAD_PLANT_SRC; _deadPlantImg.onload=()=>render(true); } return _deadPlantImg.complete&&_deadPlantImg.naturalWidth?_deadPlantImg:null; }
+// wilted stand-ins for a critically thirsty (but not yet dead) plant — only 6 of the 13 growth frames got one, so every
+// stage borrows its nearest neighbour's dehydrated look (ties resolved toward the lower/earlier frame).
+const DEHYDRATED_SPRITES={
+  sprout:__ASSET__('plant-dehydrated-02.png'), germ:__ASSET__('plant-dehydrated-03.png'), germ2:__ASSET__('plant-dehydrated-03.png'),
+  young:__ASSET__('plant-dehydrated-05.png'), young2:__ASSET__('plant-dehydrated-05.png'),
+  mature1:__ASSET__('plant-dehydrated-07.png'), bud1:__ASSET__('plant-dehydrated-07.png'), bud2:__ASSET__('plant-dehydrated-09.png'),
+  bloom1:__ASSET__('plant-dehydrated-09.png'), bloom2:__ASSET__('plant-dehydrated-11.png'), bloom3:__ASSET__('plant-dehydrated-11.png'),
+  bloomfull:__ASSET__('plant-dehydrated-11.png'), // no entry for 'seed' — nothing to wilt yet, it stays as the plain seed
+};
+let _dehydratedImgs={};
+function dehydratedImage(stage){ const src=DEHYDRATED_SPRITES[stage]; if(!src)return null;
+  if(!_dehydratedImgs[stage]){ const im=new Image(); im.src=src; im.onload=()=>render(true); _dehydratedImgs[stage]=im; }
+  const im=_dehydratedImgs[stage]; return im.complete&&im.naturalWidth?im:null;
+}
+const DEHYDRATE_WARN=0.10; // matches the hydration bar's own red-warning threshold elsewhere
 const PLANT_SPRITE_SCALE=0.67; // the painted growth sprites were reading too large against the bed — shrunk by about a third, still anchored on the same soil point
 const PLANT_STAGE_SPRITES={ // 13 hand-painted frames (Martin's Sprite-Seed_01..13) — a much finer run-up than the original 6
   seed:__ASSET__('plant-seed.png'),
@@ -4323,10 +4341,22 @@ function drawOne(x,idx,slot){
     else{ px(topX,soilY-1,'#c9cbcc'); px(topX,soilY-2,'#9b9ea0'); const r3=mulberry32(p.seed+3); for(let i=0;i<4;i++) px(potX0+2+Math.floor(r3()*(potW-4)),soilY-1,v.accent); } // fallback while it loads
     return;
   }
-  if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
-    const stage=plantSpriteStage(P), img=plantStageImage(stage);
+  if(mat==='ground'&&p.dead){ // withered: Martin's dead-plant art, same shared anchor as the growth frames — no more grey procedural stem
+    const img=deadPlantImage();
     if(img&&_slotBaseXform){
-      const realSlot=slot==null?idx:slot, al=PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5};
+      const realSlot=slot==null?idx:slot, al=PLANT_STAGE_ALIGN_SHARED;
+      const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch()*PLANT_SPRITE_SCALE, dH=dW*(img.naturalHeight/img.naturalWidth);
+      x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
+      x.drawImage(img,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
+      x.restore();
+      return;
+    }
+  }
+  if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
+    const stage=plantSpriteStage(P);
+    const wilted=hyd<DEHYDRATE_WARN, img=(wilted&&dehydratedImage(stage))||plantStageImage(stage); // critically thirsty: swap in the wilted look for this stage, once it's loaded
+    if(img&&_slotBaseXform){
+      const realSlot=slot==null?idx:slot, al=(img===dehydratedImage(stage))?PLANT_STAGE_ALIGN_SHARED:(PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5});
       // gy = the root point on the soil (Martin's dot markers, ~16 base px below the seed's centre so the seed lands ON the dot); the mound's bottom sits there for every stage
       const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch()*PLANT_SPRITE_SCALE, dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
