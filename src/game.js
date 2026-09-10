@@ -462,7 +462,8 @@ en:{
   rBaseNm:'Basic tools', rGoBtn:'Research', rFootPts:'coins available for research',
   rFootHint:'Unlock the tiers in order — every block of a tier opens the next one.',
   badgesTitle:'Badges', badgeUnlocked:'Badge unlocked', badgeLocked:'not earned yet', questsBtn:'Quests',
-  mlTime:'Speed', mlLang:'Language', mlInfo:'Info',
+  mlTime:'Speed', mlLang:'Language', mlInfo:'Info', mlDay:'Day / night',
+  dayClock:'Real clock', dayAlways:'Always day',
   potPickTitle:nm=>'Install: '+nm+' — pick a pot', potN:n=>'Pot '+n,
   slotPickTitle:nm=>'Place: '+nm+' — pick a slot', matPickOk:'click to change this pot to that material', slotN:n=>'Slot '+n, slotEmpty:'free slot', slotPickOk:'click to place the pot here', slotPickTaken:'a pot already stands here',
   zonePickTitle:nm=>'Install: '+nm+' — pick a zone', zonePickOk:'click to install in this zone', zoneGenLvl:l=>'generator lvl '+l, zoneLbl:'Zone',
@@ -751,7 +752,8 @@ fr:{
   rBaseNm:'Outils de base', rGoBtn:'Rechercher', rFootPts:'pièces disponibles pour la recherche',
   rFootHint:'Débloque les paliers dans l\'ordre — tous les blocs d\'un palier ouvrent le suivant.',
   badgesTitle:'Badges', badgeUnlocked:'Badge débloqué', badgeLocked:'pas encore obtenu', questsBtn:'Quêtes',
-  mlTime:'Vitesse', mlLang:'Langue', mlInfo:'Infos',
+  mlTime:'Vitesse', mlLang:'Langue', mlInfo:'Infos', mlDay:'Jour / nuit',
+  dayClock:'Heure réelle', dayAlways:'Toujours jour',
   potPickTitle:nm=>'Installer : '+nm+' — choisis un pot', potN:n=>'Pot '+n,
   slotPickTitle:nm=>'Poser : '+nm+' — choisis un emplacement', matPickOk:'clique pour passer ce pot dans cette matière', slotN:n=>'Emplacement '+n, slotEmpty:'emplacement libre', slotPickOk:'clique pour poser le pot ici', slotPickTaken:'un pot occupe déjà cet emplacement',
   zonePickTitle:nm=>'Installer : '+nm+' — choisis une zone', zonePickOk:'clique pour installer dans cette zone', zoneGenLvl:l=>'générateur niv. '+l, zoneLbl:'Zone',
@@ -847,7 +849,7 @@ function freshInv(){
           genLvlAt:Array(9).fill(0), energyAt:Array(9).fill(0)};
 }
 function freshState(){
-  return { normie:null, plants:[null], sel:0, mode:'real', lang:'en', lastTs:Date.now(), inv:freshInv(),
+  return { normie:null, plants:[null], sel:0, mode:'real', dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
     almanac:{seen:{}, totalHarvests:0, bestHarvestPx:0, plantsLost:0},
     daily:null, streak:{count:0, lastCounted:'', joker:1, jokerWeek:''},
     stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tutoSeen:false, tuto2Seen:false, tuto3Seen:false, tuto4Seen:false, tuto5Seen:false, tuto6Seen:false, balV:2 };
@@ -895,6 +897,7 @@ function load(){
       if(typeof S.inv[k]!=='number') S.inv[k]=0;
     if(!['hands','uproot','shears','gloves'].includes(S.inv.equip)) S.inv.equip='hands';
     if(!['hands','uproot'].includes(S.inv.equip)&&!S.inv.tools[S.inv.equip]) S.inv.equip='hands'; // uproot is never a craftable tool — never gated on ownership
+    if(!['clock','always-day'].includes(S.dayMode)) S.dayMode='clock';
     if(typeof S.inv.dripOn!=='boolean') S.inv.dripOn=true;
     if(typeof S.inv.firstWoodGiven!=='boolean') S.inv.firstWoodGiven=((S.almanac&&S.almanac.totalHarvests>0)||!!S.inv.tools.workbench);
     if(typeof S.inv.cuts!=='number') S.inv.cuts=(S.almanac&&S.almanac.totalHarvests)||0;
@@ -3598,6 +3601,7 @@ function applyLangManual(){
 /* day / night follows the player's own clock (real local time, whatever the game speed):
    night 21:00 → 05:30, dawn until 07:00, dusk from 19:00 — the scene darkens with it and the header icon follows */
 function dayDarkness(d=new Date()){ // 0 = full daylight … 1 = night
+  if(S.dayMode==='always-day') return 0; // settings override: permanent daylight, real clock ignored
   const h=d.getHours()+d.getMinutes()/60;
   if(h>=21||h<5.5) return 1;
   if(h<7) return 1-(h-5.5)/1.5;
@@ -3629,6 +3633,7 @@ function setLang(l){
   $('btnFr').classList.toggle('on',l==='fr');
   $('tSub').textContent=t.sub;
   $('btnReal').textContent=t.real; $('btnFast').textContent=t.fast;
+  $('btnDayClock').textContent=t.dayClock; $('btnDayAlways').textContent=t.dayAlways; $('mlDay').textContent=t.mlDay;
   $('tPlantTitle').textContent=t.plantTitle;
   $('tPlantP1').innerHTML=t.plantP1C(C().token,C().idMax);
   $('normieId').placeholder='n° 0-'+C().idMax;
@@ -4427,6 +4432,12 @@ function setMode(m){
   $('btnFast').classList.toggle('on',m==='fast');
   save(); render(true);
 }
+function setDayMode(m){ // 'clock' follows the visitor's real local hour; 'always-day' pins the scene to full daylight
+  S.dayMode=m;
+  $('btnDayClock').classList.toggle('on',m==='clock');
+  $('btnDayAlways').classList.toggle('on',m==='always-day');
+  save(); render(true); updateWeatherClock();
+}
 
 /* ── Init ── */
 function init(){
@@ -4446,6 +4457,8 @@ function init(){
   $('btnBack').addEventListener('click',backToGarden);
   $('btnReal').addEventListener('click',()=>setMode('real'));
   $('btnFast').addEventListener('click',()=>setMode('fast'));
+  $('btnDayClock').addEventListener('click',()=>setDayMode('clock'));
+  $('btnDayAlways').addEventListener('click',()=>setDayMode('always-day'));
   $('btnEn').addEventListener('click',()=>setLang('en'));
   $('btnFr').addEventListener('click',()=>setLang('fr'));
   $('btnBook').addEventListener('click',()=>{ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); });
@@ -4622,6 +4635,8 @@ function init(){
   } else showScreen('start');
   $('btnReal').classList.toggle('on',S.mode==='real');
   $('btnFast').classList.toggle('on',S.mode==='fast');
+  $('btnDayClock').classList.toggle('on',S.dayMode==='clock');
+  $('btnDayAlways').classList.toggle('on',S.dayMode==='always-day');
   if(!S.introSeen) openIntro(); // first visit: explain the game
   setInterval(tick,250);
   setInterval(save,5000);
