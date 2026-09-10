@@ -314,7 +314,8 @@
   .plot-card .pc-unlock-btn:disabled{background:var(--line);color:var(--faint);cursor:not-allowed}
   .plot-card .pc-cancel-btn{font-family:inherit;font-size:.7rem;background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,.2);
     border-radius:99px;width:22px;height:22px;line-height:1;cursor:pointer}
-  #roomNav{position:absolute;right:8px;top:8px;display:flex;flex-direction:column;gap:6px;z-index:6;align-items:flex-end}
+  /* the top-right zone panel is retired from the interface: the sidebar's zone slot switches rooms (and opens the control desk) */
+  #roomNav{display:none!important}
   .zone-hd{display:flex;align-items:center;gap:6px;background:var(--panel-2);border:var(--px) solid var(--line);padding:5px 8px;max-width:260px}
   .zone-lbl{font-family:'Silkscreen',monospace;font-size:.55rem;color:var(--faint);text-transform:uppercase}
   .zone-nm{font-family:'Silkscreen',monospace;font-size:.68rem;color:var(--accent);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}

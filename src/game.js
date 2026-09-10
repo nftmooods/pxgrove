@@ -2569,6 +2569,7 @@ function sidebarClick(e){ // ONE delegated handler: survives re-renders, whole s
   const eq=q('[data-eq]');         if(eq){ e.stopPropagation(); selectEquip(eq.dataset.eq); return; }
   const wm=q('[data-wm]');         if(wm){ e.stopPropagation(); setWaterMode(wm.dataset.wm); return; }
   const rm=q('[data-room]');       if(rm){ e.stopPropagation(); gotoRoom(+rm.dataset.room); return; }
+  const ct=q('[data-ctrl]');       if(ct){ e.stopPropagation(); sbOpen.room=false; controlView=true; _navSig=''; _ctrlSig=''; _ctrlEditing=false; render(true); return; }
   const dt=q('[data-driptoggle]'); if(dt){ e.stopPropagation(); S.inv.dripOn=!(S.inv.dripOn!==false); save(); renderSidebar(); renderHotbar();
     const tn=T().recipes[S.inv.dripElecCount>0?'dripElec':(S.inv.dripPlusCount>0?'dripPlus':'drip')].nm;
     showToast((S.inv.dripOn!==false?'✓ ':'⏸ ')+tn); return; }
@@ -2662,6 +2663,7 @@ function renderSidebar(){
         items+='<span class="slot mini dis lockslot" data-golock="room" data-tip="'+tip(vis?t.recipes.room.nm:'❓ ???',(vis?t.tipCraftable:t.tipLocked))+'" role="button" tabindex="0">'+
           sbIc('room','🏠')+'<span class="qty disp">R'+(r+1)+'</span><img class="lockmark" src="'+(vis?SB_ICONS.lockOpen:SB_ICONS.lock)+'" alt=""></span>'; }
     }
+    if(deskAt()) items+='<span class="slot mini owned'+(controlView?' sel':'')+'" data-ctrl="1" data-tip="'+tip(t.ctrlTitle,'')+'" role="button" tabindex="0"><span class="sbem">🖥️</span><span class="qty disp">CTRL</span></span>';
     sbGroup(box,'room',sbIc('room','🏠'),tip(t.zoneLbl,roomName(curRoom)),items,'<span class="qty disp">R'+(curRoom+1)+'</span>');
   }
 }
