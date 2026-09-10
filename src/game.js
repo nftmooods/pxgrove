@@ -494,7 +494,7 @@ en:{
   soilNone:'No soil in stock — next planting in plain dirt.',
   noSeed:'No seed available — harvest a plant first.',
   noFreePot:'All pots are busy — harvest a plant first.',
-  potLbl:(i,n)=>'Pot '+(i+1)+'/'+n, potDefault:n=>'Pot '+n,
+  potLbl:(i,n)=>'Pot '+(i+1)+'/'+n, potDefault:n=>'Pot '+n, seedDefault:n=>'Seed '+n,
   emptyTitle:'Empty pot', emptyNotice:'This pot is empty — <b>Replant</b> a seed here.',
   badgeSoil:'🪴 soil applied', badgeFert:t=>'🧪 fertilizer '+t+' left', badgeFertPlus:t=>'💠 enriched fert. '+t+' left',
   badgeFertX:(ic,pct,t)=>ic+' +'+pct+'% growth \u00b7 '+t+' left',
@@ -782,7 +782,7 @@ fr:{
   soilNone:'Pas de terreau en stock — prochaine plantation en terre nue.',
   noSeed:'Pas de graine disponible — récolte d\'abord une plante.',
   noFreePot:'Tous les pots sont occupés — récolte d\'abord une plante.',
-  potLbl:(i,n)=>'Pot '+(i+1)+'/'+n, potDefault:n=>'Pot '+n,
+  potLbl:(i,n)=>'Pot '+(i+1)+'/'+n, potDefault:n=>'Pot '+n, seedDefault:n=>'Seed '+n,
   emptyTitle:'Pot vide', emptyNotice:'Ce pot est vide — <b>Replanter</b> une graine ici.',
   badgeSoil:'🪴 terreau appliqué', badgeFert:t=>'🧪 engrais '+t+' restant', badgeFertPlus:t=>'💠 engrais enrichi '+t+' restant',
   badgeFertX:(ic,pct,t)=>ic+' +'+pct+'\x20% pousse \u00b7 '+t+' restant',
@@ -3700,6 +3700,7 @@ function viewSlots(){ return ROOM_SLOTS; } // the stage always shows ONE room of
 function potShift(){ return 0; } // slots have fixed positions: a pot is drawn where its slot is
 function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function deskAt(){ return (S.inv.controlDesk||0)>=1; } // the control desk is a Layout build, crafted like a room
+function plantName(i){ const n=(S.inv.potNames||[])[i]; return (n&&String(n).trim())||T().seedDefault(i%ROOM_SLOTS+1); } // the details popup title: custom name, else Seed 1/2/3
 function potName(i){ const n=(S.inv.potNames||[])[i]; return (n&&String(n).trim())||(isGround(i)?T().plotDefault(i+1):T().potDefault(i+1)); }
 function roomName(r){ const n=(S.inv.roomNames||[])[r]; return (n&&String(n).trim())||T().roomN(r+1); }
 function renameRoom(r,nm){
@@ -3939,11 +3940,11 @@ function detailsHtml(i,p){
   const pct=x=>Math.round(x*100)+'%';
   const bar=(lbl,cls,val)=>'<div class="pd-row"><div class="pd-lbl">'+lbl+'</div><div class="pd-barrow"><span class="pd-track"><span class="pd-fill '+cls+'" style="width:'+pct(val)+'"></span></span><span class="pd-pct disp">'+pct(val)+'</span></div></div>';
   const head=_detailsEditing
-    ? '<input class="pd-input disp" data-detinput="1" maxlength="18" value="'+esc((S.inv.potNames||[])[i]||'')+'" placeholder="'+esc(potName(i))+'" aria-label="'+esc(t.stFlowers)+'"><button type="button" class="pd-btn" data-detok="'+i+'">OK</button>'
-    : '<h3 class="pd-title disp">'+esc(vName(v))+'</h3><button type="button" class="pd-btn ghost" data-detrename="'+i+'" title="✎">✎</button>';
+    ? '<input class="pd-input disp" data-detinput="1" maxlength="18" value="'+esc((S.inv.potNames||[])[i]||'')+'" placeholder="'+esc(plantName(i))+'" aria-label="'+esc(t.stFlowers)+'"><button type="button" class="pd-btn" data-detok="'+i+'">OK</button>'
+    : '<h3 class="pd-title disp">'+esc(plantName(i))+'</h3><button type="button" class="pd-btn ghost" data-detrename="'+i+'" title="✎">✎</button>';
   return '<div class="pc-details" data-details="'+i+'">'+
     '<div class="pd-head"><span class="pd-ic">🌱</span>'+head+'<button type="button" class="pd-btn" data-detclose="1">✕</button></div>'+
-    '<div class="pd-sub">'+esc(potName(i))+' · '+esc(phaseName(p,Pv))+'</div>'+
+    '<div class="pd-sub">'+esc(vName(v))+' · '+esc(phaseName(p,Pv))+'</div>'+
     bar(t.hydration,'hyd'+(Hv<0.10?' warn':''),Hv)+bar(t.growth,'grow',Pv)+
     '<div class="pd-sep"></div>'+
     '<div class="pd-stats"><div class="pd-stat"><span class="pd-stat-ic">🌸</span><div><div class="pd-stat-k">'+t.stFlowers+'</div><div class="pd-stat-v disp">'+p.pending.length+' / '+cap+'</div></div></div>'+
