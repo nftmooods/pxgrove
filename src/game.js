@@ -298,7 +298,7 @@ en:{
   waterHand:'💧 Water by hand (50%)', waterBucket:'🪣 Water (bucket, 100%)', waterAll:'🚿 Water all pots (100%)',
   harvest:'✂ Harvest & grind', harvestDead:'🪵 Collect dead wood', deadWoodNotice:(n,w,sd)=>'🪵 Dead '+n+': <b>'+w+' wood</b>'+(sd?' · <b>1 seed</b>':'')+' — pot free', harvestShears:'✂️ Harvest (shears)', harvestGloves:'🧤 Harvest (gloves)',
   equipTitle:'Active gear', equipHarvest:'Harvest tool — click to switch', equipWater:'Watering gear',
-  equipHands:'Bare hands', invMore:'Expand inventory ▾', invLess:'Collapse inventory ▴',
+  equipHands:'Bare hands', equipUproot:'Uproot', invMore:'Expand inventory ▾', invLess:'Collapse inventory ▴',
   bookSearchPh:'Search…', fltOwned:'🎒 Owned', fltHide:'Hide ❓', tierAll:'All',
   catAll:'🔨 All', craftSub:'Craft useful items for your garden', craftInfo:'ℹ️ Unlock new recipes in the 🧪 Laboratory!',
   craftOnce:'Craftable once', craftMats:'REQUIRED MATERIALS', craftNone:'No recipe matches these filters.',
@@ -306,6 +306,7 @@ en:{
   invSort:'Name', invCats:{all:'All',ess:'Essentials',cult:'Growing',min:'Minerals',craft:'Craft',spec:'Special'},
   seedsGroup:'Special seeds', invBtn:'🎒 Inventory',
   tipHands:'Standard harvest — normal wood, plant is cut.',
+  tipUproot:'Pull the plant out right away, at any stage — a smaller, partial payout, but the pot is free again immediately. Never locked.',
   tipHandWater:'Free at the river — fills the tank to 50% only.',
   tipFertGroup:'Click a fertilizer to use it on the selected plant.',
   tipLocked:'🔒 Locked — click to open the Laboratory and research it.',
@@ -586,7 +587,7 @@ fr:{
   waterHand:'💧 Arroser à la main (50 %)', waterBucket:'🪣 Arroser (seau, 100 %)', waterAll:'🚿 Arroser tous les pots (100 %)',
   harvest:'✂ Récolter et broyer', harvestDead:'🪵 Récolter le bois mort', deadWoodNotice:(n,w,sd)=>'🪵 '+n+' morte : <b>'+w+' bois</b>'+(sd?' · <b>1 graine</b>':'')+' — pot libre', harvestShears:'✂️ Récolter (pince)', harvestGloves:'🧤 Récolter (gants)',
   equipTitle:'Équipement actif', equipHarvest:'Outil de récolte — clique pour changer', equipWater:'Matériel d\'arrosage',
-  equipHands:'Mains nues', invMore:'Étendre l\'inventaire ▾', invLess:'Replier l\'inventaire ▴',
+  equipHands:'Mains nues', equipUproot:'Arracher', invMore:'Étendre l\'inventaire ▾', invLess:'Replier l\'inventaire ▴',
   bookSearchPh:'Rechercher…', fltOwned:'🎒 Possédés', fltHide:'Masquer ❓', tierAll:'Tout',
   catAll:'🔨 Tous', craftSub:'Créez des objets utiles pour votre jardin', craftInfo:'ℹ️ Débloquez de nouvelles recettes dans le 🧪 Laboratoire !',
   craftOnce:'Fabricable une seule fois', craftMats:'MATÉRIAUX REQUIS', craftNone:'Aucune recette ne correspond à ces filtres.',
@@ -594,6 +595,7 @@ fr:{
   invSort:'Nom', invCats:{all:'Toutes',ess:'Essentielles',cult:'Culture',min:'Minéraux',craft:'Craft',spec:'Spéciales'},
   seedsGroup:'Graines spéciales', invBtn:'🎒 Inventaire',
   tipHands:'Récolte standard — bois normal, la plante est coupée.',
+  tipUproot:'Arrache la plante immédiatement, à tout stade — un gain plus faible et partiel, mais le pot se libère aussitôt. Jamais verrouillé.',
   tipHandWater:'Gratuit à la rivière — ne remplit le réservoir qu\'à 50 %.',
   tipFertGroup:'Clique un engrais pour l\'utiliser sur la plante sélectionnée.',
   tipLocked:'🔒 Verrouillé — clique pour ouvrir le Laboratoire et le rechercher.',
@@ -891,8 +893,8 @@ function load(){
     for(const k of Object.keys(fresh.tools)) if(typeof S.inv.tools[k]!=='boolean') S.inv.tools[k]=false;
     for(const k of ['compost','coins','hybridBloom','hybridTimber','fertHuman','fertZombie','fertAgent','fertCat','fertAlien'])
       if(typeof S.inv[k]!=='number') S.inv[k]=0;
-    if(!['hands','shears','gloves'].includes(S.inv.equip)) S.inv.equip='hands';
-    if(S.inv.equip!=='hands'&&!S.inv.tools[S.inv.equip]) S.inv.equip='hands';
+    if(!['hands','uproot','shears','gloves'].includes(S.inv.equip)) S.inv.equip='hands';
+    if(!['hands','uproot'].includes(S.inv.equip)&&!S.inv.tools[S.inv.equip]) S.inv.equip='hands'; // uproot is never a craftable tool — never gated on ownership
     if(typeof S.inv.dripOn!=='boolean') S.inv.dripOn=true;
     if(typeof S.inv.firstWoodGiven!=='boolean') S.inv.firstWoodGiven=((S.almanac&&S.almanac.totalHarvests>0)||!!S.inv.tools.workbench);
     if(typeof S.inv.cuts!=='number') S.inv.cuts=(S.almanac&&S.almanac.totalHarvests)||0;
@@ -1780,7 +1782,7 @@ function tryCraft(keysIn){ // ingredient KINDS only — quantities never matter 
   return {ok:true,crafted:false,recipe:target}; // revealed, not yet affordable
 }
 function cycleEquip(){
-  const opts=['hands'];
+  const opts=['hands','uproot'];
   if(S.inv.tools.shears)opts.push('shears');
   if(S.inv.tools.gloves)opts.push('gloves');
   const i=opts.indexOf(S.inv.equip);
@@ -2310,10 +2312,10 @@ function renderHudTop(changed){
 function renderWorkshop(){ renderBook(); renderHotbar(); renderInventory(); renderGen(); renderSidebar(); }
 /* ── Active gear hotbar ── */
 function selectEquip(k){
-  if(k!=='hands'&&!S.inv.tools[k])return;
+  if(!['hands','uproot'].includes(k)&&!S.inv.tools[k])return; // uproot is never a craftable tool — never gated on ownership
   S.inv.equip=k;
   save(); renderSidebar(); renderHotbar(); render(true);
-  showToast('✓ '+(k==='hands'?T().equipHands:T().recipes[k].nm));
+  showToast('✓ '+(k==='hands'?T().equipHands:k==='uproot'?T().equipUproot:T().recipes[k].nm));
 }
 function renderHotbar(){
   const t=T(), box=$('hotbar'); box.innerHTML='';
@@ -2527,7 +2529,7 @@ let sbOpen={harv:false,water:false,fert:false,room:false};
 const WATER_ICONS={hand:'✋',bucketWood:'🪣',bucketMetal:'🪣',arrosoir:'🚿'};
 // painted icons from the Claude Design handoff (downscaled to 128px). Anything without an entry falls back to its emoji.
 const SB_ICONS={
-  hands:__ASSET__('icon-hand.png'), shears:__ASSET__('icon-cut-tools.png'), shearsUp2:__ASSET__('icon-cut-tools.png'),
+  hands:__ASSET__('icon-hand.png'), uproot:__ASSET__('icon-uproot.png'), shears:__ASSET__('icon-cut-tools.png'), shearsUp2:__ASSET__('icon-cut-tools.png'),
   gloves:__ASSET__('icon-gant.png'), glovesUp2:__ASSET__('icon-gant.png'),
   hand:__ASSET__('icon-water-bowl.png'), bucketWood:__ASSET__('icon-seau.png'), bucketMetal:__ASSET__('icon-seau.png'),
   arrosoir:__ASSET__('icon-arrosoire.png'), drip:__ASSET__('icon-goutte.png'), dripPlus:__ASSET__('icon-goutte.png'), dripElec:__ASSET__('icon-goutte.png'),
@@ -2585,7 +2587,7 @@ function renderSidebar(){
   const t=T(), box=$('stageSidebar'); if(!box)return; box.innerHTML='';
   const p=selPlant();
   // ✂ harvest tools — same 3 groups whatever is unlocked; missing items fold away with a padlock
-  const harvOpts=[['hands','✋',t.equipHands,t.tipHands]];
+  const harvOpts=[['hands','✋',t.equipHands,t.tipHands],['uproot','🪴',t.equipUproot,t.tipUproot]]; // uproot sits right after bare hands — always available, never locked
   if(S.inv.tools.shears){
     const s2=S.inv.tools.shearsUp2; // the level-II upgrade lives on the same slot
     harvOpts.push(['shears',s2?'✂️²':'✂️',(s2?t.recipes.shearsUp2.nm:t.recipes.shears.nm),(s2?t.recipes.shearsUp2.fx:t.recipes.shears.fx)]);
@@ -4499,16 +4501,18 @@ function init(){
       rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 22 22, pointer"); // 44px, same scale as the design's own cursors above
       rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 22 22, pointer");
       rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 22 22, pointer");
-      rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 22 22, pointer"); } }
+      rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-tool-uproot',"url('"+__ASSET__('cursor-tool-uproot.png')+"') 22 22, pointer"); } }
   const TOOL_CURSOR_VAR={hands:'--cur-tool-hands',shears:'--cur-tool-shears',gloves:'--cur-tool-gloves'};
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water / double-click to harvest) — even the only one
     const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
     const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
     const p=onPlant?S.plants[i]:null;
+    const uprootReady=p&&S.inv.equip==='uproot'; // uproot tool active: a click pulls the plant out at any growth stage, so it always takes over the cursor here
     const readyToHarvest=p&&!p.dead&&!p.cut&&p.pending.length>=flowerCap(p,i); // full bloom: the active harvest tool is what a double-click actually uses here
     const emptyReady=cardsOn&&!onPlant&&i>=0&&hasPot(i)&&!S.plants[i]&&roomOf(i)===curRoom&&emptyPlotZoneHit(i,e.clientX,e.clientY); // an empty, unlocked plot: the seed cursor, but only right over its own soil — everywhere else follows the game's usual cursor rules
-    e.currentTarget.style.cursor=onPlant?(readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // full of flowers: the equipped tool; otherwise the droplet (one click waters it)
+    e.currentTarget.style.cursor=onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the droplet (one click waters it)
       :emptyReady?'var(--cur-seed,pointer)'
       :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
@@ -4518,7 +4522,8 @@ function init(){
     if(hasPot(i)){
       const p=S.plants[i];
       if(i!==S.sel) selectPot(i);
-      if(p&&!p.dead&&!p.cut&&plantHitAt(i,e.clientX,e.clientY)) water(); // one click on the plant itself waters it — no double-click needed
+      if(p&&S.inv.equip==='uproot'&&plantHitAt(i,e.clientX,e.clientY)) uproot(); // the uproot tool: one click pulls the plant, at any stage — a smaller, partial payout (already how uproot() pays out), but the pot frees up right away
+      else if(p&&!p.dead&&!p.cut&&plantHitAt(i,e.clientX,e.clientY)) water(); // one click on the plant itself waters it — no double-click needed
       else if(!p&&cardsOn&&emptyPlotZoneHit(i,e.clientX,e.clientY)) replant(); // clicking an empty plot's own soil plants a seed, same as its name card
     }
     else if(e.detail<=1) unlockPlot(i); // a locked slot: unlock it (free for the first 2 of a room, priced beyond that) — mobile/control-desk views have no plot card to confirm through, so this is the direct path there
