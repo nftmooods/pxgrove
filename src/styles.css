@@ -179,9 +179,6 @@
       padding:12px 14px 10px;border-radius:0 0 12px 12px;pointer-events:none;
       background:linear-gradient(to top, rgba(15,16,14,.94) 0%, rgba(15,16,14,.8) 60%, rgba(15,16,14,0) 100%)}
     #belowStage>*{pointer-events:auto}
-    /* the overlay floats over a wide image now, not a narrow column — keep resources/plant card side by side
-       even in the tablet range, instead of the pre-overlay single-column stack that would push the plant card off-screen */
-    #belowStage .bottom{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
   }
   /* ── top bar: section tabs ── */
   .tabs{display:flex;align-items:stretch;gap:2px;flex:1 1 auto;justify-content:center;min-width:0;flex-wrap:wrap}
@@ -194,14 +191,7 @@
   .tab.on{color:var(--brand);border-color:var(--brand);background:rgba(255,255,255,.06)}
   .tab:focus-visible{outline:2px dashed var(--accent);outline-offset:2px}
   /* bottom row: resources (left) · plant card (right) */
-  .bottom{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:14px;margin-top:14px;align-items:stretch}
-  @media(max-width:1200px){.bottom{grid-template-columns:1fr}}
-  .restiles{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px;margin-top:10px}
-  .restiles .res{flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:10px 6px 8px;position:relative;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
-  .restiles .res:hover{background:rgba(255,255,255,.1)}
-  .restiles .res .ic{font-size:1.35rem;line-height:1}
-  .restiles .res .rv{position:absolute;right:6px;bottom:22px;margin:0;font-size:.62rem;background:rgba(0,0,0,.5);padding:1px 4px;border-radius:4px}
-  .restiles .res .rk{font-size:.56rem;margin-top:4px}
+  .bottom{margin-top:14px}
   /* compact resources in the header: icon + value, no label */
   .resstrip{display:flex!important;gap:0;margin:0;background:var(--panel-a);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:0 4px}
   .resstrip .res{background:transparent;border:none;padding:5px 7px;gap:4px;border-right:1px solid var(--line)}

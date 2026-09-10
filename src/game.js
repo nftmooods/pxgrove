@@ -2268,19 +2268,9 @@ function openResourcePage(k){ // a resource opens its page: coins→Market, seed
 const RES_KEYS=['coins','px','wood','stone','metal','mineral','seeds'];
 function resVal(k){ return k==='seeds'?totalBaseSeeds():(k==='coins'?fmtCoins(S.inv[k]):S.inv[k]); }
 function renderResources(flash){
-  const t=T();
   const sig=RES_KEYS.map(resVal).join(',');
   const changed=sig!==lastRes||flash;
-  if(changed){
-    lastRes=sig;
-    const box=$('resGrid'); box.innerHTML='';
-    for(const k of RES_KEYS){
-      const d=document.createElement('div'); d.className='res'; d.dataset.res=k;
-      d.title=t.res[k];
-      d.innerHTML='<span class="ic">'+t.resIc[k]+'</span><span class="rk">'+t.res[k]+'</span><span class="rv">'+resVal(k)+'</span>';
-      box.appendChild(d);
-    }
-  }
+  if(changed) lastRes=sig;
   renderHudTop(changed);
 }
 // player level/XP: entirely new (no such stat existed before) — derived from recipes discovered + badges earned,
@@ -3119,7 +3109,7 @@ const TUTO_STEPS=[
    close:()=>{ document.body.classList.remove('hamb-open'); }},
 ];
 const TUTO2_STEPS=[
-  {target:'resGrid', key:'w0'},
+  {target:'hudResStrip', key:'w0'},
   {target:'btnHarvest', key:'w0b'},
   {targetSel:'[data-rid="workbench"]', key:'w1',
    open:()=>{ bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=''; bookPage=0; openBook(); }},
@@ -3538,7 +3528,6 @@ function setLang(l){
   $('tGrowth').textContent=t.growth; $('tHydration').textContent=t.hydration;
   $('btnHarvest').textContent=t.harvest;
   $('tStFlowers').textContent=t.stFlowers; $('tStNext').textContent=t.stNext;
-  $('tResTitle').textContent=t.resTitle;
   $('tWorkshop').textContent=t.workshop; $('tWorkshopHint').textContent=t.workshopHint;
   $('tEquip').textContent=t.equipTitle;
   $('bookSearch').placeholder=t.bookSearchPh;
@@ -4238,7 +4227,6 @@ function init(){
   $('btnFr').addEventListener('click',()=>setLang('fr'));
   $('btnBook').addEventListener('click',()=>{ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); });
   $('btnBuild').addEventListener('click',()=>{ bookFilter.cat='build'; bookFilter.res=null; bookPage=0; openBook(); });
-  $('resGrid').addEventListener('click',e=>{ const cell=e.target.closest('[data-res]'); if(cell) openResourcePage(cell.dataset.res); });
   $('hudResStrip').addEventListener('click',e=>{
     const cell=e.target.closest('[data-res]'); if(cell){ closeMenu(); openResourcePage(cell.dataset.res); return; }
     if(e.target.closest('[data-resmore]')){ closeMenu(); openBook(); }
