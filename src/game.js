@@ -3993,9 +3993,10 @@ function renderPlotCards(){
     const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2;
     const growing=hasPot(i)&&S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut;
     const bareEmpty=hasPot(i)&&!S.plants[i]; // unlocked, no plant: the "Empty — Choose a seed" card sits exactly where the bars pill would
+    const inactiveHere=hasPot(i)&&S.plants[i]&&(S.plants[i].dead||S.plants[i].cut); // dead/harvested: same card spot too — every plot-card type lines up at one height
     let lockTop=TP.y-40; // fallback until the canvas has a real transform to measure against
     if(!hasPot(i)){ const hint=plantHintCss(k); if(hint) lockTop=hint.y-19; } // centre the 38px lock bubble on plot 1's own little seed dot, same height on every locked plot
-    const top=(growing||bareEmpty)?TP.y-13:(!hasPot(i)?lockTop:TP.y+3); // bars pill (and the empty card, same spot) straddles the soil's front edge; the padlock centres on the seed's own spot; dead/cut name cards just under the compartment
+    const top=(growing||bareEmpty||inactiveHere)?TP.y-13:(!hasPot(i)?lockTop:TP.y+3); // bars pill, empty card and dead/cut card all straddle the soil's front edge at the same height; the padlock centres on the seed's own spot
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
     if(!hasPot(i)){ // locked compartment (design): a round padlock on the soil; click → the "Unlock the plot" card above it
       nameCls='';
@@ -4017,7 +4018,7 @@ function renderPlotCards(){
       if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
       else{
         const v=vOf(p), Pv=progress(p), Hv=hydration(p), inactive=p.dead||p.cut;
-        if(inactive){ if(p.dead)nameCls+=' pc-dead'; nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>'; }
+        if(inactive){ nameCls+=' pc-inactive'+(p.dead?' pc-dead':''); nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>'; }
         else { nameCls=''; // a growing plant shows only its bars (design): 💧 then 🌱 — click them for the details popup
           barsHtml='<button type="button" class="pc-bars-widget'+(i===S.sel?' sel':'')+'" data-bars="'+i+'">'+
             '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.10?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+

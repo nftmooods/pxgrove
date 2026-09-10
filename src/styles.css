@@ -377,6 +377,8 @@
     padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))} /* same box as the growth-bars pill it replaces — same size, same spot */
   .plot-card .pc-name-card.locked:hover,.plot-card .pc-name-card.pc-empty:hover{border-color:rgba(255,255,255,.55)}
   .plot-card .pc-name-card.pc-dead{cursor:var(--cur-tool-uproot,pointer)} /* a dead plant: uprooting is the only thing left to do with it */
+  .plot-card .pc-name-card.pc-inactive{align-self:center;width:max-content;min-width:72px;max-width:none;border-radius:max(6px,calc(var(--cq) * .5));
+    padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))} /* dead/harvested card: same box as the bars pill and the empty card, so every plot-card type lines up */
   .plot-card .pc-lock-ic{font-size:1.3rem;line-height:1;margin-bottom:2px;opacity:.85}
   .plot-card .pc-confirm{display:flex;flex-direction:column;align-items:center;gap:6px}
   .plot-card .pc-confirm .pc-name{font-size:.66rem;font-weight:400;color:var(--muted);white-space:normal;text-align:center}
