@@ -4163,6 +4163,13 @@ function drawEmptySlot(x,slot){ // a locked slot (not yet unlocked): a padlock o
   x.fillText('🔒',cx,cy);
   x.textAlign='left'; x.textBaseline='alphabetic'; // restore the defaults other draw calls rely on
 }
+const PLANT_NIGHT_SHADE=[0.45,0.25,0.08]; // per in-room slot (0=left,1=middle,2=right — the lantern sits stage-right, so the left plant reads darkest at night): peak darkening once dayDarkness()/th.night hits 1
+function plantNightShade(x,realSlot,dx,dy,dw,dh){ // tint the just-drawn sprite pixels only (source-atop), scaled by real-clock night level
+  const k=Math.max(activeTheme().night?1:0,dayDarkness()); if(k<=0)return;
+  const slotK=((realSlot%ROOM_SLOTS)+ROOM_SLOTS)%ROOM_SLOTS;
+  const a=k*PLANT_NIGHT_SHADE[slotK]; if(a<=0)return;
+  x.save(); x.globalCompositeOperation='source-atop'; x.fillStyle='rgba(4,8,20,'+a.toFixed(3)+')'; x.fillRect(dx,dy,dw,dh); x.restore();
+}
 function drawOne(x,idx,slot){
   const ox=slotOxCells(slot==null?idx:slot);
   const p=S.plants[idx]||null;
@@ -4281,6 +4288,7 @@ function drawOne(x,idx,slot){
       const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
       x.drawImage(img,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
+      plantNightShade(x,realSlot,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
       x.restore();
       return;
     }
@@ -4297,6 +4305,7 @@ function drawOne(x,idx,slot){
       const dWc=potW*1.2, dHc=dWc*(sH/sW);
       x.imageSmoothingEnabled=true;
       x.drawImage(img,0,0,sW,sH,(ox+topX-dWc/2)*CELL,(soilY-dHc)*CELL,dWc*CELL,dHc*CELL);
+      plantNightShade(x,slot==null?idx:slot,(ox+topX-dWc/2)*CELL,(soilY-dHc)*CELL,dWc*CELL,dHc*CELL);
       return;
     }
   }
