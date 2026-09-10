@@ -4142,11 +4142,12 @@ const PLANT_STAGE_SPRITES={ // 13 hand-painted frames (Martin's Sprite-Seed_01..
 // with the SAME rectangle for every frame) — so a frame's own pixel size already IS its true relative size: nothing is
 // individually stretched or shrunk to fit a common box, the plant simply grows larger across the same-sized frames.
 const PLANT_STAGE_MOUND_FRAC={sprout:0.87,germ:0.871,germ2:0.86,young:0.854,young2:0.866,mature1:0.842,bud1:0.855,bud2:0.885,bloom1:0.85,bloom2:0.89,bloom3:0.89,bloomfull:0.89};
-// where each sprite's mound sits inside the shared canvas (bottom-most opaque row / horizontal centre near it) — all
-// close together since it's the same ground line throughout, confirming the frames are a consistent, unscaled sequence.
-const PLANT_STAGE_ALIGN={seed:{b:0.898,cx:0.503},sprout:{b:0.894,cx:0.475},germ:{b:0.898,cx:0.468},germ2:{b:0.907,cx:0.446},
-  young:{b:0.899,cx:0.495},young2:{b:0.912,cx:0.486},mature1:{b:0.908,cx:0.496},bud1:{b:0.918,cx:0.537},bud2:{b:0.898,cx:0.49},
-  bloom1:{b:0.904,cx:0.498},bloom2:{b:0.902,cx:0.53},bloom3:{b:0.902,cx:0.53},bloomfull:{b:0.902,cx:0.53}};
+// where the soil mound sits inside the shared canvas: ONE point, not measured per frame. A per-frame bottom-most-pixel
+// scan picks up noise (a drooping leaf tip, a shadow blur) that drifts a few % between frames and reads as misalignment;
+// scanning for the actual soil/mound band instead (brown or the pale root-burst, excluding leaf green) lands within 2%
+// of the same row on all 13 source frames — so every stage shares this single anchor and the plant never wobbles.
+const PLANT_STAGE_ALIGN_SHARED={b:0.896,cx:0.482};
+const PLANT_STAGE_ALIGN=Object.fromEntries(Object.keys(PLANT_STAGE_SPRITES).map(k=>[k,PLANT_STAGE_ALIGN_SHARED]));
 let _plantStageImgs={};
 function plantSpriteStage(P){ // which of the 13 frames covers this growth fraction — vegetative stages 1-9 fill 0→80% (matching BLOOM_P), the 4 flowering frames split the last 20%
   if(P<0.05)return'seed'; if(P<0.12)return'sprout'; if(P<0.20)return'germ'; if(P<0.29)return'germ2';
