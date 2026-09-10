@@ -410,8 +410,8 @@ en:{
     next:'Next ▸', skip:'Skip', done:'Let\'s grow! ✓',
     t0:'🌱 Welcome! PxGrove is a <b>BETA</b>: a chance to discover the mechanics, hunt down recipes… and simply have a good time watching your cultures grow. For now your save lives in this browser\'s cache — a login / wallet-connect system may come later.',
     t1:'Here is <b>your pot</b>, with your plant inside — it has already started growing!',
-    t2:'The <b>water button</b>. Come back from time to time: without water, your plant will die of thirst.',
-    t3:'The <b>harvest button</b> activates once the plant reaches maturity: you collect the flowers and the wood, and flowers grind into <b>pixels</b> — the resource that crafts your upgrades.',
+    t2:'<b>Double-click the plant</b> to water it. Come back from time to time: without water, your plant will die of thirst.',
+    t3:'Once the plant is mature and full of flowers, <b>double-clicking it harvests</b>: you collect the flowers and the wood, and flowers grind into <b>pixels</b> — the resource that crafts your upgrades.',
     tw:'The <b>Workshop</b>: this panel gathers everything you can open — Crafting, Layout, the Market, the Laboratory, the Almanac and your Seeds. Let\'s look at the two main ones.',
     t4:'The <b>Laboratory</b>: run research first — then the crafting tables (Crafting / Layout) fill up with recipes you can build.',
     t5:'<b>Crafting</b>: grind your flowers into pixels, collect wood, and build tools, machines and rooms — every unlocked recipe opens new possibilities.',
@@ -419,7 +419,7 @@ en:{
     w1:'Time to build the <b>Workbench</b>: 20 wood. It unlocks every other recipe in the game.',
     w2:'Press <b>Craft</b> as soon as you have the wood — then harvest again: every cycle funds the next machine. 🌱',
     t6:'Up here: every day three <b>quests</b> (🗓️) await you, and your feats fill the <b>Badges</b> (🏅) — they will unlock rewards in the final version. Thanks for trying PxGrove… have a great game! 🌱',
-    w0b:'This button harvests. From <b>80% growth</b>, once the first flowers are out, you can already harvest — but the plant gives <b>fewer resources</b>. At <b>100% with every flower</b>, the yield is at its best.',
+    w0b:'Double-clicking a plant full of flowers harvests it. From <b>80% growth</b>, once the first flowers are out, you can already harvest — but the plant gives <b>fewer resources</b>. At <b>100% with every flower</b>, the yield is at its best.',
     g0:'<b>80% grown!</b> Remember: <b>double-click the pot</b> to water the plant at any moment of its growth.',
     g1:'The same double-click <b>harvests</b> — but <b>only at 100% growth with every flower out</b>. Until then it just waters.',
     h0:'<b>Second harvest: 2 seeds!</b> From now on you can also plant <b>straight in the ground</b>: click a <b>free slot</b> (dotted footprint) and pick a seed — no pot needed.',
@@ -693,8 +693,8 @@ fr:{
     next:'Suivant ▸', skip:'Passer', done:'C\'est parti ! ✓',
     t0:'🌱 Bienvenue ! PxGrove est une <b>BÊTA</b> : l\'occasion de découvrir les mécaniques, dénicher les recettes… et surtout passer un chouette moment à voir grandir tes cultures. Pour le moment la sauvegarde se fait dans le cache de ce navigateur — un système de login / wallet connect pourrait être implanté par la suite.',
     t1:'Ici, <b>ton pot</b>, avec ta plante dedans — elle a déjà commencé à pousser !',
-    t2:'Le <b>bouton d\'arrosage</b>. N\'oublie pas de revenir de temps en temps : sans eau, ta plante finit par mourir de soif.',
-    t3:'Le <b>bouton de récolte</b> s\'activera quand la plante aura atteint sa maturité : tu récolteras les fleurs et le bois, et les fleurs se broient en <b>pixels</b> — la ressource qui fabrique tes améliorations.',
+    t2:'<b>Double-clique la plante</b> pour l\'arroser. N\'oublie pas de revenir de temps en temps : sans eau, ta plante finit par mourir de soif.',
+    t3:'Quand la plante est mûre et pleine de fleurs, <b>un double-clic la récolte</b> : tu récolteras les fleurs et le bois, et les fleurs se broient en <b>pixels</b> — la ressource qui fabrique tes améliorations.',
     tw:'L\'<b>Atelier</b> : ce panneau regroupe tout ce que tu peux ouvrir — Fabrication, Aménagement, Marché, Laboratoire, Almanach et tes Graines. Regardons ensemble les deux principaux.',
     t4:'Le <b>Laboratoire</b> : effectue d\'abord des recherches — ensuite les tables de fabrication (Fabrication / Aménagement) se remplissent de recettes à construire.',
     t5:'La <b>Fabrication</b> : broie tes fleurs en pixels, récupère du bois, et fabrique outils, machines et aménagements — chaque recette débloquée ouvre de nouvelles possibilités.',
@@ -702,7 +702,7 @@ fr:{
     w1:'C\'est le moment de fabriquer l\'<b>Établi</b> : 20 bois. Il débloque toutes les autres recettes du jeu.',
     w2:'Appuie sur <b>Fabriquer</b> dès que tu as le bois — puis reviens récolter : chaque cycle finance la machine suivante. 🌱',
     t6:'Tout en haut : chaque jour, trois <b>quêtes</b> (🗓️) t\'attendent, et tes exploits remplissent les <b>badges</b> (🏅) — ils débloqueront des récompenses dans la version finale. Merci d\'essayer PxGrove… bon jeu ! 🌱',
-    w0b:'Ce bouton récolte. Dès <b>80\x20% de croissance</b>, quand les premières fleurs apparaissent, tu peux déjà récolter — mais la plante donne <b>moins de ressources</b>. À <b>100\x20% avec toutes les fleurs</b>, le rendement est maximal.',
+    w0b:'Un double-clic sur une plante pleine de fleurs la récolte. Dès <b>80\x20% de croissance</b>, quand les premières fleurs apparaissent, tu peux déjà récolter — mais la plante donne <b>moins de ressources</b>. À <b>100\x20% avec toutes les fleurs</b>, le rendement est maximal.',
     g0:'<b>80\x20% de croissance !</b> Rappel : <b>double-clique sur le pot</b> pour arroser la plante à tout moment de sa pousse.',
     g1:'Le même double-clic <b>récolte</b> — mais <b>uniquement à 100\x20% de croissance avec toutes les fleurs sorties</b>. Avant ça, il ne fait qu\'arroser.',
     h0:'<b>Deuxième récolte : 2 graines !</b> Tu peux désormais planter <b>directement en terre</b> : clique un <b>emplacement libre</b> (pointillés) et choisis une graine — sans pot.',
@@ -3157,8 +3157,8 @@ function openIntro(){
 const TUTO_STEPS=[
   {target:null,        key:'t0'},
   {target:'plantCanvas',key:'t1'},
-  {target:'btnWater',  key:'t2'},
-  {target:'btnHarvest',key:'t3'},
+  {target:'plantCanvas',key:'t2'}, // water/harvest live on the plant itself (double-click) since the panel under the scene went away
+  {target:'plantCanvas',key:'t3'},
   {target:'workshopCard', key:'tw'},
   {targetSel:'#researchOverlay .book', key:'t4', open:()=>openResearch('research'), close:closeResearch},
   {targetSel:'#bookOverlay .book',     key:'t5', close:closeBook,
@@ -3169,7 +3169,7 @@ const TUTO_STEPS=[
 ];
 const TUTO2_STEPS=[
   {target:'hudResStrip', key:'w0'},
-  {target:'btnHarvest', key:'w0b'},
+  {target:'plantCanvas', key:'w0b'},
   {targetSel:'[data-rid="workbench"]', key:'w1',
    open:()=>{ bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=''; bookPage=0; openBook(); }},
   {targetSel:'[data-craft="workbench"]', key:'w2'},
@@ -4385,7 +4385,7 @@ function init(){
     if(!card)return;
     const i=+card.dataset.plotcard;
     if(!hasPot(i)){ _unlockConfirmSlot=i; renderPlotCards(); }
-    else selectPot(i);
+    else { selectPot(i); if(!S.plants[i]) replant(); } // an empty pot's card is the way to plant, now that the Replant button under the scene is gone
   });
   // double-click on a pot: waters the plant — or harvests it when its flowers are FULL
   $('plantCanvas').addEventListener('dblclick',e=>{
@@ -4396,8 +4396,9 @@ function init(){
       if(lampAt(i)&&cyCell<=9){ if(i!==S.sel) selectPot(i); toggleLamp(i); return; }
     }
     const p=S.plants[i];
-    if(!p||p.dead||p.cut)return;
+    if(!p||p.cut)return;
     if(i!==S.sel) selectPot(i);
+    if(p.dead){ harvest(); return; } // dead plant: clear it for its dead wood + seed (same payout as uprooting)
     if(p.pending.length>=flowerCap(p,i)) harvest(); // full of flowers: the ONLY time dblclick harvests
     else water();
   });

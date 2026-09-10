@@ -173,13 +173,9 @@
   .stage.fixed .cv-scroll{height:auto!important;min-height:0!important;flex:1;display:flex;align-items:flex-end;justify-content:center}
   .stage.fixed #plantCanvas{max-height:none!important;width:100%!important;height:100%!important}
   #belowStage{width:100%}
-  /* on desktop/tablet, belowStage rides on top of the scene instead of pushing it smaller — the image stays maximized */
-  @media(min-width:821px){
-    #belowStage{position:absolute;left:0;right:0;bottom:0;max-height:46%;overflow-y:auto;z-index:6;
-      padding:12px 150px 10px 88px;border-radius:0 0 12px 12px;pointer-events:none; /* side gutters keep the plant card clear of the sidebar and the map/journal slots */
-      background:linear-gradient(to top, rgba(15,16,14,.94) 0%, rgba(15,16,14,.8) 60%, rgba(15,16,14,0) 100%)}
-    #belowStage>*{pointer-events:auto}
-  }
+  /* the old plant card / gear strip under the scene is retired from the interface (the design replaces it with per-plot
+     cards and a growing-details popup). Its DOM stays: render() still drives those elements and the tutorial reads them. */
+  #belowStage{display:none!important}
   /* ── top bar: section tabs ── */
   .tabs{display:flex;align-items:stretch;gap:2px;flex:1 1 auto;justify-content:center;min-width:0;flex-wrap:wrap}
   .tab{background:transparent;border:var(--px) solid transparent;color:var(--muted);font-family:'Silkscreen',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.4px;
