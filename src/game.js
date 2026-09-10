@@ -3926,6 +3926,25 @@ function worldToCss(wx,wy){ // world (canvas-unit) point → viewport px, via th
   const rect=cv.getBoundingClientRect(); if(!rect.width)return null;
   return {x:rect.left+p.x*(rect.width/cv.width), y:rect.top+p.y*(rect.height/cv.height)};
 }
+const _spriteAlpha=new Map(); // stage → ImageData of the painted sprite, for pixel-exact hover tests
+function spriteAlphaAt(img,stage,u,v){ // u,v in [0,1] across the sprite; true where the painting is opaque
+  if(u<0||u>1||v<0||v>1)return false;
+  let d=_spriteAlpha.get(stage);
+  if(!d){ try{ const c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight; const g=c.getContext('2d'); g.drawImage(img,0,0); d=g.getImageData(0,0,c.width,c.height); _spriteAlpha.set(stage,d); }catch(e){ return true; } }
+  const px=Math.min(d.width-1,Math.floor(u*d.width)), py=Math.min(d.height-1,Math.floor(v*d.height));
+  return d.data[(py*d.width+px)*4+3]>40;
+}
+function plantHitAt(i,clientX,clientY){ // is the pointer on the painted plant of slot i (not just its column)?
+  const p=S.plants[i]; if(!p||p.dead||p.cut)return false;
+  if(potType(i)!=='ground'||!_slotBaseXform) return true; // procedural/potted drawings: no sprite mask, the whole slot counts
+  const cv=$('plantCanvas'); const rect=cv.getBoundingClientRect(); if(!rect.width||!cv.width)return false;
+  const stage=plantSpriteStage(progress(p)), img=plantStageImage(stage); if(!img)return true;
+  const al=PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5}, k=i-curRoom*ROOM_SLOTS;
+  const cx0=slotCenterX(k), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth); // same placement as drawOne()
+  const cp=new DOMPoint((clientX-rect.left)*(cv.width/rect.width),(clientY-rect.top)*(cv.height/rect.height));
+  const w=_slotBaseXform.inverse().transformPoint(cp);
+  return spriteAlphaAt(img,stage,(w.x-(cx0-dW*al.cx))/dW,(w.y-(gy-dH*al.b))/dH);
+}
 function nextFlowerText(p,i){ // "next flower" countdown shared by the plant card and the growing-details popup
   const t=T(), P=progress(p), inactive=p.dead||p.cut;
   if(inactive) return '—';
@@ -4465,8 +4484,8 @@ function init(){
       rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer"); } }
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / double-click to water or harvest) — even the only one
-    const p=(i>=0&&hasPot(i))?S.plants[i]:null;
-    e.currentTarget.style.cursor=(p&&!p.dead&&!p.cut)?'var(--cur-drop,pointer)' // a living plant: the droplet (double-click waters it)
+    const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
+    e.currentTarget.style.cursor=onPlant?'var(--cur-drop,pointer)' // the pointer is on the plant's painting itself: the droplet (double-click waters it)
       :(i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // pots select; free slots plant in the ground
   });
   $('plantCanvas').addEventListener('click',e=>{
