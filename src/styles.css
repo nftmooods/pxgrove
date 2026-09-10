@@ -372,7 +372,9 @@
   .plot-card .pc-name{font-size:.72rem;font-weight:700;color:var(--paper);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
   .plot-card .pc-status{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
   .plot-card .pc-name-card.locked,.plot-card .pc-name-card.pc-empty{align-items:center;text-align:center;background:#181a16;border:2px dashed rgba(255,255,255,.3)}
-  .plot-card .pc-name-card.pc-empty{cursor:var(--cur-seed,pointer)} /* an empty, unlocked plot: click plants a seed — the design's little seed cursor */
+  .plot-card .pc-name-card.pc-empty{cursor:var(--cur-seed,pointer); /* an empty, unlocked plot: click plants a seed — the design's little seed cursor */
+    align-self:center;width:max-content;min-width:72px;border-radius:max(6px,calc(var(--cq) * .5));
+    padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))} /* same box as the growth-bars pill it replaces — same size, same spot */
   .plot-card .pc-name-card.locked:hover,.plot-card .pc-name-card.pc-empty:hover{border-color:rgba(255,255,255,.55)}
   .plot-card .pc-lock-ic{font-size:1.3rem;line-height:1;margin-bottom:2px;opacity:.85}
   .plot-card .pc-confirm{display:flex;flex-direction:column;align-items:center;gap:6px}
