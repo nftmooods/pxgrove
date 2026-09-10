@@ -2271,6 +2271,7 @@ function openResourcePage(k){ // a resource opens its page: coins→Market, seed
   $('bookSearch').value=''; bookPage=0; openBook();
 }
 const RES_KEYS=['coins','px','wood','stone','metal','mineral','seeds'];
+const HUD_KEYS=['coins','px','seeds','wood']; // the top strip shows only these four (design) — stone/metal/minerals live behind the + (room for 3-digit counts)
 function resVal(k){ return k==='seeds'?totalBaseSeeds():(k==='coins'?fmtCoins(S.inv[k]):S.inv[k]); }
 function renderResources(flash){
   const sig=RES_KEYS.map(resVal).join(',');
@@ -2293,7 +2294,7 @@ function renderHudTop(changed){
   const alert=anyRoomAlert();
   if(changed){
     const strip=$('hudResStrip'); if(strip){
-      strip.innerHTML=RES_KEYS.map(k=>
+      strip.innerHTML=HUD_KEYS.map(k=>
         '<button type="button" class="hud-pill" data-res="'+k+'" title="'+t.res[k]+'"><span class="hp-ic">'+t.resIc[k]+'</span><span class="hp-v">'+resVal(k)+'</span><span class="hp-plus">+</span></button>'
       ).join('')+'<button type="button" class="hud-pill-more" data-resmore="1" title="'+t.book+'"><span>+</span></button>';
     }
