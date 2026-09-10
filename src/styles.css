@@ -25,7 +25,9 @@
     color:var(--paper);
     font-family:'IBM Plex Mono','Courier New',monospace;
     -webkit-font-smoothing:none;
+    -webkit-user-select:none;user-select:none; /* clicking/dragging around the scene (pots, sidebar, cursor drags) must never fire the browser's text-selection highlight */
   }
+  input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text} /* real text fields (rename, cheat code…) still select/type normally */
   .disp{font-family:'Silkscreen','IBM Plex Mono',monospace}
   .wrap{max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column}
   ::-webkit-scrollbar{width:10px;height:10px}
