@@ -302,6 +302,8 @@ en:{
   bookSearchPh:'Search…', fltOwned:'🎒 Owned', fltHide:'Hide ❓', tierAll:'All',
   catAll:'🔨 All', craftSub:'Craft useful items for your garden', craftInfo:'ℹ️ Unlock new recipes in the 🧪 Laboratory!',
   craftOnce:'Craftable once', craftMats:'REQUIRED MATERIALS', craftNone:'No recipe matches these filters.',
+  invSub:'All your resources and materials', invInfo:'ℹ️ Collect, explore, grow and craft to earn more resources!', invSoon:'More resources coming soon!',
+  invSort:'Name', invCats:{all:'All',ess:'Essentials',cult:'Growing',min:'Minerals',craft:'Craft',spec:'Special'},
   seedsGroup:'Special seeds', invBtn:'🎒 Inventory',
   tipHands:'Standard harvest — normal wood, plant is cut.',
   tipHandWater:'Free at the river — fills the tank to 50% only.',
@@ -587,6 +589,8 @@ fr:{
   bookSearchPh:'Rechercher…', fltOwned:'🎒 Possédés', fltHide:'Masquer ❓', tierAll:'Tout',
   catAll:'🔨 Tous', craftSub:'Créez des objets utiles pour votre jardin', craftInfo:'ℹ️ Débloquez de nouvelles recettes dans le 🧪 Laboratoire !',
   craftOnce:'Fabricable une seule fois', craftMats:'MATÉRIAUX REQUIS', craftNone:'Aucune recette ne correspond à ces filtres.',
+  invSub:'Toutes vos ressources et matériaux', invInfo:'ℹ️ Collectez, explorez, cultivez et craftez pour obtenir plus de ressources !', invSoon:'Bientôt d\'autres ressources !',
+  invSort:'Nom', invCats:{all:'Toutes',ess:'Essentielles',cult:'Culture',min:'Minéraux',craft:'Craft',spec:'Spéciales'},
   seedsGroup:'Graines spéciales', invBtn:'🎒 Inventaire',
   tipHands:'Récolte standard — bois normal, la plante est coupée.',
   tipHandWater:'Gratuit à la rivière — ne remplit le réservoir qu\'à 50 %.',
@@ -3296,9 +3300,42 @@ function closeIntro(){
 }
 /* ── Inventory (crafted items) ── */
 function invQtyKey(r){ return r.kind==='multi' ? r.cnt : Object.keys(r.gives)[0]; }
-function renderInventory(){ // inventory now lives inside the unified carnet — refresh it if open
+function renderInventory(){ // refresh whichever of the crafting book / inventory popup is open
   if($('bookOverlay').classList.contains('on')) renderBook();
   else refreshWorkshopButtons();
+  if($('invOverlay')&&$('invOverlay').classList.contains('on')) renderInvPopup();
+}
+/* ── Inventory popup (design "Ressources" card): categories, search, sort, tile grid ── */
+const INV_CATS=[['all','🔷'],['ess','⭐'],['cult','🌱'],['min','⛏️'],['craft','⚙️'],['spec','✨']];
+let invCat='all', invQ='', invAsc=true;
+function invItems(){ // every countable thing the player holds, tagged with a design category
+  const t=T(), out=[];
+  const res=(k,cat)=>out.push({k,cat,ic:t.resIc[k]||'',nm:t.res[k]||k,qty:resVal(k),res:true});
+  res('coins','ess'); res('px','ess'); res('wood','cult'); res('seeds','cult'); res('stone','min'); res('metal','min'); res('mineral','min');
+  for(const r of RECIPES){ if(r.kind!=='consumable')continue; const k=Object.keys(r.gives)[0]; if(!(S.inv[k]>0))continue;
+    out.push({k,cat:FERT_FX[k]&&FERT_FX[k].only?'spec':'craft',ic:r.ic,nm:t.recipes[r.id].nm,qty:S.inv[k],rid:r.id}); }
+  return out;
+}
+function openInventory(){ invQ=''; const s=$('invSearch'); if(s) s.value=''; renderInvPopup(); $('invOverlay').classList.add('on'); }
+function closeInventory(){ $('invOverlay').classList.remove('on'); }
+function renderInvPopup(){
+  const t=T(), cats=$('invCats'), grid=$('invGrid'); if(!cats||!grid)return;
+  cats.innerHTML=INV_CATS.map(([id,ic])=>'<button type="button" class="cp-cat'+(invCat===id?' on':'')+'" data-invcat="'+id+'">'+ic+' '+t.invCats[id]+'</button>').join('');
+  $('invSort').textContent='↕️ '+t.invSort+' ('+(invAsc?'A → Z':'Z → A')+')';
+  let items=invItems().filter(it=>(invCat==='all'||it.cat===invCat)&&(!invQ||it.nm.toLowerCase().includes(invQ)));
+  items.sort((a,b)=>a.nm.localeCompare(b.nm)*(invAsc?1:-1));
+  grid.innerHTML=items.map(it=>'<button type="button" class="inv-tile" data-invk="'+it.k+'"'+(it.rid?' data-invrid="'+it.rid+'"':'')+' title="'+esc(it.nm)+'">'+
+      '<span class="inv-em">'+it.ic+'</span><span class="inv-qty disp">'+it.qty+'</span><span class="inv-lb">'+esc(it.nm)+'</span></button>').join('')+
+    '<div class="inv-tile inv-soon"><span class="inv-em">+</span><span class="inv-lb">'+t.invSoon+'</span></div>';
+}
+function invClick(e){
+  const q=sel=>e.target.closest&&e.target.closest(sel);
+  const c=q('[data-invcat]'); if(c){ invCat=c.dataset.invcat; renderInvPopup(); return; }
+  if(q('#invSort')){ invAsc=!invAsc; renderInvPopup(); return; }
+  const tile=q('[data-invk]'); if(tile){ closeInventory();
+    if(tile.dataset.invrid){ const nm=T().recipes[tile.dataset.invrid].nm; bookFilter={q:nm.toLowerCase(),owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=nm; bookSel=tile.dataset.invrid; openBook(); }
+    else openResourcePage(tile.dataset.invk);
+    return; }
 }
 /* ── Daily quests UI ── */
 function renderQuests(){
@@ -3605,6 +3642,7 @@ function setLang(l){
   $('bookSearch').placeholder=t.bookSearchPh;
   $('btnBook').textContent=t.book; $('bookTitle').textContent=t.book.replace(/^\S+\s/,''); // the design's title has no emoji
   $('bookSub').textContent=t.craftSub; $('bookInfo').textContent=t.craftInfo;
+  $('invTitle').textContent=t.inventory; $('invSub').textContent=t.invSub; $('invInfo').textContent=t.invInfo; $('invSearch').placeholder=t.bookSearchPh;
   $('tabGarden').textContent='🌱 '+t.tabGarden; $('btnJournalTab').textContent='📓 '+t.journalTitle;
   $('btnBuild').textContent=t.buildBtn;
   $('btnBuild2').textContent=t.buildBtn;
@@ -4330,10 +4368,12 @@ function init(){
   $('btnFr').addEventListener('click',()=>setLang('fr'));
   $('btnBook').addEventListener('click',()=>{ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); });
   $('btnBuild').addEventListener('click',()=>{ bookFilter.cat='build'; bookFilter.res=null; bookPage=0; openBook(); });
-  $('hudResStrip').addEventListener('click',e=>{
-    const cell=e.target.closest('[data-res]'); if(cell){ closeMenu(); openResourcePage(cell.dataset.res); return; }
-    if(e.target.closest('[data-resmore]')){ closeMenu(); openBook(); }
+  $('hudResStrip').addEventListener('click',e=>{ // any pill or the + → the Inventory popup (a resource inside it leads on to its own page)
+    if(e.target.closest('[data-res]')||e.target.closest('[data-resmore]')){ closeMenu(); openInventory(); }
   });
+  $('btnInvClose').addEventListener('click',closeInventory);
+  $('invOverlay').addEventListener('click',e=>{ if(e.target===$('invOverlay')) closeInventory(); else invClick(e); });
+  $('invSearch').addEventListener('input',e=>{ invQ=e.target.value.trim().toLowerCase(); renderInvPopup(); });
   $('btnBookClose').addEventListener('click',closeBook);
   $('bookOverlay').addEventListener('click',e=>{ if(e.target===$('bookOverlay'))closeBook(); });
   $('btnMarket').addEventListener('click',openMarket);

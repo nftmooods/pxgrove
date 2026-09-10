@@ -219,6 +219,25 @@
     </div>
   </div>
 
+  <!-- ═══ Inventory popup (design "Ressources" card) ═══ -->
+  <div class="overlay" id="invOverlay" role="dialog" aria-modal="true" aria-labelledby="invTitle">
+    <div class="book craft-popup">
+      <div class="cp-head"><h2 id="invTitle" class="disp">Inventory</h2><button class="cp-x" id="btnInvClose" type="button" aria-label="Close">✕</button></div>
+      <div class="cp-sub" id="invSub"></div>
+      <div class="cp-body">
+        <div class="cp-cats" id="invCats"></div>
+        <div class="cp-list">
+          <div class="inv-tools">
+            <div class="cp-search"><span>🔍</span><input id="invSearch" type="search" autocomplete="off" placeholder="Search…" aria-label="Search resources"></div>
+            <button class="inv-sort" id="invSort" type="button">↕️</button>
+          </div>
+          <div class="inv-grid" id="invGrid"></div>
+        </div>
+      </div>
+      <div class="cp-info" id="invInfo"></div>
+    </div>
+  </div>
+
   <!-- ═══ Pot picker for installed gear (which pot gets the device?) ═══ -->
   <div class="overlay" id="potPickOverlay" role="dialog" aria-modal="true" aria-labelledby="potPickTitle">
     <div class="book" style="max-width:460px">
