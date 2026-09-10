@@ -3676,7 +3676,6 @@ function setLang(l){
   if($('introOverlay').classList.contains('on')) openIntro();
   if($('pickerOverlay').classList.contains('on')) openPicker();
   updateCommUI();
-  $('tFooter').innerHTML=t.footer;
   layoutTabs();
   renderVarieties(); renderWorkshop(); renderStageQuick(); lastRes=''; renderResources(); render(true);
 }

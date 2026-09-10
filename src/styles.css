@@ -169,7 +169,16 @@
   .vrow span{font-size:.62rem;color:var(--muted)}
   .vrow .tag{margin-left:auto;font-family:'Silkscreen',monospace;font-size:.5rem;color:var(--faint);text-transform:uppercase;white-space:nowrap}
 
-  .garden{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:4px;align-items:stretch;height:calc(100% - 4px)}
+  .garden{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin:0;align-items:stretch;height:100%}
+  /* the garden fills the whole browser window: no page padding, no card frame around the scene (letterboxing on the
+     background's ratio is all that remains — the illustration is never cropped or stretched) */
+  .wrap:has(#scrGarden.on){padding:0}
+  .wrap:has(#scrGarden.on) .stage{border:0;border-radius:0;box-shadow:none}
+  .wrap:has(#scrGarden.on) #belowStage{border-radius:0}
+  @media(min-width:821px) and (max-width:1200px){ /* tablet-width windows: keep the scene centred in the window too */
+    .wrap:has(#scrGarden.on) .garden{height:100%}
+    .wrap:has(#scrGarden.on) .gcol-left{display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+  }
   /* the scene keeps the background's exact aspect ratio (no crop, no stretch). Wide screens: scene left, panels right; otherwise panels below */
   .garden.side{grid-template-columns:auto minmax(0,1fr)}
   #sidePanels{display:flex;flex-direction:column;min-height:0;overflow:auto}
@@ -588,8 +597,6 @@
   .pxflash.go{animation:pxpop .45s steps(4)}
   @media (prefers-reduced-motion: reduce){ .pxflash.go{animation:none} .bar>i{transition:none} }
 
-  footer{flex:none;margin-top:8px;border-top:var(--px) solid var(--line);padding-top:6px;font-size:.56rem;color:var(--faint);line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  footer a{color:var(--muted)}
   @media(max-height:760px){footer{display:none}}
 
   /* seed picker */
