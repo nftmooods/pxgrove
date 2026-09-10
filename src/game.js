@@ -4352,7 +4352,7 @@ function drawOne(x,idx,slot){
       return;
     }
   }
-  if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
+  if(mat==='ground'&&!p.dead){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only — including the grace period at 0% hydration, just before it actually dies (dehydrated art covers that too, no more grey pixel fallback)
     const stage=plantSpriteStage(P);
     // dehydration isn't its own little run-up of stages: the wilted look freezes at whatever growth stage the plant was
     // AT the moment it crossed under the warning threshold, and holds there (growth itself is paused while this thirsty
