@@ -4121,23 +4121,37 @@ function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++)
 const DIRT_HOLE_SRC=__ASSET__('icon-dirt-hole.png'); // a harvested plant leaves this little hole where the seed hint used to sit
 let _dirtHoleImg=null;
 function dirtHoleImage(){ if(!_dirtHoleImg){ _dirtHoleImg=new Image(); _dirtHoleImg.src=DIRT_HOLE_SRC; _dirtHoleImg.onload=()=>render(true); } return _dirtHoleImg.complete&&_dirtHoleImg.naturalWidth?_dirtHoleImg:null; }
-const PLANT_STAGE_SPRITES={
+const PLANT_STAGE_SPRITES={ // 13 hand-painted frames (Martin's Sprite-Seed_01..13) — a much finer run-up than the original 6
   seed:__ASSET__('plant-seed.png'),
+  sprout:__ASSET__('plant-sprout.png'),
   germ:__ASSET__('plant-germ.png'),
+  germ2:__ASSET__('plant-germ2.png'),
   young:__ASSET__('plant-young.png'),
-  mature1:__ASSET__('plant-mature1.png'), // 55–67.5 %
-  mature2:__ASSET__('plant-mature2.png'), // 67.5–80 %: fuller/taller, right before bloom
-  bloom:__ASSET__('plant-bloom.png'),
+  young2:__ASSET__('plant-young2.png'),
+  mature1:__ASSET__('plant-mature1.png'),
+  bud1:__ASSET__('plant-bud1.png'), // first closed flower bud
+  bud2:__ASSET__('plant-bud2.png'), // a second bud, taller
+  bloom1:__ASSET__('plant-bloom1.png'), // first flower open
+  bloom2:__ASSET__('plant-bloom2.png'), // second flower open
+  bloom3:__ASSET__('plant-bloom3.png'), // sparkle building
+  bloomfull:__ASSET__('plant-bloomfull.png'), // full sparkle burst
 };
 // fraction of each sprite's own height that is plant, not mound (measured per stage: taller plants have proportionally
 // less mound). No entry for 'seed' — that sprite IS the mound (seed resting on it), so pots keep the procedural dot for it.
-const PLANT_STAGE_MOUND_FRAC={germ:0.905,young:0.929,mature1:0.865,mature2:0.878,bloom:0.871}; // remeasured on Martin's v2 art (redone root/foot)
-// where each sprite's mound actually sits inside its own canvas (measured: bottom-most opaque row / horizontal centre of
-// the mound), so every stage roots at the same soil point — the seed's canvas has more empty space under it than the rest.
-const PLANT_STAGE_ALIGN={seed:{b:0.929,cx:0.518},germ:{b:0.941,cx:0.5},young:{b:0.992,cx:0.5},mature1:{b:0.924,cx:0.5},mature2:{b:0.979,cx:0.5},bloom:{b:0.942,cx:0.5}}; // remeasured on Martin's v2 art (redone root/foot)
+// All 13 frames share ONE canvas (Martin generated the whole run-up on a fixed 1221×1289 stage, then it's cropped here
+// with the SAME rectangle for every frame) — so a frame's own pixel size already IS its true relative size: nothing is
+// individually stretched or shrunk to fit a common box, the plant simply grows larger across the same-sized frames.
+const PLANT_STAGE_MOUND_FRAC={sprout:0.87,germ:0.871,germ2:0.86,young:0.854,young2:0.866,mature1:0.842,bud1:0.855,bud2:0.885,bloom1:0.85,bloom2:0.89,bloom3:0.89,bloomfull:0.89};
+// where each sprite's mound sits inside the shared canvas (bottom-most opaque row / horizontal centre near it) — all
+// close together since it's the same ground line throughout, confirming the frames are a consistent, unscaled sequence.
+const PLANT_STAGE_ALIGN={seed:{b:0.898,cx:0.503},sprout:{b:0.894,cx:0.475},germ:{b:0.898,cx:0.468},germ2:{b:0.907,cx:0.446},
+  young:{b:0.899,cx:0.495},young2:{b:0.912,cx:0.486},mature1:{b:0.908,cx:0.496},bud1:{b:0.918,cx:0.537},bud2:{b:0.898,cx:0.49},
+  bloom1:{b:0.904,cx:0.498},bloom2:{b:0.902,cx:0.53},bloom3:{b:0.902,cx:0.53},bloomfull:{b:0.902,cx:0.53}};
 let _plantStageImgs={};
-function plantSpriteStage(P){ // which sprite covers this growth fraction — mirrors phaseName()'s thresholds, with "mature" split in two for a smoother run-up to bloom
-  if(P<0.05)return'seed'; if(P<0.25)return'germ'; if(P<0.55)return'young'; if(P<0.675)return'mature1'; if(P<0.80)return'mature2'; return'bloom';
+function plantSpriteStage(P){ // which of the 13 frames covers this growth fraction — vegetative stages 1-9 fill 0→80% (matching BLOOM_P), the 4 flowering frames split the last 20%
+  if(P<0.05)return'seed'; if(P<0.12)return'sprout'; if(P<0.20)return'germ'; if(P<0.29)return'germ2';
+  if(P<0.39)return'young'; if(P<0.50)return'young2'; if(P<0.62)return'mature1'; if(P<0.71)return'bud1'; if(P<0.80)return'bud2';
+  if(P<0.85)return'bloom1'; if(P<0.90)return'bloom2'; if(P<0.95)return'bloom3'; return'bloomfull';
 }
 function plantStageImage(stage){
   const src=PLANT_STAGE_SPRITES[stage]; if(!src)return null;
