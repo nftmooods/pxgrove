@@ -300,6 +300,8 @@ en:{
   equipTitle:'Active gear', equipHarvest:'Harvest tool — click to switch', equipWater:'Watering gear',
   equipHands:'Bare hands', invMore:'Expand inventory ▾', invLess:'Collapse inventory ▴',
   bookSearchPh:'Search…', fltOwned:'🎒 Owned', fltHide:'Hide ❓', tierAll:'All',
+  catAll:'🔨 All', craftSub:'Craft useful items for your garden', craftInfo:'ℹ️ Unlock new recipes in the 🧪 Laboratory!',
+  craftOnce:'Craftable once', craftMats:'REQUIRED MATERIALS', craftNone:'No recipe matches these filters.',
   seedsGroup:'Special seeds', invBtn:'🎒 Inventory',
   tipHands:'Standard harvest — normal wood, plant is cut.',
   tipHandWater:'Free at the river — fills the tank to 50% only.',
@@ -583,6 +585,8 @@ fr:{
   equipTitle:'Équipement actif', equipHarvest:'Outil de récolte — clique pour changer', equipWater:'Matériel d\'arrosage',
   equipHands:'Mains nues', invMore:'Étendre l\'inventaire ▾', invLess:'Replier l\'inventaire ▴',
   bookSearchPh:'Rechercher…', fltOwned:'🎒 Possédés', fltHide:'Masquer ❓', tierAll:'Tout',
+  catAll:'🔨 Tous', craftSub:'Créez des objets utiles pour votre jardin', craftInfo:'ℹ️ Débloquez de nouvelles recettes dans le 🧪 Laboratoire !',
+  craftOnce:'Fabricable une seule fois', craftMats:'MATÉRIAUX REQUIS', craftNone:'Aucune recette ne correspond à ces filtres.',
   seedsGroup:'Graines spéciales', invBtn:'🎒 Inventaire',
   tipHands:'Récolte standard — bois normal, la plante est coupée.',
   tipHandWater:'Gratuit à la rivière — ne remplit le réservoir qu\'à 50 %.',
@@ -2364,71 +2368,98 @@ function bookMatch(r,t){
   return true;
 }
 function bookFiltering(){ return bookFilter.q!==''||bookFilter.owned||bookFilter.tier>=0||!!bookFilter.cat||!!bookFilter.res; }
-function buildBookPages(){
-  const t=T(), pages=[];
+/* Crafting popup (design): categories on the left, the recipe list in the middle, the selected recipe's sheet on the right.
+   The list scrolls, so the old fixed-height pages are gone; every filter of the old carnet survives in the left column. */
+let bookSel=null, craftQty=1;
+function bookEntries(){ // flat, tier by tier; per tier a collapsed "❓ N still to discover" note stands in for the undiscovered recipes
+  const t=T(), out=[];
   for(let ti=0;ti<4;ti++){
     if(bookFilter.tier>=0&&bookFilter.tier!==ti) continue;
     const list=RECIPES.filter(r=>r.tier===ti&&(!bookFilter.cat||r.cat===bookFilter.cat));
-    const visible=list.filter(r=>recipeVisible(r)&&bookMatch(r,t));
+    for(const r of list) if(recipeVisible(r)&&bookMatch(r,t)) out.push(r);
     const hiddenN=list.length-list.filter(r=>recipeVisible(r)).length;
-    const entries=visible.slice();
-    if(hiddenN>0&&!bookFilter.hideUndisc&&!bookFilter.q&&!bookFilter.owned) entries.push({hiddenN});
-    if(!entries.length&&bookFiltering()) continue; // filtered-out tier: no empty page
-    const chunks=[];
-    for(let i=0;i<entries.length;i+=BOOK_PER_PAGE) chunks.push(entries.slice(i,i+BOOK_PER_PAGE));
-    if(!chunks.length) chunks.push([]);
-    chunks.forEach((c,ci)=>pages.push({kind:'tier',ti,entries:c,ci,cn:chunks.length}));
+    if(hiddenN>0&&!bookFilter.hideUndisc&&!bookFilter.q&&!bookFilter.owned&&!bookFilter.res) out.push({hiddenN,tier:ti});
   }
-  // seeds live in their own vault (🌰) and the try table in the 🧪 Laboratory — the carnet keeps recipes only
-  if(!pages.length) pages.push({kind:'tier',ti:0,entries:[],ci:0,cn:1});
-  return pages;
+  return out;
 }
+function recipeLock(r){ // why a visible recipe can't be crafted yet, beyond resources — null when nothing blocks it
+  const t=T();
+  if(!r.noBench&&!S.inv.tools.workbench) return t.lockedBench;
+  if(r.needs&&!hasThing(r.needs)) return t.lockedMachine(t.recipes[r.needs].nm);
+  return null;
+}
+function recipeDone(r){ return ((r.kind==='tool'||r.kind==='machine')&&!!S.inv.tools[r.id])||(r.kind==='multi'&&S.inv[r.cnt]>=multiMax(r)); }
 function renderBook(){
-  const t=T(), box=$('bookBody'); box.innerHTML='';
-  renderBookTabs();
-  const pages=buildBookPages();
-  bookPage=clamp(bookPage,0,pages.length-1);
-  const pg=pages[bookPage];
-  $('bookPageLbl').textContent=(bookPage+1)+' / '+pages.length;
-  $('btnPgPrev').disabled=bookPage===0;
-  $('btnPgNext').disabled=bookPage===pages.length-1;
-  if(pg.kind==='hybs') renderHybPage(box,t,pg);
-  else renderTierPage(box,t,pg);
-  box.querySelectorAll('[data-craft]').forEach(b=>{
-    const r=RECIPES.find(x=>x.id===b.dataset.craft);
-    b.addEventListener('click',()=>craft(r));
-  });
-  box.querySelectorAll('[data-use]').forEach(b=>{
-    b.addEventListener('click',()=>useFert(b.dataset.use));
-  });
-  box.querySelectorAll('[data-planthyb]').forEach(b=>{
-    b.addEventListener('click',()=>plantHybrid(b.dataset.planthyb));
-  });
-  box.querySelectorAll('[data-plantstr]').forEach(b=>{
-    b.addEventListener('click',()=>plantStrain(b.dataset.plantstr));
-  });
+  const t=T(), box=$('bookBody'); if(!box)return;
+  renderBookCats();
+  const entries=bookEntries(), ids=entries.filter(e=>e.id).map(e=>e.id);
+  if(!ids.includes(bookSel)){ bookSel=ids[0]||null; craftQty=1; }
+  let html='';
+  if(bookFilter.res) html+='<button type="button" class="cp-chip" data-resclear="1">'+(t.resIc[bookFilter.res]||'')+' '+t.res[bookFilter.res]+' ✕</button>';
+  for(const e of entries){
+    if(e.hiddenN){
+      html+='<div class="cp-item locked"><div class="cp-ic">❓</div><div class="cp-mid"><div class="cp-nm disp">'+t.toDiscover(e.hiddenN)+'</div><div class="cp-fx">'+t.tierNames[e.tier]+' · '+t.researchMenuHint+'</div></div><img class="cp-lock" src="'+SB_ICONS.lock+'" alt=""></div>';
+      continue;
+    }
+    const r=e, tr=t.recipes[r.id], done=recipeDone(r), lock=!done&&recipeLock(r);
+    html+='<button type="button" class="cp-item'+(r.id===bookSel?' sel':'')+(lock?' locked':'')+(r.id===flashCraft?' flash':'')+'" data-rid="'+r.id+'">'+
+      '<div class="cp-ic">'+r.ic+'</div><div class="cp-mid"><div class="cp-nm disp">'+tr.nm+
+      (done?' <span class="cp-tag">✓ '+(r.kind==='multi'?t.maxed:t.owned)+'</span>':'')+
+      (discovered(r.id)&&!researched(r.tier)?' <span class="cp-tag">🧪</span>':'')+'</div>'+
+      '<div class="cp-fx">'+tr.fx+'</div></div>'+
+      (lock?'<img class="cp-lock" src="'+SB_ICONS.lock+'" alt="">':'<span class="cp-arrow">›</span>')+'</button>';
+  }
+  if(!entries.length) html='<div class="cp-none">'+t.craftNone+'</div>';
+  box.innerHTML=html;
+  renderBookDetail();
   refreshWorkshopButtons();
 }
-function renderBookTabs(){
-  const t=T(), box=$('bookTierTabs'); if(!box)return; box.innerHTML='';
-  if(bookFilter.res){
-    const c=document.createElement('button'); c.type='button'; c.className='btn xs on';
-    c.textContent=(t.resIc[bookFilter.res]||'')+' '+t.res[bookFilter.res]+' ✕';
-    c.addEventListener('click',()=>{ bookFilter.res=null; bookPage=0; renderBook(); });
-    box.appendChild(c);
-  }
-  const tabs=[[-1,t.tierAll],[0,'0'],[1,'I'],[2,'II'],[3,'III']];
-  for(const [ti,lbl] of tabs){
-    const b=document.createElement('button');
-    b.type='button'; b.className='btn xs'+(bookFilter.tier===ti?' on':'');
-    b.textContent=lbl;
-    b.addEventListener('click',()=>{ bookFilter.tier=ti; bookPage=0; renderBook(); });
-    box.appendChild(b);
-  }
-  $('bookFltOwned').classList.toggle('on',bookFilter.owned);
-  $('bookFltDisc').classList.toggle('on',bookFilter.hideUndisc);
-  $('bookCatPlant').classList.toggle('on',bookFilter.cat==='plant');
-  $('bookCatBuild').classList.toggle('on',bookFilter.cat==='build');
+function renderBookCats(){
+  const t=T(), box=$('bookCats'); if(!box)return;
+  const b=(kind,val,lbl,on)=>'<button type="button" class="cp-cat'+(on?' on':'')+'" data-bcat="'+kind+'" data-bval="'+val+'">'+lbl+'</button>';
+  const tierLbl=ti=>['0','I','II','III'][ti]+' · '+(t.tierNames[ti].split('—')[1]||'').trim();
+  box.innerHTML=b('cat','',t.catAll,!bookFilter.cat)+b('cat','plant',t.catPlant,bookFilter.cat==='plant')+b('cat','build',t.catBuild,bookFilter.cat==='build')+
+    '<div class="cp-cat-sep"></div>'+
+    b('tier',-1,'⭐ '+t.tierAll,bookFilter.tier===-1)+[0,1,2,3].map(ti=>b('tier',ti,tierLbl(ti),bookFilter.tier===ti)).join('')+
+    '<div class="cp-cat-sep"></div>'+
+    b('owned',1,t.fltOwned,bookFilter.owned)+b('hide',1,t.fltHide,bookFilter.hideUndisc);
+}
+function renderBookDetail(){
+  const t=T(), box=$('bookDetail'); if(!box)return;
+  const r=RECIPES.find(x=>x.id===bookSel);
+  if(!r){ box.innerHTML='<div class="cp-none">'+t.craftNone+'</div>'; return; }
+  const tr=t.recipes[r.id], done=recipeDone(r), lock=!done&&recipeLock(r), single=(r.kind==='tool'||r.kind==='machine');
+  const qtyOn=r.kind==='consumable'||r.kind==='resource', mult=qtyOn?craftQty:1;
+  let mats='';
+  for(const k in r.cost){ const have=S.inv[k]||0, need=r.cost[k]*mult;
+    mats+='<div class="cp-mat"><div class="cp-mat-ic">'+(t.resIc[k]||'')+'</div><div class="cp-mat-v disp" style="color:'+(have>=need?'#8fd14f':'#e07a5f')+'">'+fmtCoins(have)+' / '+need+'</div><div class="cp-mat-k">'+(t.res[k]||k)+'</div></div>'; }
+  let note='';
+  if(single) note=done?'✓ '+t.owned:t.craftOnce;
+  else if(r.kind==='multi'||r.kind==='consumable') note='<span class="disp" data-cnt="'+r.id+'"></span>'+(done?' · ✓ '+t.maxed:'');
+  if(lock) note+='<div class="cp-lock-txt">🔒 '+lock+'</div>';
+  const useKey=r.kind==='consumable'?Object.keys(r.gives)[0]:null;
+  const lbl=r.id==='stone'?t.compress:(r.id==='metal'?t.smelt:t.craft);
+  box.innerHTML='<h3 class="cp-dt disp">'+tr.nm+'</h3><div class="cp-big">'+r.ic+'</div><div class="cp-desc">'+tr.fx+'</div>'+
+    (mats?'<div class="cp-mats-lbl disp">'+t.craftMats+'</div><div class="cp-mats">'+mats+'</div>':'')+
+    '<div class="cp-note">'+note+'</div>'+
+    (qtyOn&&!done?'<div class="cp-qty"><button type="button" class="cp-qbtn" data-qdec="1">−</button><div class="cp-qval disp">'+craftQty+'</div><button type="button" class="cp-qbtn" data-qinc="1">+</button></div>':'')+
+    (useKey&&FERT_FX[useKey]&&S.inv[useKey]>0?'<button type="button" class="cp-use" data-use="'+useKey+'">'+t.use+'</button>':'')+
+    (!done?'<button type="button" class="cp-create" data-craft="'+r.id+'">🔨 <span class="disp">'+lbl+(qtyOn&&craftQty>1?' ×'+craftQty:'')+'</span></button>':'');
+}
+function bookClick(e){ // one delegated handler for the whole popup
+  const q=sel=>e.target.closest&&e.target.closest(sel);
+  const it=q('[data-rid]');      if(it){ if(bookSel!==it.dataset.rid){ bookSel=it.dataset.rid; craftQty=1; renderBook(); } return; }
+  const cat=q('[data-bcat]');    if(cat){ const k=cat.dataset.bcat, v=cat.dataset.bval;
+    if(k==='cat') bookFilter.cat=v||null; else if(k==='tier') bookFilter.tier=+v; else if(k==='owned') bookFilter.owned=!bookFilter.owned; else if(k==='hide') bookFilter.hideUndisc=!bookFilter.hideUndisc;
+    renderBook(); return; }
+  if(q('[data-resclear]')){ bookFilter.res=null; renderBook(); return; }
+  if(q('[data-qdec]')){ craftQty=Math.max(1,craftQty-1); renderBookDetail(); refreshWorkshopButtons(); return; }
+  if(q('[data-qinc]')){ craftQty=Math.min(9,craftQty+1); renderBookDetail(); refreshWorkshopButtons(); return; }
+  const cr=q('[data-craft]');    if(cr){ const r=RECIPES.find(x=>x.id===cr.dataset.craft); if(!r)return;
+    const n=(r.kind==='consumable'||r.kind==='resource')?craftQty:1;
+    for(let i=0;i<n&&canCraft(r);i++) craft(r);
+    return; }
+  const us=q('[data-use]');      if(us){ useFert(us.dataset.use); return; }
 }
 function renderHybPage(box,t,pg){
   const sec=document.createElement('div'); sec.className='tier'; sec.style.marginTop='4px';
@@ -2449,58 +2480,6 @@ function renderHybPage(box,t,pg){
         '<span class="act"><span class="cnt">×'+(S.inv.strainSeeds[e.s]||0)+'</span>'+
         '<button class="btn xs" data-plantstr="'+e.s+'" type="button">'+t.plantBtn+'</button></span>';
     }
-    wrap.appendChild(d);
-  }
-  sec.appendChild(wrap);
-  box.appendChild(sec);
-}
-function renderTierPage(box,t,pg){
-  const ti=pg.ti;
-  const sec=document.createElement('div'); sec.className='tier'; sec.style.marginTop='4px';
-  let head='<div class="tname">'+t.tierNames[ti];
-  if(pg.cn>1) head+=' ('+(pg.ci+1)+'/'+pg.cn+')';
-  if(ti>0){
-    if(researched(ti)) head+=' · ✓ '+t.researchedTag;
-    else head+=' · 🔒 '+t.researchMenuHint;
-  }
-  head+='</div>';
-  sec.innerHTML=head;
-  const wrap=document.createElement('div'); wrap.className='recipes';
-  for(const r of pg.entries){
-    const d=document.createElement('div');
-    if(r.hiddenN){ // collapsed hidden-recipes note
-      d.className='recipe locked';
-      d.innerHTML='<span class="ic">\u2753</span><span class="mid"><div class="nm">'+t.toDiscover(r.hiddenN)+'</div></span>';
-      wrap.appendChild(d);
-      continue;
-    }
-    const tr=t.recipes[r.id];
-    const owned=(r.kind==='tool'||r.kind==='machine')&&S.inv.tools[r.id];
-    const maxed=r.kind==='multi'&&S.inv[r.cnt]>=r.max;
-    const benchLocked=!r.noBench&&!S.inv.tools.workbench;
-    const machineLocked=r.needs&&!hasThing(r.needs);
-    const locked=(benchLocked||machineLocked)&&!owned&&!maxed;
-    d.className='recipe'+((owned||maxed)?' owned':'')+(locked?' locked':'');
-    let lockTxt='';
-    if(locked) lockTxt=benchLocked?t.lockedBench:t.lockedMachine(t.recipes[r.needs].nm);
-    let html='<span class="ic">'+r.ic+'</span><span class="mid"><div class="nm">'+tr.nm+
-      (owned?' <span class="own">\u2713 '+t.owned+'</span>':'')+
-      (maxed?' <span class="own">\u2713 '+t.maxed+'</span>':'')+
-      (discovered(r.id)&&!researched(r.tier)?' <span class="own">\ud83e\uddea</span>':'')+'</div>'+
-      '<div class="fx">'+tr.fx+'</div>'+
-      '<div class="cost">'+costStr(r.cost)+(lockTxt?' \u00b7 '+lockTxt:'')+'</div></span>';
-    html+='<span class="act">';
-    if(r.kind==='consumable'||r.kind==='multi') html+='<span class="cnt" data-cnt="'+r.id+'"></span>';
-    if(r.kind==='consumable'&&FERT_FX[Object.keys(r.gives)[0]]&&S.inv[Object.keys(r.gives)[0]]>0)
-      html+='<button class="btn xs" data-use="'+Object.keys(r.gives)[0]+'" type="button">'+t.use+'</button>';
-    if(!owned&&!maxed){
-      const lbl=r.id==='stone'?t.compress:(r.id==='metal'?t.smelt:t.craft);
-      html+='<button class="btn xs" data-craft="'+r.id+'" type="button">'+lbl+'</button>';
-    }
-    html+='</span>';
-    if(r.id===flashCraft) d.className+=' flash'; // confirmation glow (cleared on a timer: re-renders keep it)
-    d.dataset.rid=r.id;
-    d.innerHTML=html;
     wrap.appendChild(d);
   }
   sec.appendChild(wrap);
@@ -2687,7 +2666,7 @@ function stageQuickClick(e){
   if(k==='map'){ mapOpen=!mapOpen; renderStageQuick(); return; }
   mapOpen=false; renderStageQuick(); closeMenu();
   if(k==='market') openMarket();
-  else if(k==='workshop'){ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); }
+  else if(k==='workshop'){ bookFilter.cat=null; bookFilter.res=null; bookPage=0; openBook(); } // the design opens on "All"
   else if(k==='journal'){ renderJournal(); $('journalOverlay').classList.add('on'); }
 }
 function commitDetailsRename(i){
@@ -3513,11 +3492,11 @@ function renderGen(){
   box.appendChild(hint);
 }
 function refreshWorkshopButtons(){
-  $('bookBody').querySelectorAll('[data-craft]').forEach(b=>{
+  $('bookOverlay').querySelectorAll('[data-craft]').forEach(b=>{
     const r=RECIPES.find(x=>x.id===b.dataset.craft);
     b.disabled=!canCraft(r);
   });
-  $('bookBody').querySelectorAll('[data-cnt]').forEach(el=>{
+  $('bookOverlay').querySelectorAll('[data-cnt]').forEach(el=>{
     const r=RECIPES.find(x=>x.id===el.dataset.cnt);
     if(r.kind==='multi') el.textContent='×'+S.inv[r.cnt]+'/'+multiMax(r);
     else el.textContent='×'+S.inv[Object.keys(r.gives)[0]];
@@ -3604,9 +3583,8 @@ function setLang(l){
   $('tWorkshop').textContent=t.workshop; $('tWorkshopHint').textContent=t.workshopHint;
   $('tEquip').textContent=t.equipTitle;
   $('bookSearch').placeholder=t.bookSearchPh;
-  $('bookFltOwned').textContent=t.fltOwned;
-  $('bookFltDisc').textContent=t.fltHide;
-  $('btnBook').textContent=t.book; $('bookTitle').textContent=t.book;
+  $('btnBook').textContent=t.book; $('bookTitle').textContent=t.book.replace(/^\S+\s/,''); // the design's title has no emoji
+  $('bookSub').textContent=t.craftSub; $('bookInfo').textContent=t.craftInfo;
   $('tabGarden').textContent='🌱 '+t.tabGarden; $('btnJournalTab').textContent='📓 '+t.journalTitle;
   $('btnBuild').textContent=t.buildBtn;
   $('btnBuild2').textContent=t.buildBtn;
@@ -3615,8 +3593,6 @@ function setLang(l){
   $('btnSeeds2').textContent=t.seedVaultBtn;
   $('btnQuests').textContent='🗓️ '+t.questsBtn;
   $('btnBadges').textContent='🏅 '+t.badgesTitle;
-  $('bookCatPlant').textContent=t.catPlant;
-  $('bookCatBuild').textContent=t.catBuild;
   $('btnMarket').textContent=t.market;
   $('btnResearch').textContent='🧪 '+t.labTitle;
   $('researchTitle').textContent='🧪 '+t.labTitle;
@@ -3927,7 +3903,9 @@ function renderPlotCards(){
     const cx0=slotCenterX(k), gy=bedGroundY(), pitch=slotPitch();
     const L=worldToCss(cx0-pitch/2,gy), R=worldToCss(cx0+pitch/2,gy), TP=worldToCss(cx0,gy);
     if(!L||!R||!TP)continue;
-    const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2, top=TP.y+3; // narrower than the compartment: leaves a visible gap either side, like the stone dividers already do
+    const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2;
+    const growing=hasPot(i)&&S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut;
+    const top=growing?TP.y-20:TP.y+3; // bars pill: straddles the soil's front edge at the plant's foot (design); name cards: just under the compartment
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
     if(!hasPot(i)){
       nameCls+=' locked';
@@ -4345,8 +4323,6 @@ function init(){
   $('journalOverlay').addEventListener('click',e=>{ if(e.target===$('journalOverlay'))$('journalOverlay').classList.remove('on'); });
   $('tabGarden').addEventListener('click',()=>{ document.querySelectorAll('.overlay.on').forEach(o=>o.classList.remove('on')); if(controlView){ controlView=false; _navSig=''; render(true); } });
   $('marketOverlay').addEventListener('click',e=>{ if(e.target===$('marketOverlay'))closeMarket(); });
-  $('btnPgPrev').addEventListener('click',()=>{ bookPage--; renderBook(); });
-  $('btnPgNext').addEventListener('click',()=>{ bookPage++; renderBook(); });
   $('btnMenu').addEventListener('click',e=>{ e.stopPropagation(); toggleMenu(); });
   $('menuPanel').addEventListener('click',e=>e.stopPropagation()); // clicks inside keep the menu open
   document.addEventListener('click',()=>{ closeMenu(); document.body.classList.remove('hamb-open'); closeWs(); });
@@ -4404,10 +4380,7 @@ function init(){
   $('bookSearch').addEventListener('input',e=>{
     bookFilter.q=e.target.value.trim().toLowerCase(); bookFilter.res=null; bookPage=0; renderBook();
   });
-  $('bookFltOwned').addEventListener('click',()=>{ bookFilter.owned=!bookFilter.owned; bookPage=0; renderBook(); });
-  $('bookCatPlant').addEventListener('click',()=>{ bookFilter.cat=bookFilter.cat==='plant'?null:'plant'; bookPage=0; renderBook(); });
-  $('bookCatBuild').addEventListener('click',()=>{ bookFilter.cat=bookFilter.cat==='build'?null:'build'; bookPage=0; renderBook(); });
-  $('bookFltDisc').addEventListener('click',()=>{ bookFilter.hideUndisc=!bookFilter.hideUndisc; bookPage=0; renderBook(); });
+  $('bookOverlay').addEventListener('click',bookClick);
   $('btnPotPrev').addEventListener('click',()=>{ const l=potList(), k=l.indexOf(S.sel); if(l.length) selectPot(l[(k-1+l.length)%l.length]); });
   $('btnPotNext').addEventListener('click',()=>{ const l=potList(), k=l.indexOf(S.sel); if(l.length) selectPot(l[(k+1)%l.length]); });
   const potFromEvent=e=>{

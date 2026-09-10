@@ -204,25 +204,18 @@
 
   <!-- ═══ Recipe book modal ═══ -->
   <div class="overlay" id="bookOverlay" role="dialog" aria-modal="true" aria-labelledby="bookTitle">
-    <div class="book">
-      <div class="book-head">
-        <h3 id="bookTitle">📖 Recipe book</h3>
-        <span class="book-nav" style="margin-left:auto">
-          <button class="btn sm" id="btnPgPrev" type="button">◀</button>
-          <button class="btn sm" id="btnPgNext" type="button">▶</button>
-        </span>
-        <button class="btn sm" id="btnBookClose" type="button">✕</button>
+    <div class="book craft-popup">
+      <div class="cp-head"><h2 id="bookTitle" class="disp">Crafting</h2><button class="cp-x" id="btnBookClose" type="button" aria-label="Close">✕</button></div>
+      <div class="cp-sub" id="bookSub"></div>
+      <div class="cp-body">
+        <div class="cp-cats" id="bookCats"></div>
+        <div class="cp-list">
+          <div class="cp-search"><span>🔍</span><input id="bookSearch" type="search" autocomplete="off" placeholder="Search…" aria-label="Search recipes"></div>
+          <div class="cp-items" id="bookBody"></div>
+        </div>
+        <div class="cp-detail" id="bookDetail"></div>
       </div>
-      <div class="book-filter">
-        <input id="bookSearch" type="search" autocomplete="off" placeholder="Search…" aria-label="Search recipes">
-        <span class="ftabs" id="bookTierTabs"></span>
-        <button class="btn xs" id="bookCatPlant" type="button">🌿</button>
-        <button class="btn xs" id="bookCatBuild" type="button">🏠</button>
-        <button class="btn xs" id="bookFltOwned" type="button">🎒</button>
-        <button class="btn xs" id="bookFltDisc" type="button">Hide ❓</button>
-      </div>
-      <div class="book-body" style="overflow:hidden"><div id="bookBody"></div></div>
-      <div class="book-foot"><span class="pg" id="bookPageLbl"></span></div>
+      <div class="cp-info" id="bookInfo"></div>
     </div>
   </div>
 
