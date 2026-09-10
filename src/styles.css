@@ -295,16 +295,42 @@
      opaque pieces, kept visually separate (gap) rather than merged into one box, per reference. */
   #plotCards{position:fixed;left:0;top:0;pointer-events:none;z-index:5}
   .plot-card{position:fixed;pointer-events:none;display:flex;flex-direction:column;align-items:stretch;gap:7px}
-  .plot-card .pc-bars-widget{pointer-events:none;display:flex;flex-direction:column;gap:4px;background:#20231f;
-    border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:6px 9px;box-shadow:0 3px 8px rgba(0,0,0,.4)}
-  .plot-card .pc-bar{display:flex;align-items:center;gap:6px}
-  .plot-card .pc-bar .pc-ic{font-size:.66rem;flex:none;line-height:1}
-  .plot-card .pc-track{flex:1;height:8px;border-radius:99px;background:#111310;border:1px solid rgba(255,255,255,.08);overflow:hidden;min-width:30px}
-  .plot-card .pc-fill{height:100%;border-radius:99px;transition:width .3s steps(12)}
-  .plot-card .pc-fill.grow{background:linear-gradient(90deg,#5fb35f,#8fd66a)}
-  .plot-card .pc-fill.hyd{background:linear-gradient(90deg,#3f8fc9,#6fc3e6)}
-  .plot-card .pc-fill.res{background:linear-gradient(90deg,#d4a83f,#f0cf6a)} /* resistance, reserved for later */
-  .plot-card .pc-fill.warn{background:linear-gradient(90deg,#b85a5a,#d4707f)}
+  /* growing-details popup (design): a dark card floating above the plot's bars */
+  .pc-details{position:absolute;left:50%;top:0;transform:translate(-50%,calc(-100% - 12px));width:clamp(250px,27vw,420px);pointer-events:auto;
+    background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:3;cursor:default;text-align:left}
+  .pd-head{display:flex;align-items:center;gap:8px}
+  .pd-ic{width:28px;height:28px;background:rgba(143,167,139,.2);border:1px solid var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;font-size:.85rem}
+  .pd-title{font-size:.9rem;margin:0;color:#f2f2f2;letter-spacing:.4px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase}
+  .pd-input{flex:1;min-width:0;font-size:.85rem;color:#f2f2f2;background:#26272a;border:1px solid var(--accent);border-radius:6px;padding:3px 6px}
+  .pd-btn{width:28px;height:28px;background:#26272a;border:0;border-radius:8px;color:#c7c8c9;cursor:pointer;font-family:inherit;font-size:.8rem;flex:none;display:flex;align-items:center;justify-content:center}
+  .pd-btn.ghost{background:transparent;color:#8b8d8f;width:22px}
+  .pd-btn:hover{color:#f2f2f2;background:#323336}
+  .pd-sub{font-size:.62rem;color:#8b8d8f;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pd-row{margin-top:12px}
+  .pd-lbl{font-size:.72rem;color:#c7c8c9;margin-bottom:5px}
+  .pd-barrow{display:flex;align-items:center;gap:8px}
+  .pd-track{flex:1;height:10px;border-radius:99px;background:#2c2c2e;overflow:hidden}
+  .pd-fill{display:block;height:100%;border-radius:99px;transition:width .3s steps(12)}
+  .pd-fill.hyd{background:#5fb0e8} .pd-fill.grow{background:#7fd66a} .pd-fill.warn{background:#d4707f}
+  .pd-pct{font-size:.78rem;color:#f2f2f2;min-width:3.2em;text-align:right}
+  .pd-sep{height:1px;background:rgba(255,255,255,.1);margin:14px 0 10px}
+  .pd-stats{display:flex;align-items:center;gap:10px}
+  .pd-stat{display:flex;align-items:center;gap:6px;flex:1;min-width:0}
+  .pd-stat-ic{font-size:1.3rem;flex:none}
+  .pd-stat-k{font-size:.62rem;color:#8b8d8f;white-space:nowrap}
+  .pd-stat-v{font-size:.8rem;color:#f2f2f2;white-space:nowrap}
+  .pd-vsep{width:1px;height:28px;background:rgba(255,255,255,.12);flex:none}
+  .plot-card .pc-bars-widget{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:rgba(0,0,0,.5);border:0;font:inherit;color:inherit;align-self:center;width:max-content;min-width:72px;position:relative;
+    border-radius:8px;padding:6px 8px}
+  .plot-card .pc-bars-widget:hover,.plot-card .pc-bars-widget.sel{outline:1px solid rgba(255,255,255,.25)}
+  .plot-card .pc-bar{display:flex;align-items:center;gap:5px}
+  .plot-card .pc-bar .pc-ic{font-size:.62rem;flex:none;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+  .plot-card .pc-track{width:72px;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+  .plot-card .pc-fill{display:block;height:100%;border-radius:99px;box-shadow:0 1px 3px rgba(0,0,0,.5);transition:width .3s steps(12)}
+  .plot-card .pc-fill.grow{background:#7fd66a}
+  .plot-card .pc-fill.hyd{background:#5fb0e8}
+  .plot-card .pc-fill.res{background:#f0cf6a} /* resistance, reserved for later */
+  .plot-card .pc-fill.warn{background:#d4707f}
   .plot-card .pc-name-card{pointer-events:auto;cursor:pointer;background:#23261f;border:1px solid rgba(255,255,255,.12);
     border-radius:10px;padding:7px 10px;box-shadow:0 3px 8px rgba(0,0,0,.4);display:flex;flex-direction:column;
     justify-content:center;gap:2px;overflow:hidden}

@@ -2240,13 +2240,7 @@ function render(force){
   if(p.dead) $('btnUproot').hidden=true; // dead plant: ONE button — "Collect dead wood" (same payout as the bin)
   $('stFlowers').childNodes[0].nodeValue=p.pending.length+' ';
   $('stFlowersCap').textContent='/ '+flowerCap(p,S.sel);
-  let next='—';
-  if(!inactive&&P>=BLOOM_P){
-    next = p.pending.length>=flowerCap(p,S.sel) ? t.grindFirst : fmtDur((flowerEveryH(p,S.sel)-p.bloomAccH)/speedMult(p,S.sel));
-  } else if(!inactive){
-    next = fmtDur((BLOOM_P*GROWTH_H-p.growthH)/speedMult(p,S.sel)); // time left before the plant reaches bloom and its first flower
-  }
-  $('stNext').textContent=next;
+  $('stNext').textContent=nextFlowerText(p,S.sel);
   const capH=hydCapH(p);
   let clock=t.growthLeft(fmtDur((GROWTH_H-p.growthH)/speedMult(p,S.sel)));
   if(P>=1) clock=t.grown;
@@ -2696,7 +2690,18 @@ function stageQuickClick(e){
   else if(k==='workshop'){ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); }
   else if(k==='journal'){ renderJournal(); $('journalOverlay').classList.add('on'); }
 }
+function commitDetailsRename(i){
+  const inp=document.querySelector('[data-detinput]'); if(!inp)return;
+  const v=inp.value.trim().slice(0,18);
+  if(!Array.isArray(S.inv.potNames)) S.inv.potNames=[];
+  while(S.inv.potNames.length<=i) S.inv.potNames.push('');
+  S.inv.potNames[i]=v;
+  const p=S.plants[i]; if(p&&v) jlog(p,'named',v);
+  _detailsEditing=false; _ctrlSig='';
+  save(); render(true);
+}
 function closeStageFolds(){ // click anywhere else: every fold shuts, like the design's outside-click refs
+  closeDetails();
   let any=mapOpen; mapOpen=false;
   for(const k in sbOpen){ if(sbOpen[k]){ any=true; sbOpen[k]=false; } }
   if(any){ renderSidebar(); renderStageQuick(); }
@@ -3884,11 +3889,38 @@ function worldToCss(wx,wy){ // world (canvas-unit) point → viewport px, via th
   const rect=cv.getBoundingClientRect(); if(!rect.width)return null;
   return {x:rect.left+p.x*(rect.width/cv.width), y:rect.top+p.y*(rect.height/cv.height)};
 }
+function nextFlowerText(p,i){ // "next flower" countdown shared by the plant card and the growing-details popup
+  const t=T(), P=progress(p), inactive=p.dead||p.cut;
+  if(inactive) return '—';
+  if(P>=BLOOM_P) return p.pending.length>=flowerCap(p,i) ? t.grindFirst : fmtDur((flowerEveryH(p,i)-p.bloomAccH)/speedMult(p,i));
+  return fmtDur((BLOOM_P*GROWTH_H-p.growthH)/speedMult(p,i)); // time left before the plant reaches bloom and its first flower
+}
+/* growing-details popup (design): opens above a plot's bars, live-updated, renames the pot inline */
+let _detailsSlot=-1, _detailsEditing=false;
+function closeDetails(){ if(_detailsSlot<0)return; _detailsSlot=-1; _detailsEditing=false; renderPlotCards(); }
+function detailsHtml(i,p){
+  const t=T(), v=vOf(p), Pv=progress(p), Hv=hydration(p), cap=flowerCap(p,i);
+  const pct=x=>Math.round(x*100)+'%';
+  const bar=(lbl,cls,val)=>'<div class="pd-row"><div class="pd-lbl">'+lbl+'</div><div class="pd-barrow"><span class="pd-track"><span class="pd-fill '+cls+'" style="width:'+pct(val)+'"></span></span><span class="pd-pct disp">'+pct(val)+'</span></div></div>';
+  const head=_detailsEditing
+    ? '<input class="pd-input disp" data-detinput="1" maxlength="18" value="'+esc((S.inv.potNames||[])[i]||'')+'" placeholder="'+esc(potName(i))+'" aria-label="'+esc(t.stFlowers)+'"><button type="button" class="pd-btn" data-detok="'+i+'">OK</button>'
+    : '<h3 class="pd-title disp">'+esc(vName(v))+'</h3><button type="button" class="pd-btn ghost" data-detrename="'+i+'" title="✎">✎</button>';
+  return '<div class="pc-details" data-details="'+i+'">'+
+    '<div class="pd-head"><span class="pd-ic">🌱</span>'+head+'<button type="button" class="pd-btn" data-detclose="1">✕</button></div>'+
+    '<div class="pd-sub">'+esc(potName(i))+' · '+esc(phaseName(p,Pv))+'</div>'+
+    bar(t.hydration,'hyd'+(Hv<0.25?' warn':''),Hv)+bar(t.growth,'grow',Pv)+
+    '<div class="pd-sep"></div>'+
+    '<div class="pd-stats"><div class="pd-stat"><span class="pd-stat-ic">🌸</span><div><div class="pd-stat-k">'+t.stFlowers+'</div><div class="pd-stat-v disp">'+p.pending.length+' / '+cap+'</div></div></div>'+
+    '<div class="pd-vsep"></div>'+
+    '<div class="pd-stat"><span class="pd-stat-ic">⏱️</span><div><div class="pd-stat-k">'+t.stNext+'</div><div class="pd-stat-v disp">'+esc(nextFlowerText(p,i))+'</div></div></div></div>'+
+  '</div>';
+}
 let _unlockConfirmSlot=-1, _plotCardsRoom=-1;
 function renderPlotCards(){
   const box=$('plotCards'); if(!box)return;
   if(controlView||isMobile()){ box.innerHTML=''; return; } // control desk / mobile: the classic in-canvas view stays there for now
-  if(curRoom!==_plotCardsRoom){ _plotCardsRoom=curRoom; _unlockConfirmSlot=-1; }
+  if(curRoom!==_plotCardsRoom){ _plotCardsRoom=curRoom; _unlockConfirmSlot=-1; _detailsSlot=-1; _detailsEditing=false; }
+  if(_detailsEditing&&box.querySelector('[data-detinput]')) return; // a rename is being typed: don't rebuild under the cursor
   const base=curRoom*ROOM_SLOTS, t=T(), cards=[];
   for(let k=0;k<ROOM_SLOTS;k++){
     const i=base+k;
@@ -3912,17 +3944,22 @@ function renderPlotCards(){
       if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
       else{
         const v=vOf(p), Pv=progress(p), Hv=hydration(p), inactive=p.dead||p.cut;
-        nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>';
-        if(!inactive) barsHtml='<div class="pc-bars-widget">'+
-          '<div class="pc-bar"><span class="pc-ic">🌱</span><span class="pc-track"><span class="pc-fill grow" style="width:'+Math.round(Pv*100)+'%"></span></span></div>'+
-          '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.25?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
-        '</div>';
+        if(inactive) nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>';
+        else { nameCls=''; // a growing plant shows only its bars (design): 💧 then 🌱 — click them for the details popup
+          barsHtml='<button type="button" class="pc-bars-widget'+(i===S.sel?' sel':'')+'" data-bars="'+i+'">'+
+            '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.25?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
+            '<div class="pc-bar"><span class="pc-ic">🌱</span><span class="pc-track"><span class="pc-fill grow" style="width:'+Math.round(Pv*100)+'%"></span></span></div>'+
+          '</button>';
+          if(_detailsSlot===i) barsHtml+=detailsHtml(i,p);
+        }
       }
     }
-    const html=barsHtml+'<div class="'+nameCls+'" data-plotcard="'+i+'">'+nameHtml+'</div>';
+    if(_detailsSlot===i&&!(S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut)){ _detailsSlot=-1; _detailsEditing=false; } // the plant went away: the popup goes with it
+    const html=barsHtml+(nameCls?'<div class="'+nameCls+'" data-plotcard="'+i+'">'+nameHtml+'</div>':'');
     cards.push('<div class="plot-card" style="left:'+Math.round(left)+'px;top:'+Math.round(top)+'px;width:'+Math.round(width)+'px">'+html+'</div>');
   }
   box.innerHTML=cards.join('');
+  const inp=box.querySelector('[data-detinput]'); if(inp&&inp.focus){ inp.focus(); inp.select(); }
 }
 const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — the 3-slot bed is painted right into it
 const SCENE_BG_MOBILE=__ASSET__('bg-garden-mobile.jpg'); // same illustration MINUS the bed (bare grass/dirt clearing): used whenever the scene is fit+mirrored, since a baked-in bed would tile/mirror unpredictably there
@@ -4389,6 +4426,13 @@ function init(){
     else if(e.detail<=1) unlockPlot(i); // a locked slot: unlock it (free for the first 2 of a room, priced beyond that) — mobile/control-desk views have no plot card to confirm through, so this is the direct path there
   });
   $('plotCards').addEventListener('click',e=>{
+    const q=sel=>e.target.closest&&e.target.closest(sel);
+    if(q('.pc-details')||q('[data-bars]')) e.stopPropagation(); // keep the document-level "close every fold" from undoing what this click opens
+    const bars=q('[data-bars]'); if(bars){ const i=+bars.dataset.bars; if(i!==S.sel) selectPot(i); _detailsSlot=(_detailsSlot===i?-1:i); _detailsEditing=false; renderPlotCards(); return; }
+    if(q('[data-detclose]')){ closeDetails(); return; }
+    const rn=q('[data-detrename]'); if(rn){ _detailsEditing=true; renderPlotCards(); return; }
+    const ok=q('[data-detok]'); if(ok){ commitDetailsRename(+ok.dataset.detok); return; }
+    if(q('.pc-details')) return;
     const unlockBtn=e.target.closest('[data-unlock]'), cancelBtn=e.target.closest('[data-cancelunlock]'), card=e.target.closest('[data-plotcard]');
     if(unlockBtn){ unlockPlot(+unlockBtn.dataset.unlock); _unlockConfirmSlot=-1; renderPlotCards(); return; }
     if(cancelBtn){ _unlockConfirmSlot=-1; renderPlotCards(); return; }
@@ -4416,6 +4460,8 @@ function init(){
   $('stageSidebar').addEventListener('click',sidebarClick);
   $('stageQuick').addEventListener('click',stageQuickClick);
   document.addEventListener('click',closeStageFolds);
+  $('plotCards').addEventListener('keydown',e=>{ const inp=e.target.closest&&e.target.closest('[data-detinput]'); if(!inp)return;
+    if(e.key==='Enter') commitDetailsRename(_detailsSlot); else if(e.key==='Escape'){ _detailsEditing=false; renderPlotCards(); } });
   renderStageQuick();
   document.addEventListener('visibilitychange',()=>{ if(document.hidden)save(); });
   window.addEventListener('beforeunload',save);
