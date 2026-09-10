@@ -4295,8 +4295,10 @@ function drawOne(x,idx,slot){
   const soilY=(mat==='ground')?baseY-4:potTop+2, soilCol=(p&&p.soil)?'#2a2320':'#33302c';
   if(mat!=='ground') for(let c=potX0+1;c<potX0+potW-1;c++) px(c,soilY,soilCol);
   const topX=Math.floor(GW/2);
-  if(!p){ // empty pot: plantable hint
-    px(topX,soilY-2,'#6a6c6e'); px(topX-1,soilY-3,'#6a6c6e'); px(topX+1,soilY-3,'#6a6c6e'); px(topX,soilY-3,'#7c7f81'); px(topX,soilY-4,'#6a6c6e');
+  if(!p){ // empty pot (uprooted, cleared, or never planted): the same little dirt hole — no more grey "+" pixel hint
+    const hole=dirtHoleImage();
+    if(hole){ const hw=8, hh=hw*(hole.naturalHeight/hole.naturalWidth); x.drawImage(hole,(ox+topX-hw/2)*CELL,(soilY-hh)*CELL,hw*CELL,hh*CELL); }
+    else{ px(topX,soilY-2,'#6a6c6e'); px(topX-1,soilY-3,'#6a6c6e'); px(topX+1,soilY-3,'#6a6c6e'); px(topX,soilY-3,'#7c7f81'); px(topX,soilY-4,'#6a6c6e'); } // fallback while it loads
     return;
   }
   if(p.cut){ // harvested: a little dirt hole sits right where the seed hint would — same anchor, same spot
