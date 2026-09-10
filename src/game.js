@@ -4131,10 +4131,10 @@ const PLANT_STAGE_SPRITES={
 };
 // fraction of each sprite's own height that is plant, not mound (measured per stage: taller plants have proportionally
 // less mound). No entry for 'seed' — that sprite IS the mound (seed resting on it), so pots keep the procedural dot for it.
-const PLANT_STAGE_MOUND_FRAC={germ:0.86,young:0.88,mature1:0.89,mature2:0.92,bloom:0.92};
+const PLANT_STAGE_MOUND_FRAC={germ:0.905,young:0.929,mature1:0.865,mature2:0.878,bloom:0.871}; // remeasured on Martin's v2 art (redone root/foot)
 // where each sprite's mound actually sits inside its own canvas (measured: bottom-most opaque row / horizontal centre of
 // the mound), so every stage roots at the same soil point — the seed's canvas has more empty space under it than the rest.
-const PLANT_STAGE_ALIGN={seed:{b:0.929,cx:0.518},germ:{b:0.968,cx:0.525},young:{b:0.975,cx:0.524},mature1:{b:0.987,cx:0.520},mature2:{b:0.994,cx:0.519},bloom:{b:0.987,cx:0.502}};
+const PLANT_STAGE_ALIGN={seed:{b:0.929,cx:0.518},germ:{b:0.941,cx:0.5},young:{b:0.992,cx:0.5},mature1:{b:0.924,cx:0.5},mature2:{b:0.979,cx:0.5},bloom:{b:0.942,cx:0.5}}; // remeasured on Martin's v2 art (redone root/foot)
 let _plantStageImgs={};
 function plantSpriteStage(P){ // which sprite covers this growth fraction — mirrors phaseName()'s thresholds, with "mature" split in two for a smoother run-up to bloom
   if(P<0.05)return'seed'; if(P<0.25)return'germ'; if(P<0.55)return'young'; if(P<0.675)return'mature1'; if(P<0.80)return'mature2'; return'bloom';
