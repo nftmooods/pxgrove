@@ -3915,7 +3915,7 @@ function drawGarden(){
   for(let i=base;i<base+ROOM_SLOTS;i++){ // pots, plants and bars are scaled about the slot's ground point so they fit the bed's compartments
     const slot=(i-base)+sh, k=slotScale(), cx0=slotCenterX(slot), gy=bedGroundY(), dy=gy-(GH-8)*CELL;
     x.save(); x.translate(cx0,gy); x.scale(k,k); x.translate(-cx0,-gy+dy); // lift the slot to the bed's soil front, then shrink about that point
-    if(hasPot(i)) drawOne(x,i,slot); else drawEmptySlot(x,slot);
+    if(hasPot(i)) drawOne(x,i,slot); else if(controlView||isMobile()) drawEmptySlot(x,slot); // desktop: the plot card's own lock bubble replaces this painted emoji lock
     x.restore();
   }
   renderPlotCards();
