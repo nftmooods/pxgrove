@@ -194,14 +194,19 @@
     </div>
   </section>
 
-  <div class="overlay" id="journalOverlay" role="dialog" aria-modal="true" aria-labelledby="tJournalCard">
-    <div class="book" style="max-width:560px">
-      <div class="book-head">
-        <h3 id="tJournalCard">📓 Journal</h3>
-        <button class="btn sm" id="btnJournalClose" type="button" style="margin-left:auto">✕</button>
-      </div>
-      <div class="book-body" id="journalCard">
-        <div id="journalList" style="font-size:.68rem;color:var(--muted);line-height:1.8;margin-top:6px"></div>
+  <div class="overlay" id="journalOverlay" role="dialog" aria-modal="true" aria-labelledby="hubTitle">
+    <div class="book craft-popup">
+      <div class="cp-head"><h2 id="hubTitle" class="disp">Journal</h2><button class="cp-x" id="btnJournalClose" type="button" aria-label="Close">✕</button></div>
+      <div class="cp-sub" id="hubSub"></div>
+      <div class="cp-body">
+        <div class="cp-cats">
+          <button class="cp-cat" data-hubtab="seeds" type="button">🌰 <span id="hubTabSeeds">Seeds</span></button>
+          <button class="cp-cat" data-hubtab="herbier" type="button">🌿 <span id="hubTabHerbier">Herbarium</span></button>
+          <button class="cp-cat" data-hubtab="journal" type="button">📓 <span id="hubTabJournal">Journal</span></button>
+        </div>
+        <div class="cp-list">
+          <div id="journalList" style="flex:1;min-height:0;font-size:.68rem;color:var(--muted);line-height:1.8;overflow-y:auto"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -279,7 +284,7 @@
 
   <!-- ═══ Seed vault (typed seeds: properties, plant, sell, destroy) ═══ -->
   <div class="overlay" id="seedOverlay" role="dialog" aria-modal="true" aria-labelledby="seedTitle">
-    <div class="book" style="height:min(620px,86vh)">
+    <div class="book" style="width:min(92vw,780px);max-width:none;height:min(620px,86vh)">
       <div class="book-head">
         <h3 id="seedTitle">🌰 Seed vault</h3>
         <span class="book-nav" style="margin-left:auto">
@@ -311,7 +316,7 @@
 
   <!-- ═══ Almanac modal ═══ -->
   <div class="overlay" id="almanacOverlay" role="dialog" aria-modal="true" aria-labelledby="almanacTitle">
-    <div class="book" style="max-width:620px">
+    <div class="book" style="width:min(92vw,780px);max-width:none;height:min(620px,86vh)">
       <div class="book-head">
         <h3 id="almanacTitle">📗 Almanac</h3>
         <button class="btn sm" id="btnAlmanacClose" type="button">✕</button>

@@ -454,6 +454,7 @@ en:{
   streakLbl:(n,j)=>n+' day streak · '+j+' joker',
   streakNone:j=>'no streak yet · '+j+' joker',
   journalTitle:'Journal', tabGarden:'Garden',
+  hubSub:'Your seeds, your discoveries, and your garden\'s history.', hubTabSeeds:'Seeds', hubTabHerbier:'Herbarium', hubTabJournal:'Journal',
   jlDay:d=>'Day '+d,
   jl:{planted:v=>'planted 🌱'+(v?' — '+v:''),leaf:()=>'first leaves unfurled',bloom:()=>'started blooming ✿',saved:()=>'rescued from wilting 💧',died:()=>'died of thirst 💀',harvest:px=>'harvested — '+px+' px',gentle:px=>'gently picked — '+px+' px 🧤',mutation:m=>'a mutation appeared!',named:v=>'its pot was named “'+v+'”'},
   toDiscover:n=>n+' recipe'+(n>1?'s':'')+' still to discover — research the tier or use the try table.',
@@ -744,6 +745,7 @@ fr:{
   streakLbl:(n,j)=>'série de '+n+' j · '+j+' joker',
   streakNone:j=>'pas encore de série · '+j+' joker',
   journalTitle:'Journal', tabGarden:'Jardin',
+  hubSub:'Tes graines, tes découvertes, et l\'historique de ton jardin.', hubTabSeeds:'Graines', hubTabHerbier:'Herbier', hubTabJournal:'Journal',
   jlDay:d=>'Jour '+d,
   jl:{planted:v=>'plantée 🌱'+(v?' — '+v:''),leaf:()=>'premières feuilles dépliées',bloom:()=>'début de floraison ✿',saved:()=>'sauvée du flétrissement 💧',died:()=>'morte de soif 💀',harvest:px=>'récoltée — '+px+' px',gentle:px=>'cueillie délicatement — '+px+' px 🧤',mutation:m=>'une mutation est apparue !',named:v=>'son pot a été baptisé « '+v+' »'},
   toDiscover:n=>n+' recette'+(n>1?'s':'')+' encore à découvrir — recherche le palier ou passe par la table d\'essai.',
@@ -2685,7 +2687,7 @@ function stageQuickClick(e){
   if(k==='market') openMarket();
   else if(k==='workshop'){ bookFilter.cat=null; bookFilter.res=null; bookPage=0; openBook(); } // the design opens on "All"
   else if(k==='lab') openResearch();
-  else if(k==='journal'){ renderJournal(); $('journalOverlay').classList.add('on'); }
+  else if(k==='journal'){ openJournalHub('journal'); }
 }
 function commitDetailsRename(i){
   const inp=document.querySelector('[data-detinput]'); if(!inp)return;
@@ -3504,6 +3506,15 @@ function confirmRename(){
   _ctrlSig='';
   save(); render(true);
 }
+function openJournalHub(tab){ // one shell (same size as the crafting/inventory popups) for the three "knowledge" pages — Seeds and Herbarium hand off to their own existing popup, Journal renders in place
+  const t=T();
+  $('hubTitle').textContent='📓 '+t.journalTitle; $('hubSub').textContent=t.hubSub;
+  $('hubTabSeeds').textContent=t.hubTabSeeds; $('hubTabHerbier').textContent=t.hubTabHerbier; $('hubTabJournal').textContent=t.hubTabJournal;
+  document.querySelectorAll('#journalOverlay [data-hubtab]').forEach(b=>b.classList.toggle('on',b.dataset.hubtab===tab));
+  if(tab==='seeds'){ $('journalOverlay').classList.remove('on'); openSeeds(); return; }
+  if(tab==='herbier'){ $('journalOverlay').classList.remove('on'); openAlmanac(); return; }
+  renderJournal(); $('journalOverlay').classList.add('on');
+}
 function renderJournal(){ // the journal covers the whole ZONE on screen: every pot's entries, newest first, each tagged with its pot
   const t=T(), box=$('journalList'); if(!box)return;
   const r=curRoom, all=[];
@@ -3511,7 +3522,7 @@ function renderJournal(){ // the journal covers the whole ZONE on screen: every 
     const p=S.plants[i]; if(!hasPot(i)||!p||!p.journal)continue;
     p.journal.forEach((e,n)=>all.push({e, i, n, ts:(typeof e.ts==='number')?e.ts:((p.plantedTs||0)+e.d*86400000+n)}));
   }
-  const ttl=$('tJournalCard'); if(ttl) ttl.textContent='📓 '+t.journalTitle+' — '+roomName(r);
+  const ttl=$('hubTitle'); if(ttl) ttl.textContent='📓 '+t.journalTitle+' — '+roomName(r);
   if(!all.length){ box.innerHTML='<span class="hint">—</span>'; return; }
   all.sort((a,b)=>(b.ts-a.ts)||(b.n-a.n)||(b.i-a.i));
   const many=potList().filter(x=>roomOf(x)===r).length>1;
@@ -3679,7 +3690,7 @@ function setLang(l){
   if($('seedOverlay').classList.contains('on')) renderSeedVault();
   $('questsTitleEl').textContent='🗓️ '+t.questsTitle;
   $('badgesTitleEl').textContent='🏅 '+t.badgesTitle;
-  $('tJournalCard').textContent='📓 '+t.journalTitle+' — '+roomName(curRoom);
+  if($('journalOverlay').classList.contains('on')) renderJournal();
   $('mlTime').textContent=t.mlTime; $('mlLang').textContent=t.mlLang;
   $('btnInfo').textContent='ℹ️ '+t.mlInfo;
   renderQuests();
@@ -4531,8 +4542,9 @@ function init(){
   $('bookOverlay').addEventListener('click',e=>{ if(e.target===$('bookOverlay'))closeBook(); });
   $('btnMarket').addEventListener('click',openMarket);
   $('btnMarketClose').addEventListener('click',closeMarket);
-  $('btnJournalTab').addEventListener('click',()=>{ renderJournal(); $('journalOverlay').classList.add('on'); });
+  $('btnJournalTab').addEventListener('click',()=>{ openJournalHub('journal'); });
   $('btnJournalClose').addEventListener('click',()=>$('journalOverlay').classList.remove('on'));
+  document.querySelectorAll('#journalOverlay [data-hubtab]').forEach(b=>b.addEventListener('click',()=>openJournalHub(b.dataset.hubtab)));
   $('journalOverlay').addEventListener('click',e=>{ if(e.target===$('journalOverlay'))$('journalOverlay').classList.remove('on'); });
   $('tabGarden').addEventListener('click',()=>{ document.querySelectorAll('.overlay.on').forEach(o=>o.classList.remove('on')); if(controlView){ controlView=false; _navSig=''; render(true); } });
   $('marketOverlay').addEventListener('click',e=>{ if(e.target===$('marketOverlay'))closeMarket(); });
