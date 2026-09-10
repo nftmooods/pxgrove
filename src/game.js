@@ -4040,14 +4040,19 @@ function renderPlotCards(){
 }
 const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — the 3-slot bed is painted right into it
 const SCENE_BG_MOBILE=__ASSET__('bg-garden-mobile.jpg'); // same illustration MINUS the bed (bare grass/dirt clearing): used whenever the scene is fit+mirrored, since a baked-in bed would tile/mirror unpredictably there
-let _sceneImg=null, _sceneImgMobile=null, _sceneExactFit=false;
+const SCENE_BG_NIGHT=__ASSET__('bg-garden-night.jpg'); // a painted night version of the same garden — crossfaded over the day art by dayDarkness(), replacing the flat dark wash on desktop
+let _sceneImg=null, _sceneImgMobile=null, _sceneImgNight=null, _sceneExactFit=false;
 function sceneImage(){ if(!SCENE_BG)return null; if(!_sceneImg){ _sceneImg=new Image(); _sceneImg.src=SCENE_BG; _sceneImg.onload=()=>render(true); } return _sceneImg.complete&&_sceneImg.naturalWidth?_sceneImg:null; }
 function sceneImageMobile(){ if(!SCENE_BG_MOBILE)return null; if(!_sceneImgMobile){ _sceneImgMobile=new Image(); _sceneImgMobile.src=SCENE_BG_MOBILE; _sceneImgMobile.onload=()=>render(true); } return _sceneImgMobile.complete&&_sceneImgMobile.naturalWidth?_sceneImgMobile:null; }
+function sceneImageNight(){ if(!SCENE_BG_NIGHT)return null; if(!_sceneImgNight){ _sceneImgNight=new Image(); _sceneImgNight.src=SCENE_BG_NIGHT; _sceneImgNight.onload=()=>render(true); } return _sceneImgNight.complete&&_sceneImgNight.naturalWidth?_sceneImgNight:null; }
 function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees 30-46 · fence 46-53 · grass 53-GH
   const px=(cx,cy,col,w=1,h=1)=>{ x.fillStyle=col; x.fillRect(cx*CELL,cy*CELL,w*CELL,h*CELL); };
   const img=sceneImage();
   if(img){ const cw=W*CELL, ch=GH*CELL, iw=img.naturalWidth, ih=img.naturalHeight;
-    if(Math.abs(cw/ch-iw/ih)<0.03){ _sceneExactFit=true; x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); nightWash(x,cw,ch,th); return; } // same ratio: the whole illustration, undistorted — the baked-in bed lands exactly where SCENE_BED_META expects it
+    if(Math.abs(cw/ch-iw/ih)<0.03){ _sceneExactFit=true; x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); // same ratio: the whole illustration, undistorted — the baked-in bed lands exactly where SCENE_BED_META expects it
+      const night=sceneImageNight(), k=Math.max(th.night?1:0,dayDarkness());
+      if(night&&k>0){ x.save(); x.globalAlpha=k; x.drawImage(night,0,0,cw,ch); x.restore(); } else nightWash(x,cw,ch,th); // crossfade the painted night art in; flat tint only as a fallback before it loads
+      return; }
     // otherwise (mobile): fit the lower 74 % (fence → ground) to the height and mirror sideways — use the bed-less image, else the baked-in bed would tile/mirror across the screen
     _sceneExactFit=false;
     const mimg=sceneImageMobile()||img;
