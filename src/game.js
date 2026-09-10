@@ -3935,10 +3935,12 @@ function plantHitAt(i,clientX,clientY){ // is the pointer near the plant of slot
   const cx0=slotCenterX(k), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth); // same placement as drawOne()
   const cp=new DOMPoint((clientX-rect.left)*(cv.width/rect.width),(clientY-rect.top)*(cv.height/rect.height));
   const w=_slotBaseXform.inverse().transformPoint(cp);
-  // sprite frame → plant-centred unit ellipse (the painted plant sits roughly in the frame's middle 60% width, upper 75% height)
+  // sprite frame → plant-centred unit ellipse, generous enough that a small sprite (the seed dot) still gets a comfortable hover margin
   const u=(w.x-(cx0-dW*al.cx))/dW, v=(w.y-(gy-dH*al.b))/dH;
-  const ex=(u-0.5)/0.30, ey=(v-al.b*0.42)/(al.b*0.42);
-  return ex*ex+ey*ey<=1;
+  const ex=(u-0.5)/0.34, ey=(v-al.b*0.42)/(al.b*0.47);
+  if(ex*ex+ey*ey>1) return false;
+  const pillTop=worldToCss(cx0,bedGroundY()); // stop the droplet zone at the growth-bars pill's own dark background just below the plant — that pill owns its own clicks
+  return !pillTop||clientY<pillTop.y-13;
 }
 function nextFlowerText(p,i){ // "next flower" countdown shared by the plant card and the growing-details popup
   const t=T(), P=progress(p), inactive=p.dead||p.cut;
@@ -3983,7 +3985,7 @@ function renderPlotCards(){
     const growing=hasPot(i)&&S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut;
     let lockTop=TP.y-40; // fallback until the canvas has a real transform to measure against
     if(!hasPot(i)){ const hint=plantHintCss(k); if(hint) lockTop=hint.y-19; } // centre the 38px lock bubble on plot 1's own little seed dot, same height on every locked plot
-    const top=growing?TP.y-20:(!hasPot(i)?lockTop:TP.y+3); // bars pill straddles the soil's front edge; the padlock centres on the seed's own spot; name cards just under the compartment
+    const top=growing?TP.y-13:(!hasPot(i)?lockTop:TP.y+3); // bars pill straddles the soil's front edge, a touch lower than before; the padlock centres on the seed's own spot; name cards just under the compartment
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
     if(!hasPot(i)){ // locked compartment (design): a round padlock on the soil; click → the "Unlock the plot" card above it
       nameCls='';
