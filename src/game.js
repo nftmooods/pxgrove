@@ -3945,7 +3945,7 @@ function plantHitAt(i,clientX,clientY){ // is the pointer near the plant of slot
   const cv=$('plantCanvas'); const rect=cv.getBoundingClientRect(); if(!rect.width||!cv.width)return false;
   const stage=plantSpriteStage(progress(p)), img=plantStageImage(stage); if(!img)return true;
   const al=PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5}, k=i-curRoom*ROOM_SLOTS;
-  const cx0=slotCenterX(k), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth); // same placement as drawOne()
+  const cx0=slotCenterX(k), gy=bedGroundY()-17, dW=slotPitch()*PLANT_SPRITE_SCALE, dH=dW*(img.naturalHeight/img.naturalWidth); // same placement as drawOne()
   const cp=new DOMPoint((clientX-rect.left)*(cv.width/rect.width),(clientY-rect.top)*(cv.height/rect.height));
   const w=_slotBaseXform.inverse().transformPoint(cp);
   // sprite frame → plant-centred unit ellipse, generous enough that a small sprite (the seed dot) still gets a comfortable hover margin
@@ -4121,6 +4121,7 @@ function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++)
 const DIRT_HOLE_SRC=__ASSET__('icon-dirt-hole.png'); // a harvested plant leaves this little hole where the seed hint used to sit
 let _dirtHoleImg=null;
 function dirtHoleImage(){ if(!_dirtHoleImg){ _dirtHoleImg=new Image(); _dirtHoleImg.src=DIRT_HOLE_SRC; _dirtHoleImg.onload=()=>render(true); } return _dirtHoleImg.complete&&_dirtHoleImg.naturalWidth?_dirtHoleImg:null; }
+const PLANT_SPRITE_SCALE=0.67; // the painted growth sprites were reading too large against the bed — shrunk by about a third, still anchored on the same soil point
 const PLANT_STAGE_SPRITES={ // 13 hand-painted frames (Martin's Sprite-Seed_01..13) — a much finer run-up than the original 6
   seed:__ASSET__('plant-seed.png'),
   sprout:__ASSET__('plant-sprout.png'),
@@ -4327,7 +4328,7 @@ function drawOne(x,idx,slot){
     if(img&&_slotBaseXform){
       const realSlot=slot==null?idx:slot, al=PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5};
       // gy = the root point on the soil (Martin's dot markers, ~16 base px below the seed's centre so the seed lands ON the dot); the mound's bottom sits there for every stage
-      const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
+      const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch()*PLANT_SPRITE_SCALE, dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
       { const dx=cx0-dW*al.cx, dy=gy-dH*al.b;
         if(!plantNightShade(x,img,0,0,img.naturalWidth,img.naturalHeight,realSlot,dx,dy,dW,dH)) x.drawImage(img,dx,dy,dW,dH); }
