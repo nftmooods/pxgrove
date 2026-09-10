@@ -4496,10 +4496,10 @@ function init(){
       rs.setProperty('--cur-hand',"url('"+__ASSET__('cursor-hand-default.png')+"') 22 3, auto");
       rs.setProperty('--cur-click',"url('"+__ASSET__('cursor-click.png')+"') 22 3, pointer");
       rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer");
-      rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 20 20, pointer");
-      rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 20 20, pointer");
-      rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 20 20, pointer");
-      rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 20 20, pointer"); } }
+      rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 22 22, pointer"); // 44px, same scale as the design's own cursors above
+      rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 22 22, pointer"); } }
   const TOOL_CURSOR_VAR={hands:'--cur-tool-hands',shears:'--cur-tool-shears',gloves:'--cur-tool-gloves'};
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water / double-click to harvest) — even the only one
