@@ -1966,8 +1966,8 @@ function fertBadgeIcon(p){
   if(p.buffKind){ const r=RECIPES.find(x=>x.gives&&Object.keys(x.gives)[0]===p.buffKind); if(r&&r.ic)return r.ic; }
   return p.buffMult>=1.5?'💠':(p.buffMult<=1.2?'🍂':'🧪');
 }
-function useFert(kind){
-  const p=selPlant();
+function useFert(kind,i=S.sel){
+  const p=S.plants[i];
   const fx=FERT_FX[kind];
   if(!p||p.dead||p.cut||!fx||S.inv[kind]<=0)return;
   if(fx.only&&baseTypeOf(p)!==fx.only)return; // variety-specific fertilizer
@@ -2566,7 +2566,7 @@ function sidebarClick(e){ // ONE delegated handler: survives re-renders, whole s
   const dt=q('[data-driptoggle]'); if(dt){ e.stopPropagation(); S.inv.dripOn=!(S.inv.dripOn!==false); save(); renderSidebar(); renderHotbar();
     const tn=T().recipes[S.inv.dripElecCount>0?'dripElec':(S.inv.dripPlusCount>0?'dripPlus':'drip')].nm;
     showToast((S.inv.dripOn!==false?'✓ ':'⏸ ')+tn); return; }
-  const us=q('[data-sbuse]');      if(us){ e.stopPropagation(); useFert(us.dataset.sbuse); return; }
+  const us=q('[data-sbuse]');      if(us){ e.stopPropagation(); armFert(us.dataset.sbuse); return; } // pick the target on the scene — arms the cursor instead of using it on whatever's selected
   const gl=q('[data-golock]');     if(gl){ e.stopPropagation();
     const r=RECIPES.find(x=>x.id===gl.dataset.golock); if(!r)return;
     if(!recipeVisible(r)){ openResearch('research'); }
@@ -2641,7 +2641,7 @@ function renderSidebar(){
         const fx=FERT_FX[k];
         const usable=p&&!p.dead&&!p.cut&&(!fx.only||baseTypeOf(p)===fx.only);
         if(!main) main=[k,r.ic];
-        items+='<span class="slot mini owned'+(usable?'':' dis')+'" data-sbuse="'+k+'" data-tip="'+tip(t.recipes[r.id].nm,t.recipes[r.id].fx)+'" role="button" tabindex="0">'+sbIc(k,r.ic)+'<span class="qty">'+S.inv[k]+'</span></span>';
+        items+='<span class="slot mini owned'+(usable?'':' dis')+(pendingFert===k?' armed':'')+'" data-sbuse="'+k+'" data-tip="'+tip(t.recipes[r.id].nm,t.recipes[r.id].fx)+'" role="button" tabindex="0">'+sbIc(k,r.ic)+'<span class="qty">'+S.inv[k]+'</span></span>';
       }else if(r) items+=lockSlot(r.id,t);
     }
     sbGroup(box,'fert',main?sbIc(main[0],main[1]):sbIc('compost','🧪'),tip(t.res.fert,t.tipFertGroup),items,main?'<span class="qty">'+S.inv[main[0]]+'</span>':'');
@@ -2662,6 +2662,9 @@ function renderSidebar(){
 }
 /* ── bottom-right quick cluster: map (→ market, workshop) and journal ── */
 let mapOpen=false;
+let pendingFert=null; // armed by clicking a fertilizer in the sidebar: the cursor becomes that fertilizer until the player clicks the target plant (or clicks anything else, which cancels it)
+function fertUsable(kind,p){ const fx=FERT_FX[kind]; return !!(p&&!p.dead&&!p.cut&&fx&&S.inv[kind]>0&&(!fx.only||baseTypeOf(p)===fx.only)); }
+function armFert(kind){ pendingFert=(pendingFert===kind)?null:kind; renderSidebar(); }
 function renderStageQuick(){
   const t=T(), box=$('stageQuick'); if(!box)return;
   box.innerHTML='<span class="fgroup sq-map'+(mapOpen?' open':'')+'">'+
@@ -3978,6 +3981,7 @@ function detailsHtml(i,p){
   return '<div class="pc-details" data-details="'+i+'">'+
     '<div class="pd-head"><span class="pd-ic">🌱</span>'+head+'<button type="button" class="pd-btn" data-detclose="1">✕</button></div>'+
     '<div class="pd-sub">'+esc(vName(v))+' · '+esc(phaseName(p,Pv))+'</div>'+
+    (buffActive(p)?'<div class="pd-fertstatus">'+t.badgeFertX(fertBadgeIcon(p),Math.round((p.buffMult-1)*100),fmtDur(p.buffUntil-p.gH))+'</div>':'')+
     bar(t.hydration,'hyd'+(Hv<0.10?' warn':''),Hv)+bar(t.growth,'grow',Pv)+
     '<div class="pd-sep"></div>'+
     '<div class="pd-stats"><div class="pd-stat"><span class="pd-stat-ic">🌸</span><div><div class="pd-stat-k">'+t.stFlowers+'</div><div class="pd-stat-v disp">'+p.pending.length+' / '+cap+'</div></div></div>'+
@@ -4553,7 +4557,16 @@ function init(){
       rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 22 22, pointer");
       rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 22 22, pointer");
       rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 22 22, pointer");
-      rs.setProperty('--cur-tool-uproot',"url('"+__ASSET__('cursor-tool-uproot.png')+"') 22 22, pointer"); } }
+      rs.setProperty('--cur-tool-uproot',"url('"+__ASSET__('cursor-tool-uproot.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-compost',"url('"+__ASSET__('cursor-fert-compost.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fert',"url('"+__ASSET__('cursor-fert-fert.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertPlus',"url('"+__ASSET__('cursor-fert-fertplus.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertHuman',"url('"+__ASSET__('cursor-fert-ferthuman.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertZombie',"url('"+__ASSET__('cursor-fert-fertzombie.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertAgent',"url('"+__ASSET__('cursor-fert-fertagent.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertCat',"url('"+__ASSET__('cursor-fert-fertcat.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-fert-fertAlien',"url('"+__ASSET__('cursor-fert-fertalien.png')+"') 22 22, pointer"); } }
+  const FERT_CURSOR_VAR={compost:'--cur-fert-compost',fert:'--cur-fert-fert',fertPlus:'--cur-fert-fertPlus',fertHuman:'--cur-fert-fertHuman',fertZombie:'--cur-fert-fertZombie',fertAgent:'--cur-fert-fertAgent',fertCat:'--cur-fert-fertCat',fertAlien:'--cur-fert-fertAlien'};
   const TOOL_CURSOR_VAR={hands:'--cur-tool-hands',shears:'--cur-tool-shears',gloves:'--cur-tool-gloves'};
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water or harvest) — even the only one
@@ -4566,6 +4579,10 @@ function init(){
     const uprootReady=p&&S.inv.equip==='uproot'; // uproot tool active: a click pulls the plant out at any growth stage, so it always takes over the cursor here
     const readyToHarvest=p&&!p.dead&&!p.cut&&p.pending.length>=flowerCap(p,i); // full bloom: the active harvest tool is what a double-click actually uses here
     const emptyReady=cardsOn&&!deadHere&&!cutHere&&!onPlant&&i>=0&&hasPot(i)&&!S.plants[i]&&roomOf(i)===curRoom&&emptyPlotZoneHit(i,e.clientX,e.clientY); // an empty, unlocked plot: the seed cursor, but only right over its own soil — everywhere else follows the game's usual cursor rules
+    if(pendingFert){ // armed fertilizer: its own cursor over a plant it can actually be used on, plain hand everywhere else — takes over every other cursor rule while aiming
+      e.currentTarget.style.cursor=(onPlant&&fertUsable(pendingFert,p))?'var('+FERT_CURSOR_VAR[pendingFert]+',pointer)':'var(--cur-hand,default)';
+      return;
+    }
     e.currentTarget.style.cursor=deadHere?'var(--cur-tool-uproot,pointer)' // dead plant: always the uproot cursor, whatever tool is equipped
       :cutHere?'var(--cur-seed,pointer)' // harvested: the seed cursor, ready to replant
       :onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the droplet (one click waters it)
@@ -4575,6 +4592,13 @@ function init(){
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
     const cardsOn=!controlView&&!isMobile();
+    if(pendingFert){ // aiming a fertilizer: this click either applies it to the plant under the cursor, or cancels — never falls through to select/water/harvest
+      const p=hasPot(i)?S.plants[i]:null;
+      const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
+      if(onPlant&&fertUsable(pendingFert,p)){ if(i!==S.sel) selectPot(i); useFert(pendingFert,i); }
+      pendingFert=null; renderSidebar();
+      return;
+    }
     if(hasPot(i)){
       const p=S.plants[i];
       if(i!==S.sel) selectPot(i);

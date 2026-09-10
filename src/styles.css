@@ -318,6 +318,7 @@
   .pd-btn.ghost{background:transparent;color:#8b8d8f;width:22px}
   .pd-btn:hover{color:#f2f2f2;background:#323336}
   .pd-sub{font-size:.62rem;color:#8b8d8f;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pd-fertstatus{font-size:.62rem;color:#8fd14f;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} /* active fertilizer: bonus % and time left, right under the plant's name */
   .pd-row{margin-top:12px}
   .pd-lbl{font-size:.72rem;color:#c7c8c9;margin-bottom:5px}
   .pd-barrow{display:flex;align-items:center;gap:8px}
@@ -660,6 +661,7 @@
   .slot.mini .sbic{width:40px;height:42px;object-fit:contain;image-rendering:auto}
   .slot.mini .sbic.big{width:46px;height:50px}
   .slot.mini .sbem{font-size:1.5rem;line-height:1}
+  .sidebar .slot.mini.armed{border-color:#8fd14f;box-shadow:0 0 0 3px rgba(143,209,79,.35),0 0 10px rgba(143,209,79,.6)} /* fertilizer armed: click the target plant on the scene to apply it */
   .sidebar .slot.mini.dis{opacity:1;cursor:not-allowed}
   .sidebar .slot.mini.dis .sbic,.sidebar .slot.mini.dis .sbem{filter:grayscale(1) brightness(.8);opacity:.85}
   .sidebar .slot.mini.lockslot{cursor:var(--cur-click,pointer)}
