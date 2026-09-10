@@ -414,7 +414,7 @@ en:{
     next:'Next ▸', skip:'Skip', done:'Let\'s grow! ✓',
     t0:'🌱 Welcome! PxGrove is a <b>BETA</b>: a chance to discover the mechanics, hunt down recipes… and simply have a good time watching your cultures grow. For now your save lives in this browser\'s cache — a login / wallet-connect system may come later.',
     t1:'Here is <b>your pot</b>, with your plant inside — it has already started growing!',
-    t2:'<b>Double-click the plant</b> to water it. Come back from time to time: without water, your plant will die of thirst.',
+    t2:'<b>Click the plant</b> to water it. Come back from time to time: without water, your plant will die of thirst.',
     t3:'Once the plant is mature and full of flowers, <b>double-clicking it harvests</b>: you collect the flowers and the wood, and flowers grind into <b>pixels</b> — the resource that crafts your upgrades.',
     tw:'The <b>Workshop</b>: this panel gathers everything you can open — Crafting, Layout, the Market, the Laboratory, the Almanac and your Seeds. Let\'s look at the two main ones.',
     t4:'The <b>Laboratory</b>: run research first — then the crafting tables (Crafting / Layout) fill up with recipes you can build.',
@@ -424,8 +424,8 @@ en:{
     w2:'Press <b>Craft</b> as soon as you have the wood — then harvest again: every cycle funds the next machine. 🌱',
     t6:'Up here: every day three <b>quests</b> (🗓️) await you, and your feats fill the <b>Badges</b> (🏅) — they will unlock rewards in the final version. Thanks for trying PxGrove… have a great game! 🌱',
     w0b:'Double-clicking a plant full of flowers harvests it. From <b>80% growth</b>, once the first flowers are out, you can already harvest — but the plant gives <b>fewer resources</b>. At <b>100% with every flower</b>, the yield is at its best.',
-    g0:'<b>80% grown!</b> Remember: <b>double-click the pot</b> to water the plant at any moment of its growth.',
-    g1:'The same double-click <b>harvests</b> — but <b>only at 100% growth with every flower out</b>. Until then it just waters.',
+    g0:'<b>80% grown!</b> Remember: <b>click the pot</b> to water the plant at any moment of its growth.',
+    g1:'A <b>double-click harvests</b> — but <b>only at 100% growth with every flower out</b>. A single click just waters.',
     h0:'<b>Second harvest: 2 seeds!</b> From now on you can also plant <b>straight in the ground</b>: click a <b>free slot</b> (dotted footprint) and pick a seed — no pot needed.',
     h1:'A plant in the ground gives <b>2 flowers max</b> plus its wood, and is <b>more fragile</b>: it dries faster and will be exposed to weather and events. Pots protect — the ground is free.',
     e0:'Your first tool! It lives <b>here, on the left of the stage</b>. This slot opens the group it belongs to.',
@@ -500,9 +500,9 @@ en:{
   badgeFertX:(ic,pct,t)=>ic+' +'+pct+'% growth \u00b7 '+t+' left',
   info:{title:'ℹ️ How it works', hint:'Tap a feature to read what it does.', items:{
     plant:{nm:'🌱 Planting',tx:'Enter a Normie or Hoodie number: its type sets the plant variety (growth speed, flower richness) and its pixel count sets its size. No token? Plant a Common Sprout — slower, fewer flowers.'},
-    water:{nm:'💧 Watering & hydration',tx:'A base plant goes from full to dry in 8 h — and whatever speeds its growth (variety, soil, fertilizer) dries it just as much faster; a lamp dries it even more (down to 6 h on a base plant). Water by hand (50%), or better with a bucket / watering can. Double-click a pot to water it. At 10% you get a warning, at 0% the plant dies.'},
+    water:{nm:'💧 Watering & hydration',tx:'A base plant goes from full to dry in 8 h — and whatever speeds its growth (variety, soil, fertilizer) dries it just as much faster; a lamp dries it even more (down to 6 h on a base plant). Water by hand (50%), or better with a bucket / watering can. Click a pot to water it. At 10% you get a warning, at 0% the plant dies.'},
     grow:{nm:'🌼 Growth & flowers',tx:'Growth runs on real time (24 h base for a common seed, 18–19 h for the fastest varieties). Flowers bloom as the plant grows, up to the pot\'s flower cap.'},
-    harvest:{nm:'✂ Harvest & grind',tx:'When the pot is full of flowers (double-click works then), harvest: flowers are ground into pixels, the plant is cut and gives wood and a seed. Gloves can pick without cutting.'},
+    harvest:{nm:'✂ Harvest & grind',tx:'When the pot is full of flowers, double-click to harvest: flowers are ground into pixels, the plant is cut and gives wood and a seed. Gloves can pick without cutting.'},
     workbench:{nm:'🧰 Workbench & crafting',tx:'Craft the Workbench first (20 wood — your first full-grown harvest always yields 21). It unlocks the recipe book: tools, machines, consumables. Click a resource to open the book filtered on it.'},
     layout:{nm:'🏠 Layout',tx:'Build pots and choose each pot\'s material — clay, ceramic (+1 flower), big ceramic (+2), terracotta (faster growth for dry lovers, dries faster), plastic (holds water), concrete (insulated), self-watering (reserve ×1.40) — plus extra rooms (+3 pots each) and the Control desk. Layout is per plantation.'},
     market:{nm:'🪙 Market',tx:'Sell pixels and seeds for coins, buy what you lack. Prices are listed in the Market window.'},
@@ -712,8 +712,8 @@ fr:{
     w2:'Appuie sur <b>Fabriquer</b> dès que tu as le bois — puis reviens récolter : chaque cycle finance la machine suivante. 🌱',
     t6:'Tout en haut : chaque jour, trois <b>quêtes</b> (🗓️) t\'attendent, et tes exploits remplissent les <b>badges</b> (🏅) — ils débloqueront des récompenses dans la version finale. Merci d\'essayer PxGrove… bon jeu ! 🌱',
     w0b:'Un double-clic sur une plante pleine de fleurs la récolte. Dès <b>80\x20% de croissance</b>, quand les premières fleurs apparaissent, tu peux déjà récolter — mais la plante donne <b>moins de ressources</b>. À <b>100\x20% avec toutes les fleurs</b>, le rendement est maximal.',
-    g0:'<b>80\x20% de croissance !</b> Rappel : <b>double-clique sur le pot</b> pour arroser la plante à tout moment de sa pousse.',
-    g1:'Le même double-clic <b>récolte</b> — mais <b>uniquement à 100\x20% de croissance avec toutes les fleurs sorties</b>. Avant ça, il ne fait qu\'arroser.',
+    g0:'<b>80\x20% de croissance !</b> Rappel : <b>clique sur le pot</b> pour arroser la plante à tout moment de sa pousse.',
+    g1:'Un <b>double-clic récolte</b> — mais <b>uniquement à 100\x20% de croissance avec toutes les fleurs sorties</b>. Un simple clic arrose.',
     h0:'<b>Deuxième récolte : 2 graines !</b> Tu peux désormais planter <b>directement en terre</b> : clique un <b>emplacement libre</b> (pointillés) et choisis une graine — sans pot.',
     h1:'Une plante en terre donne <b>2 fleurs max</b> et son bois, mais elle est <b>plus fragile</b> : elle sèche plus vite et sera exposée à la météo et aux événements. Les pots protègent — la terre est gratuite.',
     e0:'Ton premier outil ! Il vit <b>ici, à gauche de la scène</b>. Cette case ouvre le groupe auquel il appartient.',
@@ -790,7 +790,7 @@ fr:{
     plant:{nm:'🌱 Planter',tx:'Entre un numéro de Normie ou de Hoodie : son type fixe la variété de la plante (vitesse de pousse, richesse des fleurs) et son nombre de pixels fixe sa taille. Pas de token ? Plante une Pousse commune — plus lente, moins de fleurs.'},
     water:{nm:'💧 Arrosage & hydratation',tx:'Une plante de base passe de pleine à sèche en 8 h — et tout ce qui accélère sa pousse (variété, terreau, engrais) la dessèche d\'autant plus vite ; une lampe la dessèche encore plus (jusqu\'à 6 h sur une plante de base). Arrose à la main (50\x20%), ou mieux avec un seau / un arrosoir. Double-clic sur un pot = arroser. À 10\x20% tu es averti, à 0\x20% la plante meurt.'},
     grow:{nm:'🌼 Pousse & fleurs',tx:'La pousse suit le temps réel (24 h de base pour une graine commune, 18–19 h pour les variétés les plus rapides). Les fleurs éclosent au fil de la pousse, jusqu\'au maximum du pot.'},
-    harvest:{nm:'✂ Récolter & broyer',tx:'Quand le pot est plein de fleurs (le double-clic marche alors), récolte : les fleurs sont broyées en pixels, la plante est coupée et donne du bois et une graine. Les gants peuvent cueillir sans couper.'},
+    harvest:{nm:'✂ Récolter & broyer',tx:'Quand le pot est plein de fleurs, double-clique pour récolter : les fleurs sont broyées en pixels, la plante est coupée et donne du bois et une graine. Les gants peuvent cueillir sans couper.'},
     workbench:{nm:'🧰 Établi & fabrication',tx:'Fabrique d\'abord l\'Établi (20 bois — ta première récolte à maturité donne toujours 21). Il débloque le carnet de recettes : outils, machines, consommables. Clique sur une ressource pour ouvrir le carnet filtré dessus.'},
     layout:{nm:'🏠 Aménagement',tx:'Construis des pots et choisis la matière de chacun — argile, céramique (+1 fleur), grand pot céramique (+2), terre cuite (pousse plus vite pour les variétés du sec, sèche plus vite), plastique (retient l\'eau), béton (isolé), auto-arrosant (réserve ×1.40) — plus des pièces (+3 pots chacune) et le Bureau de contrôle. L\'aménagement est propre à chaque plantation.'},
     market:{nm:'🪙 Marché',tx:'Vends des pixels et des graines contre des pièces, achète ce qui te manque. Les prix sont affichés dans la fenêtre Marché.'},
@@ -3158,7 +3158,7 @@ function openIntro(){
 const TUTO_STEPS=[
   {target:null,        key:'t0'},
   {target:'plantCanvas',key:'t1'},
-  {target:'plantCanvas',key:'t2'}, // water/harvest live on the plant itself (double-click) since the panel under the scene went away
+  {target:'plantCanvas',key:'t2'}, // water (click) / harvest (double-click) live on the plant itself since the panel under the scene went away
   {target:'plantCanvas',key:'t3'},
   {target:'workshopCard', key:'tw'},
   {targetSel:'#researchOverlay .book', key:'t4', open:()=>openResearch('research'), close:closeResearch},
@@ -3202,7 +3202,7 @@ function maybeTuto6(){ // right after the 2nd cut (guaranteed 2nd seed): how to 
   if(!$('scrGarden').classList.contains('on')||controlView)return;
   setTimeout(()=>{ if(tutoStep<0) runTuto(TUTO6_STEPS,'tuto6Seen'); },900);
 }
-function maybeTuto5(){ // first time ever a plant reaches 80% growth: double-click to water, double-click harvests only at 100% + all flowers
+function maybeTuto5(){ // first time ever a plant reaches 80% growth: click to water, double-click harvests only at 100% + all flowers
   if(S.tuto5Seen||tutoStep>=0||!S.tutoSeen)return;
   if(!$('scrGarden').classList.contains('on')||controlView)return;
   const i=S.plants.findIndex(p=>p&&!p.dead&&!p.cut&&progress(p)>=0.8);
@@ -4491,15 +4491,19 @@ function init(){
       rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer");
       rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 20 20, pointer"); } }
   $('plantCanvas').addEventListener('mousemove',e=>{
-    const i=potFromEvent(e); // any pot in view is clickable (select / double-click to water or harvest) — even the only one
+    const i=potFromEvent(e); // any pot in view is clickable (select / click to water / double-click to harvest) — even the only one
     const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
     const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
-    e.currentTarget.style.cursor=onPlant?'var(--cur-drop,pointer)' // the pointer is on the plant's painting itself: the droplet (double-click waters it)
+    e.currentTarget.style.cursor=onPlant?'var(--cur-drop,pointer)' // the pointer is on the plant's painting itself: the droplet (one click waters it)
       :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
-    if(hasPot(i)) selectPot(i);
+    if(hasPot(i)){
+      const p=S.plants[i];
+      if(i!==S.sel) selectPot(i);
+      if(p&&!p.dead&&!p.cut&&plantHitAt(i,e.clientX,e.clientY)) water(); // one click on the plant itself waters it — no double-click needed
+    }
     else if(e.detail<=1) unlockPlot(i); // a locked slot: unlock it (free for the first 2 of a room, priced beyond that) — mobile/control-desk views have no plot card to confirm through, so this is the direct path there
   });
   $('plotCards').addEventListener('click',e=>{
@@ -4518,7 +4522,7 @@ function init(){
     if(!hasPot(i)){ _unlockConfirmSlot=i; renderPlotCards(); }
     else { selectPot(i); if(!S.plants[i]) replant(); } // an empty pot's card is the way to plant, now that the Replant button under the scene is gone
   });
-  // double-click on a pot: waters the plant — or harvests it when its flowers are FULL
+  // double-click on a pot: harvests it when its flowers are FULL (watering is a single click on the plant, above)
   $('plantCanvas').addEventListener('dblclick',e=>{
     const i=potFromEvent(e);
     if(!hasPot(i))return;
@@ -4530,8 +4534,7 @@ function init(){
     if(!p||p.cut)return;
     if(i!==S.sel) selectPot(i);
     if(p.dead){ harvest(); return; } // dead plant: clear it for its dead wood + seed (same payout as uprooting)
-    if(p.pending.length>=flowerCap(p,i)) harvest(); // full of flowers: the ONLY time dblclick harvests
-    else water();
+    if(p.pending.length>=flowerCap(p,i)) harvest(); // full of flowers: double-click harvests them (watering is now a single click on the plant)
   });
   initTooltip();
   $('stageSidebar').addEventListener('click',sidebarClick);
