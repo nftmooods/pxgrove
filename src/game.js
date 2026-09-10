@@ -2538,6 +2538,7 @@ const SB_ICONS={
   fertAgent:__ASSET__('icon-serum-green.png'), fertCat:__ASSET__('icon-compost.png'), fertAlien:__ASSET__('icon-serum-purple.png'),
   room:__ASSET__('icon-parcel.png'), lock:__ASSET__('icon-lock-gray.png'), lockOpen:__ASSET__('icon-lock-yellow.png'),
   map:__ASSET__('icon-map.png'), market:__ASSET__('icon-market.png'), workshop:__ASSET__('icon-workshop.png'), journal:__ASSET__('icon-journal.png'),
+  lab:__ASSET__('icon-laboratory.png'),
 };
 function sbIc(key,emoji){ return SB_ICONS[key]?'<img class="sbic" src="'+SB_ICONS[key]+'" alt="">':'<span class="sbem">'+emoji+'</span>'; }
 function tip(nm,fx){ return (nm+'§'+fx).replace(/"/g,'&quot;'); }
@@ -2665,6 +2666,7 @@ function renderStageQuick(){
       '<span class="fitems">'+
         '<span class="slot mini sq" data-sq="market" data-tip="'+tip(t.market,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.market+'" alt=""></span>'+
         '<span class="slot mini sq" data-sq="workshop" data-tip="'+tip(t.book,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.workshop+'" alt=""></span>'+
+        '<span class="slot mini sq" data-sq="lab" data-tip="'+tip('🧪 '+t.labTitle,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.lab+'" alt=""></span>'+
       '</span></span>'+
     '<span class="slot mini sq" data-sq="journal" data-tip="'+tip('📓 '+t.journalTitle,'')+'" role="button" tabindex="0"><img class="sbic big" src="'+SB_ICONS.journal+'" alt=""></span>';
 }
@@ -2676,6 +2678,7 @@ function stageQuickClick(e){
   mapOpen=false; renderStageQuick(); closeMenu();
   if(k==='market') openMarket();
   else if(k==='workshop'){ bookFilter.cat=null; bookFilter.res=null; bookPage=0; openBook(); } // the design opens on "All"
+  else if(k==='lab') openResearch();
   else if(k==='journal'){ renderJournal(); $('journalOverlay').classList.add('on'); }
 }
 function commitDetailsRename(i){
