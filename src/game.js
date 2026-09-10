@@ -4490,8 +4490,9 @@ function init(){
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / double-click to water or harvest) — even the only one
     const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
+    const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
     e.currentTarget.style.cursor=onPlant?'var(--cur-drop,pointer)' // the pointer is on the plant's painting itself: the droplet (double-click waters it)
-      :(i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // pots select; free slots plant in the ground
+      :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
