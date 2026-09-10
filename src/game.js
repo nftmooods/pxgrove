@@ -2259,20 +2259,51 @@ function render(force){
   drawGarden();
 }
 let lastRes='';
+function openResourcePage(k){ // a resource opens its page: coins→Market, seeds→Seed vault, else Crafting filtered on it
+  if(k==='coins'){ openMarket(); return; }
+  if(k==='seeds'){ openSeeds(); return; }
+  bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null,res:k};
+  $('bookSearch').value=''; bookPage=0; openBook();
+}
+const RES_KEYS=['coins','px','wood','stone','metal','mineral','seeds'];
+function resVal(k){ return k==='seeds'?totalBaseSeeds():(k==='coins'?fmtCoins(S.inv[k]):S.inv[k]); }
 function renderResources(flash){
-  const t=T(), inv=S.inv;
-  const keys=['coins','px','wood','stone','metal','mineral','seeds'];
-  const val=k=>k==='seeds'?totalBaseSeeds():(k==='coins'?fmtCoins(inv[k]):inv[k]);
-  const sig=keys.map(val).join(',');
-  if(sig===lastRes&&!flash)return;
-  lastRes=sig;
-  const box=$('resGrid'); box.innerHTML='';
-  for(const k of keys){
-    const d=document.createElement('div'); d.className='res'; d.dataset.res=k;
-    d.title=t.res[k];
-    d.innerHTML='<span class="ic">'+t.resIc[k]+'</span><span class="rk">'+t.res[k]+'</span><span class="rv">'+val(k)+'</span>';
-    box.appendChild(d);
+  const t=T();
+  const sig=RES_KEYS.map(resVal).join(',');
+  const changed=sig!==lastRes||flash;
+  if(changed){
+    lastRes=sig;
+    const box=$('resGrid'); box.innerHTML='';
+    for(const k of RES_KEYS){
+      const d=document.createElement('div'); d.className='res'; d.dataset.res=k;
+      d.title=t.res[k];
+      d.innerHTML='<span class="ic">'+t.resIc[k]+'</span><span class="rk">'+t.res[k]+'</span><span class="rv">'+resVal(k)+'</span>';
+      box.appendChild(d);
+    }
   }
+  renderHudTop(changed);
+}
+// player level/XP: entirely new (no such stat existed before) — derived from recipes discovered + badges earned,
+// since Martin asked for it to grow with discovery and badge progress rather than inventing a separate grind stat.
+const XP_PER_DISCOVERY=10, XP_PER_BADGE=20, XP_PER_LEVEL=100;
+function playerXP(){ return (S.inv.discovered||[]).length*XP_PER_DISCOVERY + Object.keys(S.badges||{}).length*XP_PER_BADGE; }
+function playerLevel(){ return 1+Math.floor(playerXP()/XP_PER_LEVEL); }
+function anyRoomAlert(){ for(let r=0;r<roomsCount();r++) if(roomAlert(r)) return true; return false; }
+let lastHudAlert=null;
+function renderHudTop(changed){
+  const t=T();
+  const xp=playerXP();
+  $('hudLevelNum').textContent=playerLevel();
+  $('hudLevelFill').style.width=Math.round((xp%XP_PER_LEVEL))+'%';
+  const alert=anyRoomAlert();
+  if(changed){
+    const strip=$('hudResStrip'); if(strip){
+      strip.innerHTML=RES_KEYS.map(k=>
+        '<button type="button" class="hud-pill" data-res="'+k+'" title="'+t.res[k]+'"><span class="hp-ic">'+t.resIc[k]+'</span><span class="hp-v">'+resVal(k)+'</span></button>'
+      ).join('')+'<button type="button" class="hud-pill-more" data-resmore="1" title="'+t.book+'"><span>+</span></button>';
+    }
+  }
+  if(alert!==lastHudAlert){ lastHudAlert=alert; const dot=$('hudHambDot'); if(dot) dot.hidden=!alert; }
 }
 function renderWorkshop(){ renderBook(); renderHotbar(); renderInventory(); renderGen(); renderSidebar(); }
 /* ── Active gear hotbar ── */
@@ -3497,6 +3528,7 @@ function setLang(l){
   $('btnLookup').textContent=t.find; $('btnRandom').textContent=t.random;
   $('tRandomHint').textContent=t.randomHintC(Object.keys(commSnapshot()).length,C().token,C().apiHost);
   $('tCommLbl').textContent=t.commLbl;
+  $('tCommLblMenu').textContent=t.commLbl;
   applyLangManual();
   $('btnParse').textContent=t.importBtn;
   $('tNoNormie').textContent=t.noNormie; $('btnGeneric').textContent=t.genericBtn;
@@ -3515,6 +3547,12 @@ function setLang(l){
   $('btnBook').textContent=t.book; $('bookTitle').textContent=t.book;
   $('tabGarden').textContent='🌱 '+t.tabGarden; $('btnJournalTab').textContent='📓 '+t.journalTitle;
   $('btnBuild').textContent=t.buildBtn;
+  $('btnBuild2').textContent=t.buildBtn;
+  $('btnResearch2').textContent='🧪 '+t.labTitle;
+  $('btnAlmanac2').textContent=t.almanacTitle;
+  $('btnSeeds2').textContent=t.seedVaultBtn;
+  $('btnQuests').textContent='🗓️ '+t.questsBtn;
+  $('btnBadges').textContent='🏅 '+t.badgesTitle;
   $('bookCatPlant').textContent=t.catPlant;
   $('bookCatBuild').textContent=t.catBuild;
   $('btnMarket').textContent=t.market;
@@ -3528,7 +3566,6 @@ function setLang(l){
   $('btnSeeds').textContent=t.seedVaultBtn;
   if($('seedOverlay').classList.contains('on')) renderSeedVault();
   $('questsTitleEl').textContent='🗓️ '+t.questsTitle;
-  $('btnQuests').textContent='🗓️'; $('btnQuests').title=t.questsBtn;
   $('badgesTitleEl').textContent='🏅 '+t.badgesTitle;
   $('tJournalCard').textContent='📓 '+t.journalTitle+' — '+roomName(curRoom);
   $('mlTime').textContent=t.mlTime; $('mlLang').textContent=t.mlLang;
@@ -4209,13 +4246,10 @@ function init(){
   $('btnFr').addEventListener('click',()=>setLang('fr'));
   $('btnBook').addEventListener('click',()=>{ bookFilter.cat='plant'; bookFilter.res=null; bookPage=0; openBook(); });
   $('btnBuild').addEventListener('click',()=>{ bookFilter.cat='build'; bookFilter.res=null; bookPage=0; openBook(); });
-  $('resGrid').addEventListener('click',e=>{ // a resource opens its page: crafting filtered on it
-    const cell=e.target.closest('[data-res]'); if(!cell)return;
-    const k=cell.dataset.res;
-    if(k==='coins'){ openMarket(); return; }
-    if(k==='seeds'){ openSeeds(); return; }
-    bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null,res:k};
-    $('bookSearch').value=''; bookPage=0; openBook();
+  $('resGrid').addEventListener('click',e=>{ const cell=e.target.closest('[data-res]'); if(cell) openResourcePage(cell.dataset.res); });
+  $('hudResStrip').addEventListener('click',e=>{
+    const cell=e.target.closest('[data-res]'); if(cell){ closeMenu(); openResourcePage(cell.dataset.res); return; }
+    if(e.target.closest('[data-resmore]')){ closeMenu(); openBook(); }
   });
   $('btnBookClose').addEventListener('click',closeBook);
   $('bookOverlay').addEventListener('click',e=>{ if(e.target===$('bookOverlay'))closeBook(); });
@@ -4228,7 +4262,6 @@ function init(){
   $('marketOverlay').addEventListener('click',e=>{ if(e.target===$('marketOverlay'))closeMarket(); });
   $('btnPgPrev').addEventListener('click',()=>{ bookPage--; renderBook(); });
   $('btnPgNext').addEventListener('click',()=>{ bookPage++; renderBook(); });
-  $('btnInfo').addEventListener('click',()=>{ closeMenu(); openIntro(); });
   $('btnMenu').addEventListener('click',e=>{ e.stopPropagation(); toggleMenu(); });
   $('menuPanel').addEventListener('click',e=>e.stopPropagation()); // clicks inside keep the menu open
   document.addEventListener('click',()=>{ closeMenu(); document.body.classList.remove('hamb-open'); closeWs(); });
@@ -4237,9 +4270,13 @@ function init(){
     const wp=$('wsPanel'); if(wp.hidden){ renderWsPanel(); wp.hidden=false; } else wp.hidden=true; });
   $('wsPanel').addEventListener('click',e=>e.stopPropagation());
   $('btnResearch').addEventListener('click',openResearch);
+  $('btnResearch2').addEventListener('click',()=>{ closeMenu(); openResearch(); });
   $('btnAlmanac').addEventListener('click',openAlmanac);
+  $('btnAlmanac2').addEventListener('click',()=>{ closeMenu(); openAlmanac(); });
   $('btnAlmanacClose').addEventListener('click',closeAlmanac);
-  $('btnInfo').addEventListener('click',openInfo);
+  $('btnBuild2').addEventListener('click',()=>{ closeMenu(); bookFilter.cat='build'; bookFilter.res=null; bookPage=0; openBook(); });
+  $('btnSeeds2').addEventListener('click',()=>{ closeMenu(); openSeeds(); });
+  $('btnInfo').addEventListener('click',()=>{ closeMenu(); openInfo(); });
   $('btnInfoClose').addEventListener('click',closeInfo);
   $('infoOverlay').addEventListener('click',e=>{ if(e.target.id==='infoOverlay')closeInfo(); });
   $('almanacOverlay').addEventListener('click',e=>{ if(e.target===$('almanacOverlay'))closeAlmanac(); });

@@ -6,16 +6,21 @@
 
 <div class="wrap">
   <header>
-    <div class="brand">
-      <canvas class="logo" id="logoCanvas" width="17" height="17" aria-hidden="true"></canvas>
-      <h1 class="disp">PXGROVE <small id="tSub"></small></h1>
+    <canvas class="logo" id="logoCanvas" width="17" height="17" aria-hidden="true" hidden></canvas>
+    <div class="hud-level" id="hudLevel" aria-hidden="true">
+      <span class="hud-level-ic">🌱</span>
+      <div>
+        <div class="px-disp hud-level-lbl">PXGROVE · Niv. <span id="hudLevelNum">1</span></div>
+        <small id="tSub" hidden></small>
+        <div class="hud-level-bar"><i id="hudLevelFill"></i></div>
+      </div>
     </div>
     <span class="hamb" id="hdrMob">
       <button class="btn sm" id="btnWs" type="button" aria-label="Workshop">🛠</button>
       <button class="btn sm" id="btnHamb" type="button" aria-label="Menu">☰</button>
     </span>
     <div id="wsPanel" hidden></div>
-    <nav class="tabs" id="mainTabs" aria-label="Sections">
+    <nav class="tabs" id="mainTabs" aria-label="Sections" hidden>
       <button class="tab on" id="tabGarden" type="button">🌱 <span>Garden</span></button>
       <button class="tab" id="btnBook" type="button">🛠️ <span>Crafting</span></button>
       <button class="tab" id="btnBuild" type="button">🏠 <span>Layout</span></button>
@@ -25,18 +30,24 @@
       <button class="tab" id="btnSeeds" type="button">🌰 <span>Seeds</span></button>
       <button class="tab" id="btnJournalTab" type="button">📓 <span>Journal</span></button>
     </nav>
+    <div class="hud-res-strip" id="hudResStrip"></div>
     <div class="hdr-right">
-      <select id="commSel" class="sel-comm" aria-label="NFT collection"></select>
       <span class="chip" id="normieChip" hidden style="display:none!important"><span class="dot"></span><span id="normieChipTxt"></span></span>
-      <span id="topQB" style="display:inline-flex;gap:8px">
-      <button class="btn sm" id="btnQuests" type="button">🗓️ Quests</button>
-      <button class="btn sm" id="btnBadges" type="button">🏅</button>
-      <button class="btn sm" id="btnInfo" type="button" title="Info">ℹ️</button>
-      </span>
       <div class="weather-clock" id="weatherClock" aria-hidden="true"><span class="wc-ic">☀️</span><span class="wc-text"><b id="wcDate"></b><span id="wcTime"></span></span></div>
       <span class="menu-wrap">
-        <button class="btn sm" id="btnMenu" type="button" aria-haspopup="true" aria-expanded="false">⚙️ ▾</button>
+        <button class="hud-hamb" id="btnMenu" type="button" aria-haspopup="true" aria-expanded="false">☰<span class="hud-hamb-dot" id="hudHambDot" hidden></span></button>
         <div id="menuPanel" hidden>
+          <div class="menu-row"><span class="menu-lbl" id="tCommLblMenu">Collection</span><select id="commSel" class="sel-comm" aria-label="NFT collection"></select></div>
+          <div class="menu-sep"></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnBuild2" type="button" style="flex:1">🏠 Layout</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnResearch2" type="button" style="flex:1">🧪 Laboratory</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnAlmanac2" type="button" style="flex:1">📗 Almanac</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnSeeds2" type="button" style="flex:1">🌰 Seeds</button></div>
+          <div class="menu-sep"></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnQuests" type="button" style="flex:1">🗓️ Quests</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnBadges" type="button" style="flex:1">🏅 Badges</button></div>
+          <div class="menu-row"><button class="btn ghost sm" id="btnInfo" type="button" style="flex:1">ℹ️ Info</button></div>
+          <div class="menu-sep"></div>
           <div class="menu-row"><span class="menu-lbl" id="mlTime">Speed</span>
             <div class="toggle" role="group" aria-label="Time speed">
               <button id="btnReal" class="on" type="button">Real time</button>
@@ -50,7 +61,6 @@
             </div>
           </div>
           <div class="menu-row"><button class="btn sm" id="btnSwitch" type="button" style="flex:1">Switch Normie</button></div>
-          <div class="menu-row"><button class="btn ghost sm" id="btnInfo" type="button" style="flex:1">ℹ️ Info</button></div>
           <div class="menu-sep"></div>
           <div class="menu-row"><span class="menu-lbl" id="tCheat">Cheat code</span></div>
           <div class="idrow" style="margin:0">
