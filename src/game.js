@@ -4354,9 +4354,15 @@ function drawOne(x,idx,slot){
   }
   if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
     const stage=plantSpriteStage(P);
-    const wilted=hyd<DEHYDRATE_WARN, img=(wilted&&dehydratedImage(stage))||plantStageImage(stage); // critically thirsty: swap in the wilted look for this stage, once it's loaded
+    // dehydration isn't its own little run-up of stages: the wilted look freezes at whatever growth stage the plant was
+    // AT the moment it crossed under the warning threshold, and holds there (growth itself is paused while this thirsty
+    // anyway) until either it's watered back above the threshold, or it dies — never cycling through several wilted frames.
+    if(hyd<DEHYDRATE_WARN){ if(!p.dehydStage) p.dehydStage=stage; }
+    else if(p.dehydStage) p.dehydStage=null;
+    const dimg=p.dehydStage&&dehydratedImage(p.dehydStage);
+    const img=dimg||plantStageImage(stage);
     if(img&&_slotBaseXform){
-      const realSlot=slot==null?idx:slot, al=(img===dehydratedImage(stage))?PLANT_STAGE_ALIGN_SHARED:(PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5});
+      const realSlot=slot==null?idx:slot, al=dimg?PLANT_STAGE_ALIGN_SHARED:(PLANT_STAGE_ALIGN[stage]||{b:1,cx:0.5});
       // gy = the root point on the soil (Martin's dot markers, ~16 base px below the seed's centre so the seed lands ON the dot); the mound's bottom sits there for every stage
       const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch()*PLANT_SPRITE_SCALE, dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
