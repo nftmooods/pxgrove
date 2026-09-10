@@ -3741,25 +3741,17 @@ function renderRoomNav(){
 }
 function sceneRatio(){ const img=sceneImage(); return img?img.naturalWidth/img.naturalHeight:16/9; }
 let _layoutSig='';
-function layoutScene(){ // size the stage to the background's ratio, then decide where the panels go
+function layoutScene(){ // size the stage as large as the background's ratio allows inside the garden column —
+  // belowStage/sidePanels no longer carve out their own space: they float on top of the scene (see #belowStage CSS), like the Claude Design mockup
   const g=document.querySelector('.garden'), left=document.querySelector('.gcol-left'), stg=document.querySelector('.stage'), below=$('belowStage'), side=$('sidePanels');
   if(!g||!stg||!below||!side)return;
-  if(isMobile()||controlView){ stg.classList.remove('fixed'); g.classList.remove('side'); side.hidden=true; if(below.parentElement!==left) left.appendChild(below); return; }
-  const R=sceneRatio(), gw=g.clientWidth, gap=16, PANEL_MIN=520;
-  if(window.innerWidth<=1200){ // narrow desktop/tablet: full-width scene at the image ratio, panels below, page may scroll
-    g.classList.remove('side'); side.hidden=true; if(below.parentElement!==left) left.appendChild(below);
-    stg.style.setProperty('--sw',gw+'px'); stg.style.setProperty('--sh',Math.round(gw/R)+'px'); stg.classList.add('fixed'); return;
-  }
-  const gh=g.clientHeight;
-  // candidate A (side): scene as large as possible while leaving PANEL_MIN px for a right column
-  const wA=Math.min(Math.round(gh*R), gw-PANEL_MIN-gap), hA=Math.round(wA/R);
-  // candidate B (stacked): scene above the panels, height = what the panels leave
-  const wasSide=g.classList.contains('side');
-  if(below.parentElement!==left) left.appendChild(below); g.classList.remove('side');
-  const bh=below.offsetHeight; let hB=Math.max(200,gh-bh-gap), wB=Math.round(hB*R); if(wB>gw){ wB=gw; hB=Math.round(wB/R); }
-  if(wA>=wB&&wA>=600){ g.classList.add('side'); side.hidden=false; side.appendChild(below); stg.style.setProperty('--sw',wA+'px'); stg.style.setProperty('--sh',hA+'px'); }
-  else { side.hidden=true; stg.style.setProperty('--sw',wB+'px'); stg.style.setProperty('--sh',hB+'px'); }
-  stg.classList.add('fixed');
+  g.classList.remove('side'); side.hidden=true;
+  if(isMobile()||controlView){ stg.classList.remove('fixed'); if(below.parentElement!==left) left.appendChild(below); return; }
+  if(below.parentElement!==stg) stg.appendChild(below); // anchored to the stage itself so it overlays exactly the rendered image, letterboxing included
+  const R=sceneRatio(), gw=g.clientWidth;
+  let w=gw, h=Math.round(w/R);
+  if(window.innerWidth>1200){ const gh=g.clientHeight; if(h>gh){ h=gh; w=Math.round(h*R); } } // .garden only reports a real height at this width — below it, height:auto, so just fit the width
+  stg.style.setProperty('--sw',w+'px'); stg.style.setProperty('--sh',h+'px'); stg.classList.add('fixed');
 }
 function drawGarden(){
   const cv=$('plantCanvas'); if(!cv)return;

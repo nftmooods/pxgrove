@@ -26,7 +26,7 @@
     -webkit-font-smoothing:none;
   }
   .disp{font-family:'Silkscreen','IBM Plex Mono',monospace}
-  .wrap{max-width:1720px;height:100%;margin:0 auto;padding:10px 20px 8px;display:flex;flex-direction:column}
+  .wrap{max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column}
   ::-webkit-scrollbar{width:10px;height:10px}
   ::-webkit-scrollbar-track{background:var(--ground)}
   ::-webkit-scrollbar-thumb{background:var(--line);border:2px solid var(--ground)}
@@ -173,6 +173,16 @@
   .stage.fixed .cv-scroll{height:auto!important;min-height:0!important;flex:1;display:flex;align-items:flex-end;justify-content:center}
   .stage.fixed #plantCanvas{max-height:none!important;width:100%!important;height:100%!important}
   #belowStage{width:100%}
+  /* on desktop/tablet, belowStage rides on top of the scene instead of pushing it smaller — the image stays maximized */
+  @media(min-width:821px){
+    #belowStage{position:absolute;left:0;right:0;bottom:0;max-height:46%;overflow-y:auto;z-index:6;
+      padding:12px 14px 10px;border-radius:0 0 12px 12px;pointer-events:none;
+      background:linear-gradient(to top, rgba(15,16,14,.94) 0%, rgba(15,16,14,.8) 60%, rgba(15,16,14,0) 100%)}
+    #belowStage>*{pointer-events:auto}
+    /* the overlay floats over a wide image now, not a narrow column — keep resources/plant card side by side
+       even in the tablet range, instead of the pre-overlay single-column stack that would push the plant card off-screen */
+    #belowStage .bottom{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+  }
   /* ── top bar: section tabs ── */
   .tabs{display:flex;align-items:stretch;gap:2px;flex:1 1 auto;justify-content:center;min-width:0;flex-wrap:wrap}
   .tab{background:transparent;border:var(--px) solid transparent;color:var(--muted);font-family:'Silkscreen',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.4px;
@@ -216,7 +226,7 @@
   /* desktop: everything fits ONE viewport — no page or column scroll; the stage flexes,
      the plant card keeps its natural height, only a very long journal scrolls inside its card */
   @media(min-width:1201px){
-    .gcol-left{display:flex;flex-direction:column;overflow:hidden;padding-right:0}
+    .gcol-left{display:flex;flex-direction:column;justify-content:center;overflow:hidden;padding-right:0}
     .gcol-left>.card{flex:none}
     .stage{flex:1;min-height:0;display:flex;flex-direction:column}
     .cv-scroll{flex:1;min-height:0;display:flex;align-items:flex-end;justify-content:center}
