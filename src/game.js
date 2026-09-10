@@ -4164,11 +4164,27 @@ function drawEmptySlot(x,slot){ // a locked slot (not yet unlocked): a padlock o
   x.textAlign='left'; x.textBaseline='alphabetic'; // restore the defaults other draw calls rely on
 }
 const PLANT_NIGHT_SHADE=[0.45,0.25,0.08]; // per in-room slot (0=left,1=middle,2=right — the lantern sits stage-right, so the left plant reads darkest at night): peak darkening once dayDarkness()/th.night hits 1
-function plantNightShade(x,realSlot,dx,dy,dw,dh){ // tint the just-drawn sprite pixels only (source-atop), scaled by real-clock night level
-  const k=Math.max(activeTheme().night?1:0,dayDarkness()); if(k<=0)return;
+let _shadeCanvas=null;
+// draws img (source rect sx,sy,sw,sh) into dest rect dx,dy,dw,dh, tinted dark by the night level for this slot.
+// Returns true when it did the drawing; false means no shading was needed and the caller should drawImage() itself.
+// The tint is pre-composited on a transparent offscreen canvas (source-atop THERE, where alpha is really the sprite's
+// own silhouette) before being blitted onto the scene — doing source-atop straight on the scene canvas tints the
+// sprite's whole bounding BOX instead, since the painted background under it is already fully opaque.
+function plantNightShade(x,img,sx,sy,sw,sh,realSlot,dx,dy,dw,dh){
+  const k=Math.max(activeTheme().night?1:0,dayDarkness()); if(k<=0)return false;
   const slotK=((realSlot%ROOM_SLOTS)+ROOM_SLOTS)%ROOM_SLOTS;
-  const a=k*PLANT_NIGHT_SHADE[slotK]; if(a<=0)return;
-  x.save(); x.globalCompositeOperation='source-atop'; x.fillStyle='rgba(4,8,20,'+a.toFixed(3)+')'; x.fillRect(dx,dy,dw,dh); x.restore();
+  const a=k*PLANT_NIGHT_SHADE[slotK]; if(a<=0)return false;
+  const cw=Math.max(1,Math.ceil(dw)), ch=Math.max(1,Math.ceil(dh));
+  if(!_shadeCanvas) _shadeCanvas=document.createElement('canvas');
+  const off=_shadeCanvas; off.width=cw; off.height=ch;
+  const octx=off.getContext('2d');
+  octx.clearRect(0,0,cw,ch); octx.imageSmoothingEnabled=true;
+  octx.drawImage(img,sx,sy,sw,sh,0,0,cw,ch);
+  octx.globalCompositeOperation='source-atop';
+  octx.fillStyle='rgba(4,8,20,'+a.toFixed(3)+')';
+  octx.fillRect(0,0,cw,ch);
+  x.drawImage(off,dx,dy,dw,dh);
+  return true;
 }
 function drawOne(x,idx,slot){
   const ox=slotOxCells(slot==null?idx:slot);
@@ -4287,8 +4303,8 @@ function drawOne(x,idx,slot){
       // gy = the root point on the soil (Martin's dot markers, ~16 base px below the seed's centre so the seed lands ON the dot); the mound's bottom sits there for every stage
       const cx0=slotCenterX(realSlot), gy=bedGroundY()-17, dW=slotPitch(), dH=dW*(img.naturalHeight/img.naturalWidth);
       x.save(); x.setTransform(_slotBaseXform); x.imageSmoothingEnabled=true;
-      x.drawImage(img,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
-      plantNightShade(x,realSlot,cx0-dW*al.cx,gy-dH*al.b,dW,dH);
+      { const dx=cx0-dW*al.cx, dy=gy-dH*al.b;
+        if(!plantNightShade(x,img,0,0,img.naturalWidth,img.naturalHeight,realSlot,dx,dy,dW,dH)) x.drawImage(img,dx,dy,dW,dH); }
       x.restore();
       return;
     }
@@ -4304,8 +4320,8 @@ function drawOne(x,idx,slot){
       const sW=img.naturalWidth, sH=Math.round(img.naturalHeight*mf);
       const dWc=potW*1.2, dHc=dWc*(sH/sW);
       x.imageSmoothingEnabled=true;
-      x.drawImage(img,0,0,sW,sH,(ox+topX-dWc/2)*CELL,(soilY-dHc)*CELL,dWc*CELL,dHc*CELL);
-      plantNightShade(x,slot==null?idx:slot,(ox+topX-dWc/2)*CELL,(soilY-dHc)*CELL,dWc*CELL,dHc*CELL);
+      { const dx=(ox+topX-dWc/2)*CELL, dy=(soilY-dHc)*CELL;
+        if(!plantNightShade(x,img,0,0,sW,sH,slot==null?idx:slot,dx,dy,dWc*CELL,dHc*CELL)) x.drawImage(img,0,0,sW,sH,dx,dy,dWc*CELL,dHc*CELL); }
       return;
     }
   }
