@@ -4104,6 +4104,9 @@ function slotFromWorldX(wx){ let best=-99, bd=1e9; for(let k=0;k<ROOM_SLOTS;k++)
 // later). Same canvas convention across all of them (soil mound baked into the bottom edge, stem centred), so they
 // can share one anchor/scale formula. Ground-planted slots draw the sprite whole; potted plants draw it cropped
 // (mound sliced off — PLANT_STAGE_MOUND_FRAC below) since a painted soil mound doesn't fit a pot's own rim graphic.
+const DIRT_HOLE_SRC=__ASSET__('icon-dirt-hole.png'); // a harvested plant leaves this little hole where the seed hint used to sit
+let _dirtHoleImg=null;
+function dirtHoleImage(){ if(!_dirtHoleImg){ _dirtHoleImg=new Image(); _dirtHoleImg.src=DIRT_HOLE_SRC; _dirtHoleImg.onload=()=>render(true); } return _dirtHoleImg.complete&&_dirtHoleImg.naturalWidth?_dirtHoleImg:null; }
 const PLANT_STAGE_SPRITES={
   seed:__ASSET__('plant-seed.png'),
   germ:__ASSET__('plant-germ.png'),
@@ -4259,10 +4262,10 @@ function drawOne(x,idx,slot){
     px(topX,soilY-2,'#6a6c6e'); px(topX-1,soilY-3,'#6a6c6e'); px(topX+1,soilY-3,'#6a6c6e'); px(topX,soilY-3,'#7c7f81'); px(topX,soilY-4,'#6a6c6e');
     return;
   }
-  if(p.cut){
-    px(topX,soilY-1,'#c9cbcc'); px(topX,soilY-2,'#9b9ea0');
-    const r3=mulberry32(p.seed+3);
-    for(let i=0;i<4;i++) px(potX0+2+Math.floor(r3()*(potW-4)),soilY-1,v.accent);
+  if(p.cut){ // harvested: a little dirt hole sits right where the seed hint would — same anchor, same spot
+    const hole=dirtHoleImage();
+    if(hole){ const hw=8, hh=hw*(hole.naturalHeight/hole.naturalWidth); x.drawImage(hole,(ox+topX-hw/2)*CELL,(soilY-hh)*CELL,hw*CELL,hh*CELL); }
+    else{ px(topX,soilY-1,'#c9cbcc'); px(topX,soilY-2,'#9b9ea0'); const r3=mulberry32(p.seed+3); for(let i=0;i<4;i++) px(potX0+2+Math.floor(r3()*(potW-4)),soilY-1,v.accent); } // fallback while it loads
     return;
   }
   if(mat==='ground'&&!p.dead&&hyd>0){ // painted growth-stage sprite instead of the procedural stem, ground-planted slots only
