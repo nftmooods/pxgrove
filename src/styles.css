@@ -351,12 +351,14 @@
   .pc-unlock-go .disp{font-size:.72rem}
   .pc-unlock-go img{width:16px;height:16px;object-fit:contain}
   .pc-unlock-go.off,.pc-unlock-go:disabled{background:#3a3a3d;color:#a9abad;cursor:not-allowed}
-  .plot-card .pc-bars-widget{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;gap:3px;background:rgba(0,0,0,.5);border:0;font:inherit;color:inherit;align-self:center;width:max-content;min-width:72px;position:relative;
-    border-radius:8px;padding:6px 8px}
+  /* bars pill: the design's cqw sizes (0.55cqw bars, 5.4cqw wide, 0.4/0.55cqw padding) on --sw = scene width; a touch darker than its .50 */
+  .plot-card{--cq:calc(var(--sw,1200px) / 100)}
+  .plot-card .pc-bars-widget{pointer-events:auto;cursor:pointer;display:flex;flex-direction:column;gap:max(3px,calc(var(--cq) * .2));background:rgba(0,0,0,.6);border:0;font:inherit;color:inherit;align-self:center;width:max-content;min-width:72px;position:relative;
+    border-radius:max(6px,calc(var(--cq) * .5));padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))}
   .plot-card .pc-bars-widget:hover,.plot-card .pc-bars-widget.sel{outline:1px solid rgba(255,255,255,.25)}
-  .plot-card .pc-bar{display:flex;align-items:center;gap:5px}
-  .plot-card .pc-bar .pc-ic{font-size:.62rem;flex:none;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
-  .plot-card .pc-track{width:72px;height:6px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+  .plot-card .pc-bar{display:flex;align-items:center;gap:max(4px,calc(var(--cq) * .4))}
+  .plot-card .pc-bar .pc-ic{font-size:max(.62rem,calc(var(--cq) * .75));flex:none;line-height:1;filter:drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+  .plot-card .pc-track{width:max(72px,calc(var(--cq) * 5.4));height:max(6px,calc(var(--cq) * .55));border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
   .plot-card .pc-fill{display:block;height:100%;border-radius:99px;box-shadow:0 1px 3px rgba(0,0,0,.5);transition:width .3s steps(12)}
   .plot-card .pc-fill.grow{background:#7fd66a}
   .plot-card .pc-fill.hyd{background:#5fb0e8}

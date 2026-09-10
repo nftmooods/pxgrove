@@ -3959,6 +3959,7 @@ function renderPlotCards(){
   if(curRoom!==_plotCardsRoom){ _plotCardsRoom=curRoom; _unlockConfirmSlot=-1; _detailsSlot=-1; _detailsEditing=false; }
   if(_detailsEditing&&box.querySelector('[data-detinput]')) return; // a rename is being typed: don't rebuild under the cursor
   const base=curRoom*ROOM_SLOTS, t=T(), cards=[];
+  const cv=$('plantCanvas'); if(cv&&cv.getBoundingClientRect){ const cw=cv.getBoundingClientRect().width; if(cw) box.style.setProperty('--sw',cw+'px'); } // the design sizes the bars pill in cqw of the scene
   for(let k=0;k<ROOM_SLOTS;k++){
     const i=base+k;
     const cx0=slotCenterX(k), gy=bedGroundY(), pitch=slotPitch();
