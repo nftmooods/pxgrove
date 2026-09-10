@@ -3981,7 +3981,9 @@ function renderPlotCards(){
     if(!L||!R||!TP)continue;
     const width=Math.max(66,(R.x-L.x)*0.82), left=TP.x-width/2;
     const growing=hasPot(i)&&S.plants[i]&&!S.plants[i].dead&&!S.plants[i].cut;
-    const top=growing?TP.y-20:(!hasPot(i)?TP.y-40:TP.y+3); // bars pill straddles the soil's front edge; the padlock sits on the soil; name cards just under the compartment
+    let lockTop=TP.y-40; // fallback until the canvas has a real transform to measure against
+    if(!hasPot(i)){ const hint=plantHintCss(k); if(hint) lockTop=hint.y-19; } // centre the 38px lock bubble on plot 1's own little seed dot, same height on every locked plot
+    const top=growing?TP.y-20:(!hasPot(i)?lockTop:TP.y+3); // bars pill straddles the soil's front edge; the padlock centres on the seed's own spot; name cards just under the compartment
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
     if(!hasPot(i)){ // locked compartment (design): a round padlock on the soil; click → the "Unlock the plot" card above it
       nameCls='';
@@ -4120,6 +4122,14 @@ function drawBed(x,slot,th){ // raised stone bed under a slot: border ring + dar
   px(x0,y0,th.stone,w,h); px(x0,y0,th.stoneL,w,1); px(x0,y0+h-1,th.stoneD,w,2); px(x0,y0,th.stoneL,1,h); px(x0+w-1,y0,th.stoneD,1,h);
   for(let c=x0+3;c<x0+w-3;c+=6){ px(c,y0+1,th.stoneD,1,1); px(c+3,y0+h-2,th.stoneL,1,1); }
   px(x0+2,y0+2,th.soil,w-4,h-4); for(let c=x0+3;c<x0+w-3;c+=4) px(c,y0+3+((c*7)%(h-6)),th.soilL,1,1);
+}
+function plantHintCss(slot){ // css point of the tiny "plantable" pixel hint drawOne() paints on an empty-but-unlocked pot (plot 1's little seed dot) — reused to align the lock bubble at the very same height on locked plots
+  if(!_slotBaseXform||typeof DOMMatrix==='undefined') return null;
+  const k=slotScale(), cx0=slotCenterX(slot), gy=bedGroundY(), dy=gy-(GH-8)*CELL;
+  const M=new DOMMatrix().translate(cx0,gy).scale(k,k).translate(-cx0,-gy+dy); // mirrors drawOne()'s per-slot save/translate/scale/translate chain
+  const baseY=GH-8, soilY=baseY-4, topX=Math.floor(GW/2);
+  const w=M.transformPoint(new DOMPoint((slotOxCells(slot)+topX)*CELL,(soilY-2)*CELL));
+  return worldToCss(w.x,w.y);
 }
 function drawEmptySlot(x,slot){ // a locked slot (not yet unlocked): a padlock on the bed's soil — the plot card below explains how to unlock it
   const ox=slotOxCells(slot), baseY=GH-8;
