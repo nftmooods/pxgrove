@@ -3549,11 +3549,30 @@ function applyLangManual(){
   const link=$('manualLink').outerHTML;
   $('tManualP2').innerHTML=t.manualP2a+link+t.manualP2b;
 }
-function updateWeatherClock(){ // header widget: sunny for now (placeholder — real weather later), date/time in the visitor's own local clock
+/* day / night follows the player's own clock (real local time, whatever the game speed):
+   night 21:00 → 05:30, dawn until 07:00, dusk from 19:00 — the scene darkens with it and the header icon follows */
+function dayDarkness(d=new Date()){ // 0 = full daylight … 1 = night
+  const h=d.getHours()+d.getMinutes()/60;
+  if(h>=21||h<5.5) return 1;
+  if(h<7) return 1-(h-5.5)/1.5;
+  if(h>=19) return (h-19)/2;
+  return 0;
+}
+function dayIcon(){ const k=dayDarkness(); return k>=1?'🌙':(k>0?'🌅':'☀️'); }
+function nightWash(x,w,h,th){ // dark wash over the painted scene: the community's own night tint, or a blue night from the clock
+  const k=Math.max(th.night?1:0,dayDarkness()); if(k<=0)return;
+  x.fillStyle=th.night?'rgba(0,26,12,'+(.62*k).toFixed(3)+')':'rgba(8,14,38,'+(.55*k).toFixed(3)+')';
+  x.fillRect(0,0,w,h);
+}
+let _lastDayIcon='';
+function updateWeatherClock(){ // header widget: date/time in the visitor's own local clock, sun/dawn/moon from the same clock
   const d=$('wcDate'), tm=$('wcTime'); if(!d||!tm)return;
   const now=new Date(), locale=S.lang==='fr'?'fr-FR':'en-US';
   d.textContent=now.toLocaleDateString(locale,{weekday:'short',day:'numeric',month:'long',year:'numeric'});
   tm.textContent=now.toLocaleTimeString(locale,{hour:'2-digit',minute:'2-digit',hour12:false});
+  const ic=document.querySelector('.weather-clock .wc-ic'), icon=dayIcon();
+  if(ic) ic.textContent=icon;
+  if(icon!==_lastDayIcon){ _lastDayIcon=icon; if(typeof render==='function'&&S&&S.plants) render(true); } // phase changed: repaint the scene's wash
 }
 function setLang(l){
   S.lang=l; save();
@@ -3948,7 +3967,7 @@ function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees
   const px=(cx,cy,col,w=1,h=1)=>{ x.fillStyle=col; x.fillRect(cx*CELL,cy*CELL,w*CELL,h*CELL); };
   const img=sceneImage();
   if(img){ const cw=W*CELL, ch=GH*CELL, iw=img.naturalWidth, ih=img.naturalHeight;
-    if(Math.abs(cw/ch-iw/ih)<0.03){ _sceneExactFit=true; x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); if(th.night){ x.fillStyle='rgba(0,26,12,.62)'; x.fillRect(0,0,cw,ch); } return; } // same ratio: the whole illustration, undistorted — the baked-in bed lands exactly where SCENE_BED_META expects it
+    if(Math.abs(cw/ch-iw/ih)<0.03){ _sceneExactFit=true; x.imageSmoothingEnabled=true; x.drawImage(img,0,0,cw,ch); nightWash(x,cw,ch,th); return; } // same ratio: the whole illustration, undistorted — the baked-in bed lands exactly where SCENE_BED_META expects it
     // otherwise (mobile): fit the lower 74 % (fence → ground) to the height and mirror sideways — use the bed-less image, else the baked-in bed would tile/mirror across the screen
     _sceneExactFit=false;
     const mimg=sceneImageMobile()||img;
@@ -3957,7 +3976,7 @@ function drawScene(x,W,th){ // W = world width in cells. Rows: sky 0-33 · trees
     x.imageSmoothingEnabled=true;
     x.drawImage(mimg,x0,y0,dw,dh);
     x.save(); x.scale(-1,1); x.drawImage(mimg,-(x0),y0,dw,dh); x.drawImage(mimg,-(x0+2*dw),y0,dw,dh); x.restore(); // mirrored copies left & right
-    if(th.night){ x.fillStyle='rgba(0,26,12,.62)'; x.fillRect(0,0,cw,ch); } // night communities: dark green wash
+    nightWash(x,cw,ch,th);
     return; }
   const HZ=46, FENCE0=46, GR=53;
   const rng=mulberry32(4242);
