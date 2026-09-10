@@ -4017,7 +4017,7 @@ function renderPlotCards(){
       if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
       else{
         const v=vOf(p), Pv=progress(p), Hv=hydration(p), inactive=p.dead||p.cut;
-        if(inactive) nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>';
+        if(inactive){ if(p.dead)nameCls+=' pc-dead'; nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>'; }
         else { nameCls=''; // a growing plant shows only its bars (design): 💧 then 🌱 — click them for the details popup
           barsHtml='<button type="button" class="pc-bars-widget'+(i===S.sel?' sel':'')+'" data-bars="'+i+'">'+
             '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.10?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
@@ -4508,12 +4508,15 @@ function init(){
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water / double-click to harvest) — even the only one
     const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
-    const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
+    const dp=(i>=0&&hasPot(i)&&roomOf(i)===curRoom)?S.plants[i]:null;
+    const deadHere=cardsOn&&dp&&dp.dead&&!dp.cut&&emptyPlotZoneHit(i,e.clientX,e.clientY); // a dead plant: uprooting is the ONLY thing left to do with it, over its whole compartment (there's no live sprite to hug a tighter zone to)
+    const onPlant=!deadHere&&i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
     const p=onPlant?S.plants[i]:null;
     const uprootReady=p&&S.inv.equip==='uproot'; // uproot tool active: a click pulls the plant out at any growth stage, so it always takes over the cursor here
     const readyToHarvest=p&&!p.dead&&!p.cut&&p.pending.length>=flowerCap(p,i); // full bloom: the active harvest tool is what a double-click actually uses here
-    const emptyReady=cardsOn&&!onPlant&&i>=0&&hasPot(i)&&!S.plants[i]&&roomOf(i)===curRoom&&emptyPlotZoneHit(i,e.clientX,e.clientY); // an empty, unlocked plot: the seed cursor, but only right over its own soil — everywhere else follows the game's usual cursor rules
-    e.currentTarget.style.cursor=onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the droplet (one click waters it)
+    const emptyReady=cardsOn&&!deadHere&&!onPlant&&i>=0&&hasPot(i)&&!S.plants[i]&&roomOf(i)===curRoom&&emptyPlotZoneHit(i,e.clientX,e.clientY); // an empty, unlocked plot: the seed cursor, but only right over its own soil — everywhere else follows the game's usual cursor rules
+    e.currentTarget.style.cursor=deadHere?'var(--cur-tool-uproot,pointer)' // dead plant: always the uproot cursor, whatever tool is equipped
+      :onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the droplet (one click waters it)
       :emptyReady?'var(--cur-seed,pointer)'
       :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
@@ -4523,7 +4526,8 @@ function init(){
     if(hasPot(i)){
       const p=S.plants[i];
       if(i!==S.sel) selectPot(i);
-      if(p&&S.inv.equip==='uproot'&&plantHitAt(i,e.clientX,e.clientY)) uproot(); // the uproot tool: one click pulls the plant, at any stage — a smaller, partial payout (already how uproot() pays out), but the pot frees up right away
+      if(p&&p.dead&&!p.cut&&cardsOn&&emptyPlotZoneHit(i,e.clientX,e.clientY)) uproot(); // a dead plant: the only action left is uprooting it, whatever tool is equipped
+      else if(p&&S.inv.equip==='uproot'&&plantHitAt(i,e.clientX,e.clientY)) uproot(); // the uproot tool: one click pulls the plant, at any stage — a smaller, partial payout (already how uproot() pays out), but the pot frees up right away
       else if(p&&!p.dead&&!p.cut&&plantHitAt(i,e.clientX,e.clientY)) water(); // one click on the plant itself waters it — no double-click needed
       else if(!p&&cardsOn&&emptyPlotZoneHit(i,e.clientX,e.clientY)) replant(); // clicking an empty plot's own soil plants a seed, same as its name card
     }
@@ -4543,7 +4547,7 @@ function init(){
     if(!card)return;
     const i=+card.dataset.plotcard;
     if(!hasPot(i)){ _unlockConfirmSlot=i; renderPlotCards(); }
-    else { selectPot(i); if(!S.plants[i]) replant(); } // an empty pot's card is the way to plant, now that the Replant button under the scene is gone
+    else { selectPot(i); const p=S.plants[i]; if(!p) replant(); else if(p.dead&&!p.cut) uproot(); } // an empty pot's card plants; a dead plant's card only ever uproots it
   });
   // double-click on a pot: harvests it when its flowers are FULL (watering is a single click on the plant, above)
   $('plantCanvas').addEventListener('dblclick',e=>{
@@ -4556,7 +4560,7 @@ function init(){
     const p=S.plants[i];
     if(!p||p.cut)return;
     if(i!==S.sel) selectPot(i);
-    if(p.dead){ harvest(); return; } // dead plant: clear it for its dead wood + seed (same payout as uprooting)
+    if(p.dead){ uproot(); return; } // dead plant: uprooting is the only thing left to do with it (same partial wood + seed payout)
     if(p.pending.length>=flowerCap(p,i)) harvest(); // full of flowers: double-click harvests them (watering is now a single click on the plant)
   });
   initTooltip();
