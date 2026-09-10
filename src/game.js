@@ -4077,12 +4077,13 @@ function drawOne(x,idx,slot){
   const P=progress(p), hyd=hydration(p);
   const px=(cx,cy,col)=>{ x.fillStyle=col; x.fillRect((ox+cx)*CELL,cy*CELL,CELL,CELL); };
   const mat=potType(idx), ceramic=(mat==='ceramic'||mat==='ceramicBig');
+  const cardsOn=!controlView&&!isMobile(); // the HTML plot cards (bars pill + details popup) replace the painted bars and selection line
   // selection marker (only when several pots)
-  if(potCount()>1&&idx===S.sel){
+  if(!cardsOn&&potCount()>1&&idx===S.sel){
     for(let c=GW/2-11;c<=GW/2+11;c++) px(c,GH-1,activeTheme().brand);
   }
-  // status bars under the pot: growth (accent) + hydration (blue), with %
-  if(p){
+  // status bars under the pot: growth (accent) + hydration (blue), with % — classic view only (control desk, mobile)
+  if(p&&!cardsOn){
     const Pv=progress(p), Hv=hydration(p);
     const inactive=p.dead||p.cut;
   $('metersBox').hidden=false; // meters stay: the cut/dead notice now lives in the stage
