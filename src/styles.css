@@ -311,7 +311,7 @@
   .pd-barrow{display:flex;align-items:center;gap:8px}
   .pd-track{flex:1;height:10px;border-radius:99px;background:#2c2c2e;overflow:hidden}
   .pd-fill{display:block;height:100%;border-radius:99px;transition:width .3s steps(12)}
-  .pd-fill.hyd{background:#5fb0e8} .pd-fill.grow{background:#7fd66a} .pd-fill.warn{background:#d4707f}
+  .pd-fill.hyd{background:#5fb0e8} .pd-fill.grow{background:#7fd66a} .pd-fill.warn{background:#e03131}
   .pd-pct{font-size:.78rem;color:#f2f2f2;min-width:3.2em;text-align:right}
   .pd-sep{height:1px;background:rgba(255,255,255,.1);margin:14px 0 10px}
   .pd-stats{display:flex;align-items:center;gap:10px}
@@ -330,7 +330,7 @@
   .plot-card .pc-fill.grow{background:#7fd66a}
   .plot-card .pc-fill.hyd{background:#5fb0e8}
   .plot-card .pc-fill.res{background:#f0cf6a} /* resistance, reserved for later */
-  .plot-card .pc-fill.warn{background:#d4707f}
+  .plot-card .pc-fill.warn{background:#e03131}
   .plot-card .pc-name-card{pointer-events:auto;cursor:pointer;background:#23261f;border:1px solid rgba(255,255,255,.12);
     border-radius:10px;padding:7px 10px;box-shadow:0 3px 8px rgba(0,0,0,.4);display:flex;flex-direction:column;
     justify-content:center;gap:2px;overflow:hidden}

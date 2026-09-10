@@ -3903,7 +3903,7 @@ function detailsHtml(i,p){
   return '<div class="pc-details" data-details="'+i+'">'+
     '<div class="pd-head"><span class="pd-ic">🌱</span>'+head+'<button type="button" class="pd-btn" data-detclose="1">✕</button></div>'+
     '<div class="pd-sub">'+esc(potName(i))+' · '+esc(phaseName(p,Pv))+'</div>'+
-    bar(t.hydration,'hyd'+(Hv<0.25?' warn':''),Hv)+bar(t.growth,'grow',Pv)+
+    bar(t.hydration,'hyd'+(Hv<0.10?' warn':''),Hv)+bar(t.growth,'grow',Pv)+
     '<div class="pd-sep"></div>'+
     '<div class="pd-stats"><div class="pd-stat"><span class="pd-stat-ic">🌸</span><div><div class="pd-stat-k">'+t.stFlowers+'</div><div class="pd-stat-v disp">'+p.pending.length+' / '+cap+'</div></div></div>'+
     '<div class="pd-vsep"></div>'+
@@ -3944,7 +3944,7 @@ function renderPlotCards(){
         if(inactive) nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>';
         else { nameCls=''; // a growing plant shows only its bars (design): 💧 then 🌱 — click them for the details popup
           barsHtml='<button type="button" class="pc-bars-widget'+(i===S.sel?' sel':'')+'" data-bars="'+i+'">'+
-            '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.25?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
+            '<div class="pc-bar"><span class="pc-ic">💧</span><span class="pc-track"><span class="pc-fill hyd'+(Hv<0.10?' warn':'')+'" style="width:'+Math.round(Hv*100)+'%"></span></span></div>'+
             '<div class="pc-bar"><span class="pc-ic">🌱</span><span class="pc-track"><span class="pc-fill grow" style="width:'+Math.round(Pv*100)+'%"></span></span></div>'+
           '</button>';
           if(_detailsSlot===i) barsHtml+=detailsHtml(i,p);
@@ -4089,7 +4089,7 @@ function drawOne(x,idx,slot){
     x.fillStyle='rgba(0,0,0,.45)'; x.fillRect((ox+bx-1)*CELL,(gy-1)*CELL,(barW+11)*CELL,(GH-gy)*CELL); // backing plate
     for(let c=0;c<barW;c++){ px(bx+c,gy,'#2c2d2f'); px(bx+c,hy,'#2c2d2f'); }
     const gCol=inactive?'#6f7274':activeTheme().brand;
-    const hCol=inactive?'#6f7274':(Hv<0.25?'#d4707f':'#6fa3b8');
+    const hCol=inactive?'#6f7274':(Hv<0.10?'#e03131':'#6fa3b8');
     for(let c=0;c<Math.round(Pv*barW);c++) px(bx+c,gy,gCol);
     for(let c=0;c<Math.round(Hv*barW);c++) px(bx+c,hy,hCol);
     if(genAtPot(idx)){ // ⚡ energy bar, exactly like hydration
