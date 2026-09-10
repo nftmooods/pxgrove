@@ -4554,7 +4554,9 @@ function init(){
   { const rs=document.documentElement&&document.documentElement.style; if(rs&&rs.setProperty){ // the design's cursors, hotspots as in its CSS
       rs.setProperty('--cur-hand',"url('"+__ASSET__('cursor-hand-default.png')+"') 22 3, auto");
       rs.setProperty('--cur-click',"url('"+__ASSET__('cursor-click.png')+"') 22 3, pointer");
-      rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer");
+      rs.setProperty('--cur-water-hand',"url('"+__ASSET__('cursor-water-bowl.png')+"') 22 22, pointer"); // replaces the plain droplet: the actual watering gear in hand (bowl by default)
+      rs.setProperty('--cur-water-bucket',"url('"+__ASSET__('cursor-water-bucket.png')+"') 22 22, pointer");
+      rs.setProperty('--cur-water-can',"url('"+__ASSET__('cursor-water-can.png')+"') 22 22, pointer");
       rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 22 22, pointer"); // 44px, same scale as the design's own cursors above
       rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 22 22, pointer");
       rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 22 22, pointer");
@@ -4570,6 +4572,7 @@ function init(){
       rs.setProperty('--cur-fert-fertAlien',"url('"+__ASSET__('cursor-fert-fertalien.png')+"') 22 22, pointer"); } }
   const FERT_CURSOR_VAR={compost:'--cur-fert-compost',fert:'--cur-fert-fert',fertPlus:'--cur-fert-fertPlus',fertHuman:'--cur-fert-fertHuman',fertZombie:'--cur-fert-fertZombie',fertAgent:'--cur-fert-fertAgent',fertCat:'--cur-fert-fertCat',fertAlien:'--cur-fert-fertAlien'};
   const TOOL_CURSOR_VAR={hands:'--cur-tool-hands',shears:'--cur-tool-shears',gloves:'--cur-tool-gloves'};
+  const WATER_CURSOR_VAR={hand:'--cur-water-hand',bucketWood:'--cur-water-bucket',bucketMetal:'--cur-water-bucket',arrosoir:'--cur-water-can'};
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water or harvest) — even the only one
     const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
@@ -4587,7 +4590,7 @@ function init(){
     }
     e.currentTarget.style.cursor=deadHere?'var(--cur-tool-uproot,pointer)' // dead plant: always the uproot cursor, whatever tool is equipped
       :cutHere?'var(--cur-seed,pointer)' // harvested: the seed cursor, ready to replant
-      :onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the droplet (one click waters it)
+      :onPlant?(uprootReady?'var(--cur-tool-uproot,pointer)':readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var('+(WATER_CURSOR_VAR[waterModeEffective()]||'--cur-water-hand')+',pointer)') // uproot tool first; else full of flowers: the equipped tool; otherwise the equipped watering gear (bowl/bucket/can) — one click waters it
       :emptyReady?'var(--cur-seed,pointer)'
       :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
