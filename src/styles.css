@@ -373,8 +373,9 @@
   .plot-card .pc-status{font-size:.62rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
   .plot-card .pc-name-card.locked,.plot-card .pc-name-card.pc-empty{align-items:center;text-align:center;background:#181a16;border:2px dashed rgba(255,255,255,.3)}
   .plot-card .pc-name-card.pc-empty{cursor:var(--cur-click,pointer); /* the seed cursor is reserved for the planting zone on the soil itself — this popup card is a regular click target */
-    align-self:center;width:max-content;min-width:72px;border-radius:max(6px,calc(var(--cq) * .5));
-    padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))} /* same box as the growth-bars pill it replaces — same size, same spot */
+    align-self:center;width:max(104px,calc(var(--cq) * 10.8));border-radius:max(6px,calc(var(--cq) * .5));
+    padding:max(5px,calc(var(--cq) * .4)) max(7px,calc(var(--cq) * .55))} /* the bars pill's own overall width (icon+track+padding), not just its box model — text wraps instead of forcing the card wider */
+  .plot-card .pc-name-card.pc-empty .pc-name{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}
   .plot-card .pc-name-card.locked:hover,.plot-card .pc-name-card.pc-empty:hover{border-color:rgba(255,255,255,.55)}
   .plot-card .pc-name-card.pc-dead{cursor:var(--cur-tool-uproot,pointer)} /* a dead plant: uprooting is the only thing left to do with it */
   .plot-card .pc-name-card.pc-cut{cursor:var(--cur-click,pointer)} /* the seed cursor is reserved for the planting zone on the soil itself — this popup card is a regular click target */

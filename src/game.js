@@ -4015,7 +4015,7 @@ function renderPlotCards(){
       barsHtml='<div class="pc-lockwrap">'+pop+'<button type="button" class="pc-lockbtn" data-plotcard="'+i+'" title="'+t.pcLockedTitle+'"><img src="'+(ok?SB_ICONS.lockOpen:SB_ICONS.lock)+'" alt=""></button></div>';
     }else{
       const p=S.plants[i];
-      if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptyTitle+'</span><span class="pc-status">'+t.pcEmptySub+'</span>'; }
+      if(!p){ nameCls+=' pc-empty'; nameHtml='<span class="pc-name">'+t.pcEmptySub+'</span>'; } // just "Choose a seed" — no separate "Empty" title, one line, same box as the bars pill
       else{
         const v=vOf(p), Pv=progress(p), Hv=hydration(p), inactive=p.dead||p.cut;
         if(inactive){ nameCls+=' pc-inactive'+(p.dead?' pc-dead':' pc-cut'); nameHtml='<span class="pc-name">'+esc(vName(v))+'</span><span class="pc-status">'+esc(phaseName(p,Pv))+'</span>'; }
