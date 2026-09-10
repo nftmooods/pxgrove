@@ -306,7 +306,7 @@
   #plotCards{position:fixed;left:0;top:0;pointer-events:none;z-index:5}
   .plot-card{position:fixed;pointer-events:none;display:flex;flex-direction:column;align-items:stretch;gap:7px}
   /* growing-details popup (design): a dark card floating above the plot's bars */
-  .pc-details{position:absolute;left:50%;top:0;transform:translate(-50%,calc(-100% - 12px));width:clamp(290px,30vw,440px);pointer-events:auto;
+  .pc-details{position:absolute;left:50%;top:0;transform:translate(-50%,calc(-100% - 12px));width:clamp(320px,34vw,480px);pointer-events:auto;
     background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:3;cursor:var(--cur-hand,default);text-align:left}
   .pd-head{display:flex;align-items:center;gap:8px}
   .pd-ic{width:28px;height:28px;background:rgba(143,167,139,.2);border:1px solid var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;font-size:.85rem}

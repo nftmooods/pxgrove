@@ -3942,6 +3942,13 @@ function plantHitAt(i,clientX,clientY){ // is the pointer near the plant of slot
   const pillTop=worldToCss(cx0,bedGroundY()); // stop the droplet zone at the growth-bars pill's own dark background just below the plant — that pill owns its own clicks
   return !pillTop||clientY<pillTop.y-13;
 }
+function emptyPlotZoneHit(i,clientX,clientY){ // is the pointer within the visible soil compartment of an empty, unlocked plot — the seed cursor's own bounded zone
+  if(!_slotBaseXform) return false;
+  const k=i-curRoom*ROOM_SLOTS, cx0=slotCenterX(k), gy=bedGroundY(), pitch=slotPitch();
+  const L=worldToCss(cx0-pitch/2,gy), R=worldToCss(cx0+pitch/2,gy), TP=worldToCss(cx0,gy);
+  if(!L||!R||!TP) return false;
+  return clientX>=L.x&&clientX<=R.x&&clientY>=TP.y-95&&clientY<=TP.y+40; // the compartment's dirt box, roughly ground-edge ±one bed height
+}
 function nextFlowerText(p,i){ // "next flower" countdown shared by the plant card and the growing-details popup
   const t=T(), P=progress(p), inactive=p.dead||p.cut;
   if(inactive) return '—';
@@ -4489,20 +4496,30 @@ function init(){
       rs.setProperty('--cur-hand',"url('"+__ASSET__('cursor-hand-default.png')+"') 22 3, auto");
       rs.setProperty('--cur-click',"url('"+__ASSET__('cursor-click.png')+"') 22 3, pointer");
       rs.setProperty('--cur-drop',"url('"+__ASSET__('cursor-droplet.png')+"') 16 16, pointer");
-      rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 20 20, pointer"); } }
+      rs.setProperty('--cur-seed',"url('"+__ASSET__('cursor-seed.png')+"') 20 20, pointer");
+      rs.setProperty('--cur-tool-hands',"url('"+__ASSET__('cursor-tool-hand.png')+"') 20 20, pointer");
+      rs.setProperty('--cur-tool-shears',"url('"+__ASSET__('cursor-tool-shears.png')+"') 20 20, pointer");
+      rs.setProperty('--cur-tool-gloves',"url('"+__ASSET__('cursor-tool-gloves.png')+"') 20 20, pointer"); } }
+  const TOOL_CURSOR_VAR={hands:'--cur-tool-hands',shears:'--cur-tool-shears',gloves:'--cur-tool-gloves'};
   $('plantCanvas').addEventListener('mousemove',e=>{
     const i=potFromEvent(e); // any pot in view is clickable (select / click to water / double-click to harvest) — even the only one
-    const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
     const cardsOn=!controlView&&!isMobile(); // desktop: the HTML plot cards (bars pill, lock bubble, name card) are the real clickable controls — clicking bare soil still selects the pot (kept), but shouldn't advertise a finger over that whole broad zone
-    e.currentTarget.style.cursor=onPlant?'var(--cur-drop,pointer)' // the pointer is on the plant's painting itself: the droplet (one click waters it)
+    const onPlant=i>=0&&hasPot(i)&&roomOf(i)===curRoom&&plantHitAt(i,e.clientX,e.clientY);
+    const p=onPlant?S.plants[i]:null;
+    const readyToHarvest=p&&!p.dead&&!p.cut&&p.pending.length>=flowerCap(p,i); // full bloom: the active harvest tool is what a double-click actually uses here
+    const emptyReady=cardsOn&&!onPlant&&i>=0&&hasPot(i)&&!S.plants[i]&&roomOf(i)===curRoom&&emptyPlotZoneHit(i,e.clientX,e.clientY); // an empty, unlocked plot: the seed cursor, but only right over its own soil — everywhere else follows the game's usual cursor rules
+    e.currentTarget.style.cursor=onPlant?(readyToHarvest?'var('+(TOOL_CURSOR_VAR[S.inv.equip]||'--cur-tool-hands')+',pointer)':'var(--cur-drop,pointer)') // full of flowers: the equipped tool; otherwise the droplet (one click waters it)
+      :emptyReady?'var(--cur-seed,pointer)'
       :(!cardsOn&&i>=0&&i<potSlots()&&roomOf(i)===curRoom)?'var(--cur-click,pointer)':'var(--cur-hand,default)'; // mobile/control-desk: no plot cards, the whole column is the only way to select/plant
   });
   $('plantCanvas').addEventListener('click',e=>{
     const i=potFromEvent(e);
+    const cardsOn=!controlView&&!isMobile();
     if(hasPot(i)){
       const p=S.plants[i];
       if(i!==S.sel) selectPot(i);
       if(p&&!p.dead&&!p.cut&&plantHitAt(i,e.clientX,e.clientY)) water(); // one click on the plant itself waters it — no double-click needed
+      else if(!p&&cardsOn&&emptyPlotZoneHit(i,e.clientX,e.clientY)) replant(); // clicking an empty plot's own soil plants a seed, same as its name card
     }
     else if(e.detail<=1) unlockPlot(i); // a locked slot: unlock it (free for the first 2 of a room, priced beyond that) — mobile/control-desk views have no plot card to confirm through, so this is the direct path there
   });
