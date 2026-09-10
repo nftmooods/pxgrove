@@ -2102,9 +2102,16 @@ function applyAccent(){
   document.documentElement.style.setProperty('--accent',th.brand);
   document.documentElement.style.setProperty('--accent-ink',th.brandInk);
 }
+function placeHeader(inStage){ // the top bar floats over the scene on the garden (design shell); it sits in the flow everywhere else
+  const hd=document.querySelector('header'), stg=document.querySelector('.stage'), wrap=document.querySelector('.wrap'); if(!hd||!stg||!wrap)return;
+  const first=(el)=>{ if(hd.parentElement===el)return; if(el.insertBefore) el.insertBefore(hd,el.firstChild); else el.appendChild(hd); }; // the unit-test DOM stub only knows appendChild
+  if(inStage){ first(stg); hd.classList.add('in-stage'); }
+  else { first(wrap); hd.classList.remove('in-stage'); }
+}
 function showScreen(which){
   $('scrStart').classList.toggle('on',which==='start');
   $('scrGarden').classList.toggle('on',which==='garden');
+  if(which!=='garden') placeHeader(false);
   $('normieChip').hidden=(which!=='garden');
   $('btnBack').hidden=!(which==='start'&&S.plants.some(p=>p));
 }
@@ -2289,7 +2296,7 @@ function renderHudTop(changed){
   if(changed){
     const strip=$('hudResStrip'); if(strip){
       strip.innerHTML=RES_KEYS.map(k=>
-        '<button type="button" class="hud-pill" data-res="'+k+'" title="'+t.res[k]+'"><span class="hp-ic">'+t.resIc[k]+'</span><span class="hp-v">'+resVal(k)+'</span></button>'
+        '<button type="button" class="hud-pill" data-res="'+k+'" title="'+t.res[k]+'"><span class="hp-ic">'+t.resIc[k]+'</span><span class="hp-v">'+resVal(k)+'</span><span class="hp-plus">+</span></button>'
       ).join('')+'<button type="button" class="hud-pill-more" data-resmore="1" title="'+t.book+'"><span>+</span></button>';
     }
   }
@@ -3794,8 +3801,9 @@ function layoutScene(){ // size the stage as large as the background's ratio all
   const g=document.querySelector('.garden'), left=document.querySelector('.gcol-left'), stg=document.querySelector('.stage'), below=$('belowStage'), side=$('sidePanels');
   if(!g||!stg||!below||!side)return;
   g.classList.remove('side'); side.hidden=true;
-  if(isMobile()||controlView){ stg.classList.remove('fixed'); if(below.parentElement!==left) left.appendChild(below); return; }
+  if(isMobile()||controlView){ stg.classList.remove('fixed'); if(below.parentElement!==left) left.appendChild(below); placeHeader(false); return; }
   if(below.parentElement!==stg) stg.appendChild(below); // anchored to the stage itself so it overlays exactly the rendered image, letterboxing included
+  placeHeader($('scrGarden').classList.contains('on')); // render() also runs while the start screen is up: the bar must stay in the page flow there
   const R=sceneRatio(), gw=g.clientWidth;
   let w=gw, h=Math.round(w/R);
   if(window.innerWidth>1200){ const gh=g.clientHeight; if(h>gh){ h=gh; w=Math.round(h*R); } } // .garden only reports a real height at this width — below it, height:auto, so just fit the width
@@ -3808,7 +3816,7 @@ function drawGarden(){
   layoutScene();
   const N=potCount(), V=viewSlots(), sh=potShift(), base=curRoom*ROOM_SLOTS;
   renderRoomNav();
-  { const nz=$('noticeZone'), stg=cv.closest?cv.closest('.stage'):null; if(nz&&stg){ const r=stg.getBoundingClientRect(); if(r.width>0){ nz.style.left=(r.left+r.width/2)+'px'; nz.style.top=(r.top+8)+'px'; } } } // notifications: top centre of the scene
+  { const nz=$('noticeZone'), stg=cv.closest?cv.closest('.stage'):null; if(nz&&stg){ const r=stg.getBoundingClientRect(); if(r.width>0){ nz.style.left=(r.left+r.width/2)+'px'; nz.style.top=(r.top+(stg.querySelector('header.in-stage')?64:8))+'px'; } } } // notifications: top centre of the scene, under the floating top bar
   const ctrlEl=$('controlPanel');
   if(controlView){ // 🖥️ the control desk replaces the plant view and claims the whole column
     if(cv.parentElement) cv.parentElement.hidden=true;
