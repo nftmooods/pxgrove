@@ -413,8 +413,10 @@ en:{
   introGo:'Let\'s grow!',
   tuto:{
     next:'Next ▸', skip:'Skip', done:'Let\'s grow! ✓',
-    z0:'👋 <b>Click the first plot</b> to plant a seed there.',
-    z1:'This is an <b>alpha version</b> of the game — you can speed up time from the menu options (☰, top right).',
+    z0:'🌱 Your <b>first seed is planted</b> and already growing. Watch its two bars: 💧 water and 🌱 growth.',
+    z1:'💧 <b>Click the plant</b> to water it whenever the water bar runs low — without water it stops growing, then dies.',
+    z2:'🪴 The <b>uproot tool</b>, in the column on the left: pick it, then click a plant to pull it out and free the plot (dead plants can only be uprooted).',
+    z3:'⏩ This is an <b>alpha</b>: time runs <b>fast</b> (×720) so you can see everything happen. Switch to real time from the menu (☰ top right → Speed).',
     y0:'💧 Your plant is thirsty! <b>Click the plant</b> to water it.',
     y1:'You can follow its growth at any time by <b>clicking its growth bars</b>.',
   },
@@ -687,8 +689,10 @@ fr:{
   introGo:'C\'est parti !',
   tuto:{
     next:'Suivant ▸', skip:'Passer', done:'C\'est parti ! ✓',
-    z0:'👋 <b>Clique sur la première parcelle</b> pour y planter une graine.',
-    z1:'Ceci est une <b>version alpha</b> du jeu — tu peux accélérer la vitesse depuis les options du menu (☰, en haut à droite).',
+    z0:'🌱 Ta <b>première graine est plantée</b> et pousse déjà. Surveille ses deux barres : 💧 l’eau et 🌱 la croissance.',
+    z1:'💧 <b>Clique sur la plante</b> pour l’arroser dès que la barre d’eau baisse — sans eau elle s’arrête de pousser, puis meurt.',
+    z2:'🪴 L’<b>outil arracher</b>, dans la colonne de gauche : sélectionne-le puis clique sur une plante pour la retirer et libérer la parcelle (une plante morte ne peut qu’être arrachée).',
+    z3:'⏩ Version <b>alpha</b> : le temps tourne en <b>accéléré</b> (×720) pour tout voir se passer. Repasse en temps réel depuis le menu (☰ en haut à droite → Vitesse).',
     y0:'💧 Ta plante a soif ! <b>Clique sur la plante</b> pour l\'arroser.',
     y1:'Tu peux suivre sa croissance à tout moment en <b>cliquant sur ses barres de croissance</b>.',
   },
@@ -817,7 +821,8 @@ function freshInv(){
           genLvlAt:Array(9).fill(0), energyAt:Array(9).fill(0)};
 }
 function freshState(){
-  return { normie:null, plants:[null], sel:0, mode:'real', dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
+  return { normie:null, plants:[null], sel:0, mode:'fast', // alpha: time runs ×720 out of the box so the first plant visibly grows in the first minutes — the menu switches back to real time
+    dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
     almanac:{seen:{}, totalHarvests:0, bestHarvestPx:0, plantsLost:0},
     daily:null, streak:{count:0, lastCounted:'', joker:1, jokerWeek:''},
     stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tuto0Seen:false, tutoHydSeen:false, balV:2 };
@@ -3131,11 +3136,15 @@ function openIntro(){
   $('introOverlay').classList.add('on');
 }
 /* ── first-launch tutorial: spotlight steps over the real interface ── */
-const TUTO0_STEPS=[ {target:null, key:'z0'}, {target:null, key:'z1'} ]; // fires before anything is planted: card sits centred, just under the header — no plant/pot exists yet to ring
-function maybeTuto0(){ // a brand-new player, garden shown, nothing planted yet: point at the first plot, then mention the speed setting
+const TUTO0_STEPS=[ // first launch, first seed already in the ground: the two bars, watering, the uproot tool, and the fast clock
+  {target:'plantCanvas', key:'z0'},
+  {target:'plantCanvas', key:'z1'},
+  {targetSel:'[data-eq="uproot"]', key:'z2', open:()=>{ sbOpen.harv=true; renderSidebar(); }, close:()=>{ sbOpen.harv=false; renderSidebar(); }},
+  {target:null, key:'z3'},
+];
+function maybeTuto0(){ // a brand-new player, garden shown, starter seed just planted for them: the basics, once
   if(S.tuto0Seen||tutoStep>=0)return;
   if($('introOverlay').classList.contains('on'))return; // let the welcome modal close first — closeIntro() retries this
-  if(S.plants.some(p=>p))return; // already planted: too late for this hint
   if(!$('scrGarden').classList.contains('on')||controlView)return;
   runTuto(TUTO0_STEPS,'tuto0Seen');
 }
@@ -4655,7 +4664,10 @@ function init(){
     S.lastTs=Date.now();
     if(dtH>0) advance(dtH);
     applyAccent(); showScreen('garden'); render(true);
-  } else { applyAccent(); showScreen('start'); render(true); setTimeout(maybeTuto0,400); }
+  } else { // brand-new garden: plant the starter seed straight away so something is growing from the very first second
+    applyAccent(); showScreen('start');
+    if(hasPot(0)&&!S.plants[0]&&totalBaseSeeds()>0){ S.sel=0; plantNormalHere(); }
+    render(true); setTimeout(maybeTuto0,400); }
   $('btnReal').classList.toggle('on',S.mode==='real');
   $('btnFast').classList.toggle('on',S.mode==='fast');
   $('btnDayClock').classList.toggle('on',S.dayMode==='clock');

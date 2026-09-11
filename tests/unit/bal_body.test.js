@@ -104,8 +104,10 @@ S=freshState(); ensurePlants();
 }
 
 // 10. tuto steps: only the two onboarding tutorials remain (first plot, then thirst)
-ok(TUTO0_STEPS.length===2, 'TUTO0_STEPS has 2 steps, got '+TUTO0_STEPS.length);
-ok(TUTO0_STEPS[0].key==='z0'&&TUTO0_STEPS[1].key==='z1', 'TUTO0_STEPS keys are z0/z1');
+ok(TUTO0_STEPS.length===4, 'TUTO0_STEPS has 4 steps, got '+TUTO0_STEPS.length);
+ok(TUTO0_STEPS.map(s=>s.key).join()==='z0,z1,z2,z3', 'TUTO0_STEPS keys are z0..z3');
+ok(TUTO0_STEPS[2].targetSel==='[data-eq="uproot"]', 'uproot step rings the uproot slot');
+ok(freshState().mode==='fast', 'a fresh game starts in fast mode');
 ok(!!I18N.en.tuto.z0&&!!I18N.fr.tuto.z0, 'z0 texts exist in EN+FR');
 ok(!!I18N.en.tuto.y0&&!!I18N.fr.tuto.y0, 'y0 texts exist in EN+FR');
 ok(typeof maybeTuto0==='function', 'maybeTuto0 exists');
