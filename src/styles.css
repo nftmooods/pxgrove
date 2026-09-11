@@ -29,7 +29,7 @@
   }
   input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text} /* real text fields (rename, cheat code…) still select/type normally */
   .disp{font-family:'Silkscreen','IBM Plex Mono',monospace}
-  .wrap{max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column}
+  .wrap{position:relative;max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column} /* every popup below is anchored to THIS box, not the browser window — they can never spill past the game's own frame */
   ::-webkit-scrollbar{width:10px;height:10px}
   ::-webkit-scrollbar-track{background:var(--ground)}
   ::-webkit-scrollbar-thumb{background:var(--line);border:2px solid var(--ground)}
@@ -513,7 +513,7 @@
   .hotrow .bar{flex:1 1 70px;height:10px}
 
   /* recipe book modal */
-  .overlay{position:fixed;inset:0;background:rgba(20,21,22,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:14px}
+  .overlay{position:absolute;inset:0;background:rgba(20,21,22,.72);display:none;align-items:center;justify-content:center;z-index:50;padding:14px} /* absolute + .wrap's position:relative: confined to the game's own frame, never the full browser window */
   .overlay.on{display:flex}
   /* ── Home / title screen: full-bleed art, two invisible hit-zones over the baked-in buttons ── */
   .home-overlay{z-index:500;background:#0d1410;padding:0}
