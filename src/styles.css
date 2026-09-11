@@ -522,7 +522,7 @@
   .home-hit:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
   .home-hit-disabled{cursor:var(--cur-hand,auto)}
   /* ── Crafting popup (design): 780×500 dark card, 3 columns ── */
-  .book.craft-popup{width:min(92vw,780px);max-width:none;height:560px;max-height:82vh;background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:16px;
+  .book.craft-popup{width:min(92%,780px);max-width:none;height:560px;max-height:82%;background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:16px;
     padding:16px 18px;backdrop-filter:none;box-shadow:0 16px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;color:#eceded}
   .cp-head{display:flex;align-items:center;gap:10px}
   .cp-head h2{font-size:1.05rem;margin:0;color:#f2f2f2;letter-spacing:.5px;flex:1;text-transform:uppercase}
@@ -596,8 +596,8 @@
   .inv-soon:hover{border-color:rgba(255,255,255,.15)}
   .inv-soon .inv-em{font-size:1.4rem}
   .inv-soon .inv-lb{white-space:normal;line-height:1.3;color:#6f7173}
-  .book{background:var(--panel-a);border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(6px);box-shadow:0 12px 40px rgba(0,0,0,.55);max-width:860px;width:100%;max-height:88vh;display:flex;flex-direction:column}
-  #bookOverlay .book{height:min(660px,86vh)} /* the recipe book keeps ONE size across pages; tiers split into fixed pages, no scroll */
+  .book{background:var(--panel-a);border:1px solid rgba(255,255,255,.14);border-radius:12px;backdrop-filter:blur(6px);box-shadow:0 12px 40px rgba(0,0,0,.55);max-width:860px;width:100%;max-height:88%;display:flex;flex-direction:column}
+  #bookOverlay .book{height:min(660px,86%)} /* the recipe book keeps ONE size across pages; tiers split into fixed pages, no scroll */
   #researchOverlay .book{max-width:1200px} /* the research tree spreads its 4 tier columns */
   .book-foot{flex:none;display:flex;justify-content:flex-end;padding:6px 14px;border-top:var(--px) dashed var(--line)}
   .book-filter{flex:none;display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 14px;border-bottom:var(--px) dashed var(--line);background:var(--panel-2)}
