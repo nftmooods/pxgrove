@@ -2126,6 +2126,7 @@ function placeHeader(inStage){ // the top bar floats over the scene on the garde
   else { first(wrap); hd.classList.remove('in-stage'); }
 }
 function showScreen(which){
+  if(which==='start')which='garden'; // Normie/Hoodie selection temporarily disabled — everyone goes straight into the garden with their starter common sprout, an empty pot planting itself the same way a harvested one does
   $('scrStart').classList.toggle('on',which==='start');
   $('scrGarden').classList.toggle('on',which==='garden');
   if(which!=='garden') placeHeader(false);
@@ -4739,7 +4740,7 @@ function init(){
     S.lastTs=Date.now();
     if(dtH>0) advance(dtH);
     applyAccent(); showScreen('garden'); render(true);
-  } else showScreen('start');
+  } else { applyAccent(); showScreen('start'); render(true); }
   $('btnReal').classList.toggle('on',S.mode==='real');
   $('btnFast').classList.toggle('on',S.mode==='fast');
   $('btnDayClock').classList.toggle('on',S.dayMode==='clock');
