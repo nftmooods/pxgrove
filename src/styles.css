@@ -29,7 +29,7 @@
   }
   input,textarea,[contenteditable]{-webkit-user-select:text;user-select:text} /* real text fields (rename, cheat code…) still select/type normally */
   .disp{font-family:'Silkscreen','IBM Plex Mono',monospace}
-  .wrap{position:relative;max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column} /* every popup below is anchored to THIS box, not the browser window — they can never spill past the game's own frame */
+  .wrap{position:relative;overflow:hidden;max-width:none;height:100%;margin:0 auto;padding:8px 14px 6px;display:flex;flex-direction:column} /* every popup below is anchored + hard-clipped to THIS box, not the browser window — they can never spill past the game's own frame, whatever the popup's own content does */
   ::-webkit-scrollbar{width:10px;height:10px}
   ::-webkit-scrollbar-track{background:var(--ground)}
   ::-webkit-scrollbar-thumb{background:var(--line);border:2px solid var(--ground)}
