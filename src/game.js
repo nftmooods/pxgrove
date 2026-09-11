@@ -3781,7 +3781,8 @@ function layoutScene(){ // size the stage as large as the background's ratio all
   placeHeader($('scrGarden').classList.contains('on')); // render() also runs while the start screen is up: the bar must stay in the page flow there
   const R=sceneRatio(), gw=g.clientWidth;
   let w=gw, h=Math.round(w/R);
-  if(window.innerWidth>1200){ const gh=g.clientHeight; if(h>gh){ h=gh; w=Math.round(h*R); } } // .garden only reports a real height at this width — below it, height:auto, so just fit the width
+  { const wrap=document.querySelector('.wrap'), gh=Math.min(g.clientHeight||Infinity, (wrap&&wrap.clientHeight)||Infinity); // never taller than the window: a phone held sideways is far wider than tall, so the scene fits the height and letterboxes left/right
+    if(isFinite(gh)&&h>gh){ h=gh; w=Math.round(h*R); } }
   stg.style.setProperty('--sw',w+'px'); stg.style.setProperty('--sh',h+'px'); stg.classList.add('fixed');
 }
 function drawGarden(){
