@@ -37,7 +37,27 @@ if (artifact) {
   writeFileSync(resolve(root, 'dist/artifact.html'), html);
   console.log(`dist/artifact.html  ${(html.length / 1024).toFixed(0)} KB  stamp ${stamp}`);
 } else {
-  const skeleton = '<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n<meta name="color-scheme" content="dark">\n<meta name="robots" content="noindex">\n<style>body{margin:0;font:14px system-ui,sans-serif;background:#333537}img{max-width:100%}[hidden]{display:none!important}</style>\n';
+  // PWA bits so the game can run edge-to-edge, chrome-free on a phone once added to the home screen —
+  // true programmatic fullscreen isn't available on iOS Safari for arbitrary pages, so "installed as an app" is the reliable path.
+  const icon = asset('app-icon.png');
+  const manifest = JSON.stringify({
+    name: 'PxGrove', short_name: 'PxGrove', start_url: '.',
+    display: 'fullscreen', display_override: ['fullscreen', 'standalone'],
+    background_color: '#48494b', theme_color: '#48494b',
+    icons: [{ src: icon, sizes: '544x544', type: 'image/png', purpose: 'any maskable' }],
+  });
+  const manifestHref = `data:application/manifest+json;base64,${Buffer.from(manifest).toString('base64')}`;
+  const skeleton = '<!doctype html>\n<html lang="fr">\n<head>\n<meta charset="utf-8">\n' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">\n' +
+    '<meta name="color-scheme" content="dark">\n<meta name="robots" content="noindex">\n' +
+    '<meta name="theme-color" content="#48494b">\n' +
+    '<meta name="mobile-web-app-capable" content="yes">\n' +
+    '<meta name="apple-mobile-web-app-capable" content="yes">\n' +
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">\n' +
+    '<meta name="apple-mobile-web-app-title" content="PxGrove">\n' +
+    `<link rel="manifest" href="${manifestHref}">\n` +
+    `<link rel="apple-touch-icon" href="${icon}">\n` +
+    '<style>body{margin:0;font:14px system-ui,sans-serif;background:#333537}img{max-width:100%}[hidden]{display:none!important}</style>\n';
   const i = html.indexOf('<style>');
   const out = skeleton + html.slice(0, i) + '</head>\n<body>\n' + html.slice(i) + '\n</body>\n</html>\n';
   writeFileSync(resolve(root, 'dist/index.html'), out);

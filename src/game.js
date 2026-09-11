@@ -4433,7 +4433,10 @@ function init(){
   drawLogo();
   { const hi=$('homeImg'); hi.onload=layoutHome; hi.src=HOME_BG; layoutHome(); }
   window.addEventListener('resize',layoutHome);
-  $('btnHomeGuest').addEventListener('click',()=>{ $('homeOverlay').classList.remove('on'); });
+  $('btnHomeGuest').addEventListener('click',()=>{
+    $('homeOverlay').classList.remove('on');
+    if(isMobile()&&document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); } // best-effort: hides the browser chrome on phones that support it (mainly Android); iOS gets the same result via "Add to Home Screen" (see the manifest/meta tags in build.mjs)
+  });
   $('btnLookup').addEventListener('click',lookup);
   $('normieId').addEventListener('keydown',e=>{ if(e.key==='Enter')lookup(); });
   $('btnRandom').addEventListener('click',randomPick);
