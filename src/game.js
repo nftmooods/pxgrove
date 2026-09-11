@@ -3618,7 +3618,8 @@ function setLang(l){
 
 /* ── Pixel rendering of the garden (all pots side by side) ── */
 const CELL=5, GW=64, GH=80, RES=2; // RES: canvas pixels per world unit (crisper illustration & text) // taller grid: the pots area breathes, plants get headroom
-const isMobile=()=>window.innerWidth<=820;
+const isNarrow=()=>window.innerWidth<=820; // phone-width window: the top bar sits in the flow above the scene and the menus collapse into the hamburger
+const isMobile=()=>false; // the one-pot-per-screen mobile view is retired: every width shows the real illustration with its 3 plots, scaled to fit (the plot cards scale with it)
 function hexRGB(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
 function mixCol(a,b,t){ const A=hexRGB(a),B=hexRGB(b);
   return '#'+A.map((vv,i)=>Math.round(vv+(B[i]-vv)*t).toString(16).padStart(2,'0')).join(''); }
@@ -3778,7 +3779,7 @@ function layoutScene(){ // size the stage as large as the background's ratio all
   g.classList.remove('side'); side.hidden=true;
   if(isMobile()||controlView){ stg.classList.remove('fixed'); if(below.parentElement!==left) left.appendChild(below); placeHeader(false); return; }
   if(below.parentElement!==stg) stg.appendChild(below); // anchored to the stage itself so it overlays exactly the rendered image, letterboxing included
-  placeHeader($('scrGarden').classList.contains('on')); // render() also runs while the start screen is up: the bar must stay in the page flow there
+  placeHeader($('scrGarden').classList.contains('on')&&!isNarrow()); // render() also runs while the start screen is up: the bar must stay in the page flow there — and on a phone-width window there is no room to float it over a ~200px-tall scene
   const R=sceneRatio(), gw=g.clientWidth;
   let w=gw, h=Math.round(w/R);
   { const wrap=document.querySelector('.wrap'), gh=Math.min(g.clientHeight||Infinity, (wrap&&wrap.clientHeight)||Infinity); // never taller than the window: a phone held sideways is far wider than tall, so the scene fits the height and letterboxes left/right
@@ -3966,6 +3967,12 @@ function renderPlotCards(){
     cards.push('<div class="plot-card" style="left:'+Math.round(left)+'px;top:'+Math.round(top)+'px;width:'+Math.round(width)+'px">'+html+'</div>');
   }
   box.innerHTML=cards.join('');
+  box.classList.toggle('pop',_detailsSlot>=0||_unlockConfirmSlot>=0); // an open popup rises above the tool column (they overlap on a phone-width scene)
+  box.querySelectorAll('.pc-details,.pc-unlock').forEach(d=>{ // a popup centred on an edge plot can hang past a phone screen: nudge it back inside
+    const r=d.getBoundingClientRect(), pad=8, vw=window.innerWidth; let dx=0;
+    if(r.left<pad) dx=pad-r.left; else if(r.right>vw-pad) dx=(vw-pad)-r.right;
+    if(dx) d.style.marginLeft=Math.round(dx)+'px';
+  });
   const inp=box.querySelector('[data-detinput]'); if(inp&&inp.focus){ inp.focus(); inp.select(); }
 }
 const HOME_BG=__ASSET__('home-bg.jpg'); // title-screen art (1672×941) with the Guest / Connect Wallet buttons painted in — hit-zones below are positioned to match
@@ -4436,7 +4443,7 @@ function init(){
   window.addEventListener('resize',layoutHome);
   $('btnHomeGuest').addEventListener('click',()=>{
     $('homeOverlay').classList.remove('on');
-    if(isMobile()&&document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); } // best-effort: hides the browser chrome on phones that support it (mainly Android); iOS gets the same result via "Add to Home Screen" (see the manifest/meta tags in build.mjs)
+    if(isNarrow()&&document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); } // best-effort: hides the browser chrome on phones that support it (mainly Android); iOS gets the same result via "Add to Home Screen" (see the manifest/meta tags in build.mjs)
   });
   $('btnLookup').addEventListener('click',lookup);
   $('normieId').addEventListener('keydown',e=>{ if(e.key==='Enter')lookup(); });
