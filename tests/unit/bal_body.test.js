@@ -103,12 +103,13 @@ S=freshState(); ensurePlants();
   approx(S.plants[0].growthH, 12, 1e-6, 'migration idempotent');
 }
 
-// 10. tuto steps: 8 steps, workshop + topQB present
-ok(TUTO_STEPS.length===8, 'TUTO_STEPS has 8 steps, got '+TUTO_STEPS.length);
-ok(TUTO_STEPS[4].target==='workshopCard'&&TUTO_STEPS[4].key==='tw', 'step 5 = workshop card');
-ok(TUTO_STEPS[7].target==='topQB', 'step 8 = top bar'); // open() only unfolds the mobile hamburger
-ok(!!I18N.en.tuto.tw&&!!I18N.fr.tuto.tw, 'tw texts exist in EN+FR');
-ok(I18N.fr.tuto.t6.includes('bon jeu'), 'FR finale keeps bon jeu');
+// 10. tuto steps: only the two onboarding tutorials remain (first plot, then thirst)
+ok(TUTO0_STEPS.length===2, 'TUTO0_STEPS has 2 steps, got '+TUTO0_STEPS.length);
+ok(TUTO0_STEPS[0].key==='z0'&&TUTO0_STEPS[1].key==='z1', 'TUTO0_STEPS keys are z0/z1');
+ok(!!I18N.en.tuto.z0&&!!I18N.fr.tuto.z0, 'z0 texts exist in EN+FR');
+ok(!!I18N.en.tuto.y0&&!!I18N.fr.tuto.y0, 'y0 texts exist in EN+FR');
+ok(typeof maybeTuto0==='function', 'maybeTuto0 exists');
+ok(typeof maybeTutoHyd==='function', 'maybeTutoHyd exists');
 
 console.log(pass+' passed, '+fail+' failed');
 process.exit(fail?1:0);

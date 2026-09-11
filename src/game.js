@@ -413,28 +413,10 @@ en:{
   introGo:'Let\'s grow!',
   tuto:{
     next:'Next ▸', skip:'Skip', done:'Let\'s grow! ✓',
-    t0:'🌱 Welcome! PxGrove is a <b>BETA</b>: a chance to discover the mechanics, hunt down recipes… and simply have a good time watching your cultures grow. For now your save lives in this browser\'s cache — a login / wallet-connect system may come later.',
-    t1:'Here is <b>your pot</b>, with your plant inside — it has already started growing!',
-    t2:'<b>Click the plant</b> to water it. Come back from time to time: without water, your plant will die of thirst.',
-    t3:'Once the plant is mature and full of flowers, <b>clicking it harvests</b>: you collect the flowers and the wood, and flowers grind into <b>pixels</b> — the resource that crafts your upgrades.',
-    tw:'The <b>Workshop</b>: this panel gathers everything you can open — Crafting, Layout, the Market, the Laboratory, the Almanac and your Seeds. Let\'s look at the two main ones.',
-    t4:'The <b>Laboratory</b>: run research first — then the crafting tables (Crafting / Layout) fill up with recipes you can build.',
-    t5:'<b>Crafting</b>: grind your flowers into pixels, collect wood, and build tools, machines and rooms — every unlocked recipe opens new possibilities.',
-    w0:'First harvest! Your flowers were ground into <b>pixels</b> and you picked up <b>wood</b> — your resources live up here.',
-    w1:'Time to build the <b>Workbench</b>: 20 wood. It unlocks every other recipe in the game.',
-    w2:'Press <b>Craft</b> as soon as you have the wood — then harvest again: every cycle funds the next machine. 🌱',
-    t6:'Up here: every day three <b>quests</b> (🗓️) await you, and your feats fill the <b>Badges</b> (🏅) — they will unlock rewards in the final version. Thanks for trying PxGrove… have a great game! 🌱',
-    w0b:'Double-clicking a plant full of flowers harvests it. From <b>80% growth</b>, once the first flowers are out, you can already harvest — but the plant gives <b>fewer resources</b>. At <b>100% with every flower</b>, the yield is at its best.',
-    g0:'<b>80% grown!</b> Remember: <b>click the pot</b> to water the plant at any moment of its growth.',
-    g1:'A <b>click harvests</b> once you reach <b>100% growth with every flower out</b> — before that, a click just waters.',
-    h0:'<b>Second harvest: 2 seeds!</b> From now on you can also plant <b>straight in the ground</b>: click a <b>free slot</b> (dotted footprint) and pick a seed — no pot needed.',
-    h1:'A plant in the ground gives <b>2 flowers max</b> plus its wood, and is <b>more fragile</b>: it dries faster and will be exposed to weather and events. Pots protect — the ground is free.',
-    e0:'Your first tool! It lives <b>here, on the left of the stage</b>. This slot opens the group it belongs to.',
-    e1:'Click the tool to <b>equip</b> it — the highlighted slot is the one in use.',
-    e2:'Once equipped it stays <b>active permanently</b>: no need to select it again before each harvest or watering.',
-    f0:'Your first fertilizer! Your boosters live <b>here, on the left of the stage</b>. This slot opens the group.',
-    f1:'Click a fertilizer to <b>apply it to the selected plant</b> — it is consumed, and the bonus starts right away.',
-    f2:'The active bonus shows <b>here, under the plant name</b>: its icon, its effect and the time left.'
+    z0:'👋 <b>Click the first plot</b> to plant a seed there.',
+    z1:'This is an <b>alpha version</b> of the game — you can speed up time from the menu options (☰, top right).',
+    y0:'💧 Your plant is thirsty! <b>Click the plant</b> to water it.',
+    y1:'You can follow its growth at any time by <b>clicking its growth bars</b>.',
   },
   notifBody:(nm,i)=>'💧 Your '+nm+' (pot '+(i+1)+') is down to 10% hydration — water it before it withers!',
   notifDry:(nm,i)=>'🥀 Your '+nm+' (pot '+(i+1)+') is bone dry — growth has stopped, it dies in 24h without water!',
@@ -705,28 +687,10 @@ fr:{
   introGo:'C\'est parti !',
   tuto:{
     next:'Suivant ▸', skip:'Passer', done:'C\'est parti ! ✓',
-    t0:'🌱 Bienvenue ! PxGrove est une <b>BÊTA</b> : l\'occasion de découvrir les mécaniques, dénicher les recettes… et surtout passer un chouette moment à voir grandir tes cultures. Pour le moment la sauvegarde se fait dans le cache de ce navigateur — un système de login / wallet connect pourrait être implanté par la suite.',
-    t1:'Ici, <b>ton pot</b>, avec ta plante dedans — elle a déjà commencé à pousser !',
-    t2:'<b>Double-clique la plante</b> pour l\'arroser. N\'oublie pas de revenir de temps en temps : sans eau, ta plante finit par mourir de soif.',
-    t3:'Quand la plante est mûre et pleine de fleurs, <b>un clic la récolte</b> : tu récolteras les fleurs et le bois, et les fleurs se broient en <b>pixels</b> — la ressource qui fabrique tes améliorations.',
-    tw:'L\'<b>Atelier</b> : ce panneau regroupe tout ce que tu peux ouvrir — Fabrication, Aménagement, Marché, Laboratoire, Almanach et tes Graines. Regardons ensemble les deux principaux.',
-    t4:'Le <b>Laboratoire</b> : effectue d\'abord des recherches — ensuite les tables de fabrication (Fabrication / Aménagement) se remplissent de recettes à construire.',
-    t5:'La <b>Fabrication</b> : broie tes fleurs en pixels, récupère du bois, et fabrique outils, machines et aménagements — chaque recette débloquée ouvre de nouvelles possibilités.',
-    w0:'Première récolte ! Tes fleurs ont été broyées en <b>pixels</b> et tu as ramassé du <b>bois</b> — tes ressources vivent juste ici.',
-    w1:'C\'est le moment de fabriquer l\'<b>Établi</b> : 20 bois. Il débloque toutes les autres recettes du jeu.',
-    w2:'Appuie sur <b>Fabriquer</b> dès que tu as le bois — puis reviens récolter : chaque cycle finance la machine suivante. 🌱',
-    t6:'Tout en haut : chaque jour, trois <b>quêtes</b> (🗓️) t\'attendent, et tes exploits remplissent les <b>badges</b> (🏅) — ils débloqueront des récompenses dans la version finale. Merci d\'essayer PxGrove… bon jeu ! 🌱',
-    w0b:'Un clic sur une plante pleine de fleurs la récolte. Dès <b>80\x20% de croissance</b>, quand les premières fleurs apparaissent, tu peux déjà récolter — mais la plante donne <b>moins de ressources</b>. À <b>100\x20% avec toutes les fleurs</b>, le rendement est maximal.',
-    g0:'<b>80\x20% de croissance !</b> Rappel : <b>clique sur le pot</b> pour arroser la plante à tout moment de sa pousse.',
-    g1:'Un <b>clic récolte</b> une fois arrivé à <b>100\x20% de croissance avec toutes les fleurs sorties</b> — avant ça, un clic arrose seulement.',
-    h0:'<b>Deuxième récolte : 2 graines !</b> Tu peux désormais planter <b>directement en terre</b> : clique un <b>emplacement libre</b> (pointillés) et choisis une graine — sans pot.',
-    h1:'Une plante en terre donne <b>2 fleurs max</b> et son bois, mais elle est <b>plus fragile</b> : elle sèche plus vite et sera exposée à la météo et aux événements. Les pots protègent — la terre est gratuite.',
-    e0:'Ton premier outil ! Il vit <b>ici, à gauche de la scène</b>. Cette case ouvre le groupe auquel il appartient.',
-    e1:'Clique sur l\'outil pour <b>l\'équiper</b> — la case en surbrillance est celle en service.',
-    e2:'Une fois équipé, il reste <b>actif en permanence</b> : inutile de le resélectionner avant chaque récolte ou arrosage.',
-    f0:'Ton premier engrais ! Tes bonus vivent <b>ici, à gauche de la scène</b>. Cette case ouvre le groupe.',
-    f1:'Clique sur un engrais pour <b>l\'appliquer à la plante sélectionnée</b> — il est consommé, et le bonus démarre aussitôt.',
-    f2:'Le bonus actif s\'affiche <b>ici, sous le nom de la plante</b> : son icône, son effet et le temps restant.'
+    z0:'👋 <b>Clique sur la première parcelle</b> pour y planter une graine.',
+    z1:'Ceci est une <b>version alpha</b> du jeu — tu peux accélérer la vitesse depuis les options du menu (☰, en haut à droite).',
+    y0:'💧 Ta plante a soif ! <b>Clique sur la plante</b> pour l\'arroser.',
+    y1:'Tu peux suivre sa croissance à tout moment en <b>cliquant sur ses barres de croissance</b>.',
   },
   notifBody:(nm,i)=>'💧 Ta '+nm+' (pot '+(i+1)+') est à 10 % d\'hydratation — arrose-la avant qu\'elle ne flétrisse !',
   notifDry:(nm,i)=>'🥀 Ta '+nm+' (pot '+(i+1)+') est à sec — la croissance est stoppée, mort dans 24 h sans arrosage !',
@@ -856,7 +820,7 @@ function freshState(){
   return { normie:null, plants:[null], sel:0, mode:'real', dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
     almanac:{seen:{}, totalHarvests:0, bestHarvestPx:0, plantsLost:0},
     daily:null, streak:{count:0, lastCounted:'', joker:1, jokerWeek:''},
-    stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tutoSeen:false, tuto2Seen:false, tuto3Seen:false, tuto4Seen:false, tuto5Seen:false, tuto6Seen:false, balV:2 };
+    stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tuto0Seen:false, tutoHydSeen:false, balV:2 };
 }
 let S = freshState();
 const LS_KEY='pixelvalet_state_v2';
@@ -1542,7 +1506,6 @@ function plantNow(normie){ // from the start screen: selected pot if free, else 
   S.plants[idx]=makePlant(normie);
   S.sel=idx;
   applyAccent(); showScreen('garden'); save(); render(true);
-  if(!S.tutoSeen) setTimeout(startTuto,350); // first plant in the pot → quick guided tour
 }
 function plantNormalHere(){ // reuse the pot's token, consuming a matching seed when possible
   ensurePlants();
@@ -1646,8 +1609,8 @@ function checkThirst(){
   S.plants.forEach((p,i)=>{
     if(!p||p.dead||p.cut)return;
     const h=hydration(p), nm=potName(i)+' \u00b7 '+vName(vOf(p));
-    if(h<=0&&!p.notif0){ p.notif0=true; p.notif10=true; warn(t.notifDry(nm,i)); }
-    else if(h<=0.10&&!p.notif10){ p.notif10=true; warn(t.notifBody(nm,i)); }
+    if(h<=0&&!p.notif0){ p.notif0=true; p.notif10=true; warn(t.notifDry(nm,i)); if(!S.tutoHydSeen) maybeTutoHyd(i); }
+    else if(h<=0.10&&!p.notif10){ p.notif10=true; warn(t.notifBody(nm,i)); if(!S.tutoHydSeen) maybeTutoHyd(i); }
     if(h>0.2&&p.notif10&&h>0){ p.notif10=false; }
     if(h>0&&p.notif0){ p.notif0=false; }
   });
@@ -1702,7 +1665,6 @@ function harvest(){
     S.almanac.totalHarvests++; if(got>S.almanac.bestHarvestPx)S.almanac.bestHarvestPx=got;
     questBump('harvest',1); questBump('px',got);
     save(); render(true); renderResources(true);
-    maybeTuto2();
     return;
   }
   const v=vOf(p);
@@ -1730,10 +1692,8 @@ function harvest(){
   if(secondSeed) setTimeout(()=>showToast(T().secondSeedToast),1200);
   jlog(p,'harvest',got);
   S.almanac.totalHarvests++; if(got>S.almanac.bestHarvestPx)S.almanac.bestHarvestPx=got;
-  maybeTuto2();
   questBump('harvest',1); questBump('px',got);
   save(); render(true); renderResources(true);
-  if(S.inv.secondSeedGiven) maybeTuto6();
 }
 function plantHybrid(kind){ // consumes a hybrid seed, not a normal one
   ensurePlants();
@@ -1856,14 +1816,13 @@ function craft(r){
   if(POT_EQUIP[r.id]){ openPotPick(r.id); return; } // pay only once a pot is chosen
   questBump('craft',1);
   for(const k in r.cost) S.inv[k]-=r.cost[k];
-  if(r.kind==='tool'||r.kind==='machine'){ S.inv.tools[r.id]=true; maybeTuto3(r.id); }
+  if(r.kind==='tool'||r.kind==='machine'){ S.inv.tools[r.id]=true; }
   else if(r.kind==='multi'){
     S.inv[r.cnt]++;
   }
   else {
     for(const k in r.gives) S.inv[k]+=r.gives[k];
     if(r.bonus&&Math.random()<r.bonus.chance) S.inv[r.bonus.res]+=r.bonus.n;
-    { const gk=Object.keys(r.gives||{})[0]; if(gk) maybeTuto4(gk); }
   }
   // visible confirmation: glow on the recipe row + toast with how many are now owned
   flashCraft=r.id;
@@ -3172,63 +3131,23 @@ function openIntro(){
   $('introOverlay').classList.add('on');
 }
 /* ── first-launch tutorial: spotlight steps over the real interface ── */
-const TUTO_STEPS=[
-  {target:null,        key:'t0'},
-  {target:'plantCanvas',key:'t1'},
-  {target:'plantCanvas',key:'t2'}, // water / harvest live on the plant itself (both a single click) since the panel under the scene went away
-  {target:'plantCanvas',key:'t3'},
-  {target:'workshopCard', key:'tw'},
-  {targetSel:'#researchOverlay .book', key:'t4', open:()=>openResearch('research'), close:closeResearch},
-  {targetSel:'#bookOverlay .book',     key:'t5', close:closeBook,
-   open:()=>{ bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=''; bookPage=0; openBook(); }},
-  {target:'topQB', key:'t6', // finale: the quests & badges buttons up in the top bar
-   open:()=>{ if(isMobile()) document.body.classList.add('hamb-open'); },
-   close:()=>{ document.body.classList.remove('hamb-open'); }},
-];
-const TUTO2_STEPS=[
-  {target:'hudResStrip', key:'w0'},
-  {target:'plantCanvas', key:'w0b'},
-  {targetSel:'[data-rid="workbench"]', key:'w1',
-   open:()=>{ bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=''; bookPage=0; openBook(); }},
-  {targetSel:'[data-craft="workbench"]', key:'w2'},
-];
-const SIDEBAR_TOOLS={shears:['harv','[data-eq="shears"]'],shearsUp2:['harv','[data-eq="shears"]'],gloves:['harv','[data-eq="gloves"]'],glovesUp2:['harv','[data-eq="gloves"]'],
-  bucketWood:['water','[data-wm="bucketWood"]'],bucketMetal:['water','[data-wm="bucketMetal"]'],arrosoir:['water','[data-wm="arrosoir"]']};
-function maybeTuto3(rid){ // first equipable tool ever crafted: where it lives, how to equip it, and that it stays on
-  const g=SIDEBAR_TOOLS[rid]; if(!g||S.tuto3Seen||tutoStep>=0)return;
-  const steps=[
-    {targetSel:'[data-sbg="'+g[0]+'"]', key:'e0', open:()=>{ closeBook(); sbOpen[g[0]]=true; renderSidebar(); }},
-    {targetSel:g[1], key:'e1'},
-    {targetSel:g[1], key:'e2'},
-  ];
-  setTimeout(()=>runTuto(steps,'tuto3Seen'),350);
-}
-function maybeTuto4(kind){ // first fertilizer ever crafted: where to apply it, and where the active bonus shows
-  if(!FERT_FX[kind]||S.tuto4Seen||tutoStep>=0)return;
-  const steps=[
-    {targetSel:'[data-sbg="fert"]', key:'f0', open:()=>{ closeBook(); sbOpen.fert=true; renderSidebar(); }},
-    {targetSel:'[data-sbuse="'+kind+'"]', key:'f1'},
-    {target:'plantBadges', key:'f2'},
-  ];
-  setTimeout(()=>runTuto(steps,'tuto4Seen'),350);
-}
-const TUTO5_STEPS=[ {target:'plantCanvas', key:'g0'}, {target:'plantCanvas', key:'g1'} ];
-const TUTO6_STEPS=[ {target:'plantCanvas', key:'h0'}, {target:'plantCanvas', key:'h1'} ];
-function maybeTuto6(){ // right after the 2nd cut (guaranteed 2nd seed): how to plant straight in the ground
-  if(S.tuto6Seen||tutoStep>=0||!S.tutoSeen)return;
+const TUTO0_STEPS=[ {target:null, key:'z0'}, {target:null, key:'z1'} ]; // fires before anything is planted: card sits centred, just under the header — no plant/pot exists yet to ring
+function maybeTuto0(){ // a brand-new player, garden shown, nothing planted yet: point at the first plot, then mention the speed setting
+  if(S.tuto0Seen||tutoStep>=0)return;
+  if($('introOverlay').classList.contains('on'))return; // let the welcome modal close first — closeIntro() retries this
+  if(S.plants.some(p=>p))return; // already planted: too late for this hint
   if(!$('scrGarden').classList.contains('on')||controlView)return;
-  setTimeout(()=>{ if(tutoStep<0) runTuto(TUTO6_STEPS,'tuto6Seen'); },900);
+  runTuto(TUTO0_STEPS,'tuto0Seen');
 }
-function maybeTuto5(){ // first time ever a plant reaches 80% growth: click waters, and a click also harvests once at 100% + all flowers
-  if(S.tuto5Seen||tutoStep>=0||!S.tutoSeen)return;
+function maybeTutoHyd(i){ // the very first time any plant's hydration hits the 10% warning: how to water it, and where to watch its growth
+  if(S.tutoHydSeen||tutoStep>=0)return;
   if(!$('scrGarden').classList.contains('on')||controlView)return;
-  const i=S.plants.findIndex(p=>p&&!p.dead&&!p.cut&&progress(p)>=0.8);
-  if(i<0)return;
+  const steps=[
+    {target:'plantCanvas', key:'y0'},
+    {targetSel:'[data-bars="'+i+'"]', key:'y1'},
+  ];
   if(i!==S.sel) selectPot(i);
-  runTuto(TUTO5_STEPS,'tuto5Seen');
-}
-function maybeTuto2(){ // fires once, right after the very first harvest, while the Workbench is unbuilt
-  if(!S.tuto2Seen&&!S.inv.tools.workbench&&tutoStep<0) setTimeout(()=>runTuto(TUTO2_STEPS,'tuto2Seen'),350);
+  runTuto(steps,'tutoHydSeen');
 }
 let tutoStep=-1;
 let tutoList=null, tutoFlag=null;
@@ -3258,17 +3177,6 @@ function ensureTutoDom(){
     document.body.appendChild(ring); document.body.appendChild(card);
   }
 }
-function startTuto(){ runTuto(TUTO_STEPS,'tutoSeen'); }
-function _startTutoLegacy(){
-  if(S.tutoSeen)return;
-  tutoStep=0;
-  if(!$('tutoRing')){
-    const ring=document.createElement('div'); ring.id='tutoRing'; ring.className='tuto-ring'; ring.hidden=true;
-    const card=document.createElement('div'); card.id='tutoCard'; card.hidden=true;
-    document.body.appendChild(ring); document.body.appendChild(card);
-  }
-  renderTuto();
-}
 function endTuto(){
   tutoStep=-1; if(tutoFlag)S[tutoFlag]=true; save();
   clearInterval(_tutoTick); _tutoTick=null;
@@ -3276,7 +3184,7 @@ function endTuto(){
   if(r)r.hidden=true; if(c)c.hidden=true;
 }
 function renderTuto(){
-  const st=(tutoList||TUTO_STEPS)[tutoStep];
+  const st=tutoList&&tutoList[tutoStep];
   if(!st){ endTuto(); return; }
   if(st.open){ st.open(); setTimeout(()=>positionTuto(st),90); } // the real window opens BEHIND the card
   else positionTuto(st);
@@ -3285,8 +3193,8 @@ function positionTuto(st){
   const t=T().tuto;
   const ring=$('tutoRing'), card=$('tutoCard');
   card.hidden=false;
-  const last=tutoStep===(tutoList||TUTO_STEPS).length-1;
-  card.innerHTML='<div class="tstep">'+(tutoStep+1)+' / '+(tutoList||TUTO_STEPS).length+'</div>'+
+  const last=tutoStep===tutoList.length-1;
+  card.innerHTML='<div class="tstep">'+(tutoStep+1)+' / '+tutoList.length+'</div>'+
     '<div>'+t[st.key]+'</div>'+
     '<div class="actions"><button class="btn primary sm" id="tutoNext" type="button">'+(last?t.done:t.next)+'</button>'+
     '<button class="btn ghost sm" id="tutoSkip" type="button">'+t.skip+'</button></div>';
@@ -3317,6 +3225,7 @@ function closeIntro(){
   $('introOverlay').classList.remove('on');
   if(!S.introSeen){ S.introSeen=true; save(); }
   ensureNotifPermission(); // user gesture: right moment to ask
+  setTimeout(maybeTuto0,200);
 }
 /* ── Inventory (crafted items) ── */
 function invQtyKey(r){ return r.kind==='multi' ? r.cnt : Object.keys(r.gives)[0]; }
@@ -4488,7 +4397,6 @@ function tick(){
   const hadDaily=S.daily&&S.daily.date===todayStr();
   if(!hadDaily){ ensureDaily(); renderQuests(); }
   checkThirst();
-  maybeTuto5();
   checkBadges();
   render();
   refreshWorkshopButtons();
@@ -4735,7 +4643,7 @@ function init(){
     S.lastTs=Date.now();
     if(dtH>0) advance(dtH);
     applyAccent(); showScreen('garden'); render(true);
-  } else { applyAccent(); showScreen('start'); render(true); }
+  } else { applyAccent(); showScreen('start'); render(true); setTimeout(maybeTuto0,400); }
   $('btnReal').classList.toggle('on',S.mode==='real');
   $('btnFast').classList.toggle('on',S.mode==='fast');
   $('btnDayClock').classList.toggle('on',S.dayMode==='clock');
