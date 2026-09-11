@@ -518,7 +518,7 @@
   /* ── Home / title screen: full-bleed art, two invisible hit-zones over the baked-in buttons ── */
   .home-overlay{z-index:500;background:#0d1410;padding:0}
   .home-overlay img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
-  .home-hit{position:absolute;border:0;background:transparent;padding:0;cursor:pointer}
+  .home-hit{position:absolute;border:0;background:transparent;padding:0;cursor:var(--cur-click,pointer)}
   .home-hit:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
   /* ── Crafting popup (design): 780×500 dark card, 3 columns ── */
   .book.craft-popup{width:min(92vw,780px);max-width:none;height:560px;max-height:82vh;background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:16px;
