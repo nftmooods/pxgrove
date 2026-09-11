@@ -520,6 +520,7 @@
   .home-overlay img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;pointer-events:none;user-select:none}
   .home-hit{position:absolute;border:0;background:transparent;padding:0;cursor:var(--cur-click,pointer)}
   .home-hit:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
+  .home-hit-disabled{cursor:not-allowed}
   /* ── Crafting popup (design): 780×500 dark card, 3 columns ── */
   .book.craft-popup{width:min(92vw,780px);max-width:none;height:560px;max-height:82vh;background:#1c1c1e;border:1px solid rgba(255,255,255,.08);border-radius:16px;
     padding:16px 18px;backdrop-filter:none;box-shadow:0 16px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;color:#eceded}
