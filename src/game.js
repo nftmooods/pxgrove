@@ -3673,10 +3673,6 @@ function setLang(l){
   $('invTitle').textContent=t.inventory; $('invSub').textContent=t.invSub; $('invInfo').textContent=t.invInfo; $('invSearch').placeholder=t.bookSearchPh;
   $('tabGarden').textContent='🌱 '+t.tabGarden; $('btnJournalTab').textContent='📓 '+t.journalTitle;
   $('btnBuild').textContent=t.buildBtn;
-  $('btnBuild2').textContent=t.buildBtn;
-  $('btnResearch2').textContent='🧪 '+t.labTitle;
-  $('btnAlmanac2').textContent=t.almanacTitle;
-  $('btnSeeds2').textContent=t.seedVaultBtn;
   $('btnQuests').textContent='🗓️ '+t.questsBtn;
   $('btnBadges').textContent='🏅 '+t.badgesTitle;
   $('btnMarket').textContent=t.market;
@@ -4571,12 +4567,8 @@ function init(){
     const wp=$('wsPanel'); if(wp.hidden){ renderWsPanel(); wp.hidden=false; } else wp.hidden=true; });
   $('wsPanel').addEventListener('click',e=>e.stopPropagation());
   $('btnResearch').addEventListener('click',openResearch);
-  $('btnResearch2').addEventListener('click',()=>{ closeMenu(); openResearch(); });
   $('btnAlmanac').addEventListener('click',openAlmanac);
-  $('btnAlmanac2').addEventListener('click',()=>{ closeMenu(); openAlmanac(); });
   $('btnAlmanacClose').addEventListener('click',closeAlmanac);
-  $('btnBuild2').addEventListener('click',()=>{ closeMenu(); bookFilter.cat='build'; bookFilter.res=null; bookPage=0; openBook(); });
-  $('btnSeeds2').addEventListener('click',()=>{ closeMenu(); openSeeds(); });
   $('btnInfo').addEventListener('click',()=>{ closeMenu(); openInfo(); });
   $('btnInfoClose').addEventListener('click',closeInfo);
   $('infoOverlay').addEventListener('click',e=>{ if(e.target.id==='infoOverlay')closeInfo(); });
