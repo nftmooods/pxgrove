@@ -472,6 +472,7 @@ en:{
   pcLockedTitle:'Locked', pcLockedSub:'Upgrade your garden', pcEmptyTitle:'Empty', pcEmptySub:'Choose a seed',
   pcUnlockFreeQ:'Unlock this plot?', pcUnlockCostQ:cost=>'Unlock this plot for '+cost+'?', pcUnlockFree:'Unlock — free', pcUnlockCost:cost=>'Unlock — '+cost,
   pcNoRes:'Not enough resources to unlock this plot.',
+  pcNeed2Seeds:'You need at least 2 seeds in your inventory to unlock a plot.',
   pcUnlockTitle:'Unlock the plot', pcUnlockTxt:'Unlock this plot to grow your garden.', pcReqLbl:'REQUIRED RESOURCES', pcUnlockFreeBtn:'Unlock for free', pcUnlockBtn:'Unlock the plot',
   secondSeedToast:'🌰 2nd harvest: guaranteed 2nd seed — plant it in the ground!', potPickOk:'click to install here', potPickNo:'not a valid target for this device',
   potPickRepl:'♻ will REPLACE the current device — half its materials come back to your inventory',
@@ -763,6 +764,7 @@ fr:{
   pcLockedTitle:'Verrouillé', pcLockedSub:'Améliore ton jardin', pcEmptyTitle:'Vide', pcEmptySub:'Choisis une graine',
   pcUnlockFreeQ:'Déverrouiller cet emplacement ?', pcUnlockCostQ:cost=>'Déverrouiller cet emplacement pour '+cost+' ?', pcUnlockFree:'Déverrouiller — gratuit', pcUnlockCost:cost=>'Déverrouiller — '+cost,
   pcNoRes:'Pas assez de ressources pour déverrouiller cet emplacement.',
+  pcNeed2Seeds:'Il te faut au moins 2 graines dans ton inventaire pour déverrouiller une parcelle.',
   pcUnlockTitle:'Débloquer la parcelle', pcUnlockTxt:'Débloquez cette parcelle pour agrandir votre jardin.', pcReqLbl:'RESSOURCES REQUISES', pcUnlockFreeBtn:'Débloquer gratuitement', pcUnlockBtn:'Débloquer la parcelle',
   secondSeedToast:'🌰 2ᵉ récolte : 2ᵉ graine garantie — plante-la en pleine terre !', potPickOk:'clique pour installer ici', potPickNo:'cible invalide pour cet équipement',
   potPickRepl:'♻ REMPLACERA l\'équipement actuel — la moitié de ses matériaux retourne dans l\'inventaire',
@@ -1113,6 +1115,7 @@ function plotUnlockCost(i){ return (i%ROOM_SLOTS)<2?null:{stone:40}; } // the fi
 function canAffordCost(cost){ if(!cost)return true; for(const k in cost) if((S.inv[k]||0)<cost[k]) return false; return true; }
 function unlockPlot(i){ // confirmed from the "Locked" plot card
   if(i<0||i>=potSlots()||hasPot(i)||roomOf(i)!==curRoom)return;
+  if(totalBaseSeeds()<2){ showToast(T().pcNeed2Seeds); return; } // a fresh plot needs its own seed reserve: 2 in hand, so unlocking doesn't leave the player with none
   if(!canReplant()){ showToast(T().noSeed); return; } // check BEFORE spending: groundPlantAt bails out here too, but only after the cost would already be gone
   const cost=plotUnlockCost(i);
   if(!canAffordCost(cost)){ showToast(T().pcNoRes); return; }
@@ -4020,12 +4023,12 @@ function renderPlotCards(){
     let nameCls='pc-name-card', barsHtml='', nameHtml='';
     if(!hasPot(i)){ // locked compartment (design): a round padlock on the soil; click → the "Unlock the plot" card above it
       nameCls='';
-      const cost=plotUnlockCost(i), ok=canAffordCost(cost)&&canReplant();
+      const cost=plotUnlockCost(i), ok=canAffordCost(cost)&&canReplant()&&totalBaseSeeds()>=2;
       let pop='';
       if(_unlockConfirmSlot===i){
         const need=Object.assign({},cost||{}); const mats=Object.keys(need).map(k=>{ const have=S.inv[k]||0;
           return '<div class="pc-mat"><div class="pc-mat-ic">'+(t.resIc[k]||'')+'</div><div class="pc-mat-v disp" style="color:'+(have>=need[k]?'#8fd14f':'#e07a5f')+'">'+fmtCoins(have)+' / '+need[k]+'</div><div class="pc-mat-k">'+(t.res[k]||k)+'</div></div>'; });
-        { const have=totalBaseSeeds(); mats.push('<div class="pc-mat"><div class="pc-mat-ic">'+t.resIc.seeds+'</div><div class="pc-mat-v disp" style="color:'+(canReplant()?'#8fd14f':'#e07a5f')+'">'+have+' / 1</div><div class="pc-mat-k">'+t.res.seeds+'</div></div>'); }
+        { const have=totalBaseSeeds(); mats.push('<div class="pc-mat"><div class="pc-mat-ic">'+t.resIc.seeds+'</div><div class="pc-mat-v disp" style="color:'+(have>=2?'#8fd14f':'#e07a5f')+'">'+have+' / 2</div><div class="pc-mat-k">'+t.res.seeds+'</div></div>'); }
         pop='<div class="pc-unlock"><div class="pd-head"><h3 class="pd-title pc-unlock-t">'+t.pcUnlockTitle+'</h3><button type="button" class="pd-btn" data-cancelunlock="1">✕</button></div>'+
           '<div class="pc-unlock-txt">'+t.pcUnlockTxt+'</div>'+
           (cost?'<div class="cp-mats-lbl disp pc-req">'+t.pcReqLbl+'</div><div class="pc-mats">'+mats.join('')+'</div>':'')+
