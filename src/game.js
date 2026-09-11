@@ -4058,6 +4058,17 @@ function renderPlotCards(){
   box.innerHTML=cards.join('');
   const inp=box.querySelector('[data-detinput]'); if(inp&&inp.focus){ inp.focus(); inp.select(); }
 }
+const HOME_BG=__ASSET__('home-bg.jpg'); // title-screen art (1672×941) with the Guest / Connect Wallet buttons painted in — hit-zones below are positioned to match
+const HOME_HIT_GUEST={x0:0.268,y0:0.678,x1:0.486,y1:0.815}, HOME_HIT_WALLET={x0:0.513,y0:0.678,x1:0.729,y1:0.815};
+function layoutHome(){ // keeps the two invisible buttons aligned with the art's painted buttons through object-fit:contain letterboxing
+  const img=$('homeImg'), stage=$('homeOverlay');
+  if(!img||!stage||!img.naturalWidth)return;
+  const cw=stage.clientWidth, ch=stage.clientHeight, ir=img.naturalWidth/img.naturalHeight, cr=cw/ch;
+  let rw,rh,rx,ry;
+  if(cr>ir){ rh=ch; rw=ch*ir; rx=(cw-rw)/2; ry=0; } else { rw=cw; rh=cw/ir; rx=0; ry=(ch-rh)/2; }
+  const place=(el,z)=>{ el.style.left=(rx+z.x0*rw)+'px'; el.style.top=(ry+z.y0*rh)+'px'; el.style.width=((z.x1-z.x0)*rw)+'px'; el.style.height=((z.y1-z.y0)*rh)+'px'; };
+  place($('btnHomeGuest'),HOME_HIT_GUEST); place($('btnHomeWallet'),HOME_HIT_WALLET);
+}
 const SCENE_BG=__ASSET__('bg-garden.jpg'); // Martin's garden illustration (16:9, 1600×900 jpg) — the 3-slot bed is painted right into it
 const SCENE_BG_MOBILE=__ASSET__('bg-garden-mobile.jpg'); // same illustration MINUS the bed (bare grass/dirt clearing): used whenever the scene is fit+mirrored, since a baked-in bed would tile/mirror unpredictably there
 const SCENE_BG_NIGHT=__ASSET__('bg-garden-night.jpg'); // a painted night version of the same garden — crossfaded over the day art by dayDarkness(), replacing the flat dark wash on desktop
@@ -4512,6 +4523,9 @@ function setDayMode(m){ // 'clock' follows the visitor's real local hour; 'alway
 function init(){
   load();
   drawLogo();
+  { const hi=$('homeImg'); hi.onload=layoutHome; hi.src=HOME_BG; layoutHome(); }
+  window.addEventListener('resize',layoutHome);
+  $('btnHomeGuest').addEventListener('click',()=>{ $('homeOverlay').classList.remove('on'); });
   $('btnLookup').addEventListener('click',lookup);
   $('normieId').addEventListener('keydown',e=>{ if(e.key==='Enter')lookup(); });
   $('btnRandom').addEventListener('click',randomPick);
