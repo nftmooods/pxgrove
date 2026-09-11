@@ -252,7 +252,7 @@ const BLOCK_OF={}; RESEARCH_BLOCKS.forEach(b=>b.recipes.forEach(r=>BLOCK_OF[r]=b
 /* ── i18n ── */
 const I18N = {
 en:{
-  sub:'update '+BUILD_STAMP, real:'Real time', fast:'Fast ×720',
+  sub:'update '+BUILD_STAMP, real:'Real time', alpha:'Alpha ×500', fast:'Fast ×720',
   plantTitle:'Plant your Normie',
   plantTitleC:tok=>'Plant your '+tok,
   commLbl:'NFT collection',
@@ -416,7 +416,7 @@ en:{
     z0:'🌱 Your <b>first seed is planted</b> and already growing. Watch its two bars: 💧 water and 🌱 growth.',
     z1:'💧 <b>Click the plant</b> to water it whenever the water bar runs low — without water it stops growing, then dies.',
     z2:'🪴 The <b>uproot tool</b>, in the column on the left: pick it, then click a plant to pull it out and free the plot (dead plants can only be uprooted).',
-    z3:'⏩ This is an <b>alpha</b>: time runs <b>fast</b> (×720) so you can see everything happen. Switch to real time from the menu (☰ top right → Speed).',
+    z3:'⏩ This is an <b>alpha</b>: time runs <b>×500</b> so you can see everything happen. The menu (☰ top right → Speed) switches to real time or ×720.',
     y0:'💧 Your plant is thirsty! <b>Click the plant</b> to water it.',
     y1:'You can follow its growth at any time by <b>clicking its growth bars</b>.',
   },
@@ -506,7 +506,7 @@ en:{
     desk:{nm:'🖥️ Control desk',tx:'An expensive Layout build. Opens a control-tower view: energy, water and harvest state of every room on one screen, with recharge / refill / rename buttons.'},
     quests:{nm:'🗓️ Quests & badges',tx:'Daily quests reward coins and resources; badges record milestones. Both live in the top bar.'},
     hybrid:{nm:'🧬 Hybrids & strains',tx:'The try table lets you cross two seeds into a strain with mixed stats. Strains live in the seed vault and improve with harvests.'},
-    time:{nm:'⏱️ Speed & language',tx:'The ⚙️ menu switches real time / fast ×720 (for testing) and English / French.'},
+    time:{nm:'⏱️ Speed & language',tx:'The ⚙️ menu switches real time / ×500 (alpha default) / ×720 and English / French.'},
     save:{nm:'💾 Saving',tx:'Progress is saved automatically in this browser only. Clearing site data erases it.'}
   }},
   badgeLuck:'💠 +5% double seed \u00b7 until harvest', badgeLamp:'💡 lamp on this pot',
@@ -528,7 +528,7 @@ en:{
   footer:'PxGrove — MVP Step 1 (discovery mode, no wallet). Loop: plant → water → flowers → harvest (cuts the plant) → grind & craft → replant.<br>Normie data: snapshot at planting time, via <a href="https://api.normies.art" target="_blank" rel="noopener">api.normies.art</a> (embedded sample + manual import). Progress is saved locally in this browser only.',
 },
 fr:{
-  sub:'màj '+BUILD_STAMP, real:'Temps réel', fast:'Accéléré ×720',
+  sub:'màj '+BUILD_STAMP, real:'Temps réel', alpha:'Alpha ×500', fast:'Accéléré ×720',
   plantTitle:'Plante ton Normie',
   plantTitleC:tok=>'Plante ton '+tok,
   commLbl:'Collection NFT',
@@ -692,7 +692,7 @@ fr:{
     z0:'🌱 Ta <b>première graine est plantée</b> et pousse déjà. Surveille ses deux barres : 💧 l’eau et 🌱 la croissance.',
     z1:'💧 <b>Clique sur la plante</b> pour l’arroser dès que la barre d’eau baisse — sans eau elle s’arrête de pousser, puis meurt.',
     z2:'🪴 L’<b>outil arracher</b>, dans la colonne de gauche : sélectionne-le puis clique sur une plante pour la retirer et libérer la parcelle (une plante morte ne peut qu’être arrachée).',
-    z3:'⏩ Version <b>alpha</b> : le temps tourne en <b>accéléré</b> (×720) pour tout voir se passer. Repasse en temps réel depuis le menu (☰ en haut à droite → Vitesse).',
+    z3:'⏩ Version <b>alpha</b> : le temps tourne en <b>×500</b> pour tout voir se passer. Le menu (☰ en haut à droite → Vitesse) permet de repasser en temps réel ou en ×720.',
     y0:'💧 Ta plante a soif ! <b>Clique sur la plante</b> pour l\'arroser.',
     y1:'Tu peux suivre sa croissance à tout moment en <b>cliquant sur ses barres de croissance</b>.',
   },
@@ -782,7 +782,7 @@ fr:{
     desk:{nm:'🖥️ Bureau de contrôle',tx:'Un élément d\'aménagement coûteux. Ouvre une vue tour de contrôle : énergie, eau et état des récoltes de toutes les pièces sur un seul écran, avec boutons recharger / remplir / renommer.'},
     quests:{nm:'🗓️ Quêtes & badges',tx:'Les quêtes du jour rapportent pièces et ressources ; les badges gardent trace des étapes franchies. Les deux sont dans la barre du haut.'},
     hybrid:{nm:'🧬 Hybrides & souches',tx:'La table d\'essai croise deux graines en une souche aux stats mélangées. Les souches vivent dans le coffre à graines et s\'améliorent avec les récoltes.'},
-    time:{nm:'⏱️ Vitesse & langue',tx:'Le menu ⚙️ bascule temps réel / accéléré ×720 (pour tester) et anglais / français.'},
+    time:{nm:'⏱️ Vitesse & langue',tx:'Le menu ⚙️ bascule temps réel / ×500 (défaut alpha) / ×720 et anglais / français.'},
     save:{nm:'💾 Sauvegarde',tx:'La progression est sauvegardée automatiquement dans ce navigateur uniquement. Effacer les données du site la supprime.'}
   }},
   badgeLuck:'💠 +5\x20% double graine \u00b7 jusqu\'à la récolte', badgeLamp:'💡 lampe sur ce pot',
@@ -821,7 +821,7 @@ function freshInv(){
           genLvlAt:Array(9).fill(0), energyAt:Array(9).fill(0)};
 }
 function freshState(){
-  return { normie:null, plants:[null], sel:0, mode:'fast', // alpha: time runs ×720 out of the box so the first plant visibly grows in the first minutes — the menu switches back to real time
+  return { normie:null, plants:[null], sel:0, mode:'alpha', // alpha: time runs ×500 out of the box so the first plant visibly grows in the first minutes — the menu switches back to real time
     dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
     almanac:{seen:{}, totalHarvests:0, bestHarvestPx:0, plantsLost:0},
     daily:null, streak:{count:0, lastCounted:'', joker:1, jokerWeek:''},
@@ -1338,7 +1338,7 @@ function flowerCap(p,i){
 function flowerPx(p){ return Math.round(20*sizeF(p)*vOf(p).yield*(0.8+0.4*Math.random())); }
 function progress(p){ return p?clamp(p.growthH/GROWTH_H,0,1):0; }
 function hydration(p){ if(!p||p.dead||p.cut)return 0; return clamp(1-(p.gH-p.hydAtH)/hydCapH(p),0,1); }
-function timeMult(){ return S.mode==='fast'?720:1; }
+function timeMult(){ return S.mode==='fast'?720:S.mode==='alpha'?500:1; } // 'alpha' (×500) is the default for the test phase; 'fast' (×720) stays for quick checks
 function hasBucket(){ return S.inv.tools.bucketWood||S.inv.tools.bucketMetal; }
 function slotFree(p){ return !p||p.cut; } // a dead plant blocks its pot until uprooted
 
@@ -3568,7 +3568,7 @@ function setLang(l){
   $('btnEn').classList.toggle('on',l==='en');
   $('btnFr').classList.toggle('on',l==='fr');
   $('tSub').textContent=t.sub;
-  $('btnReal').textContent=t.real; $('btnFast').textContent=t.fast;
+  $('btnReal').textContent=t.real; $('btnAlpha').textContent=t.alpha; $('btnFast').textContent=t.fast;
   $('btnDayClock').textContent=t.dayClock; $('btnDayAlways').textContent=t.dayAlways; $('mlDay').textContent=t.mlDay;
   $('tPlantTitle').textContent=t.plantTitle;
   $('tPlantP1').innerHTML=t.plantP1C(C().token,C().idMax);
@@ -4434,6 +4434,7 @@ function setMode(m){
   tick();
   S.mode=m;
   $('btnReal').classList.toggle('on',m==='real');
+  $('btnAlpha').classList.toggle('on',m==='alpha');
   $('btnFast').classList.toggle('on',m==='fast');
   save(); render(true);
 }
@@ -4468,6 +4469,7 @@ function init(){
   for(const id of ['commSel','commSelStart']){ const el=$(id); if(el) el.addEventListener('change',e=>{ switchComm(e.target.value); fillCommSelects(); }); }
   $('btnBack').addEventListener('click',backToGarden);
   $('btnReal').addEventListener('click',()=>setMode('real'));
+  $('btnAlpha').addEventListener('click',()=>setMode('alpha'));
   $('btnFast').addEventListener('click',()=>setMode('fast'));
   $('btnDayClock').addEventListener('click',()=>setDayMode('clock'));
   $('btnDayAlways').addEventListener('click',()=>setDayMode('always-day'));
@@ -4669,6 +4671,7 @@ function init(){
     if(hasPot(0)&&!S.plants[0]&&totalBaseSeeds()>0){ S.sel=0; plantNormalHere(); }
     render(true); setTimeout(maybeTuto0,400); }
   $('btnReal').classList.toggle('on',S.mode==='real');
+  $('btnAlpha').classList.toggle('on',S.mode==='alpha');
   $('btnFast').classList.toggle('on',S.mode==='fast');
   $('btnDayClock').classList.toggle('on',S.dayMode==='clock');
   $('btnDayAlways').classList.toggle('on',S.dayMode==='always-day');

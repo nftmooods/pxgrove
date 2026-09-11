@@ -107,7 +107,8 @@ S=freshState(); ensurePlants();
 ok(TUTO0_STEPS.length===4, 'TUTO0_STEPS has 4 steps, got '+TUTO0_STEPS.length);
 ok(TUTO0_STEPS.map(s=>s.key).join()==='z0,z1,z2,z3', 'TUTO0_STEPS keys are z0..z3');
 ok(TUTO0_STEPS[2].targetSel==='[data-eq="uproot"]', 'uproot step rings the uproot slot');
-ok(freshState().mode==='fast', 'a fresh game starts in fast mode');
+ok(freshState().mode==='alpha', 'a fresh game starts in alpha ×500 mode');
+{ const m=S.mode; S.mode='alpha'; ok(timeMult()===500, 'alpha mode = ×500'); S.mode='fast'; ok(timeMult()===720, 'fast mode = ×720'); S.mode=m; }
 ok(!!I18N.en.tuto.z0&&!!I18N.fr.tuto.z0, 'z0 texts exist in EN+FR');
 ok(!!I18N.en.tuto.y0&&!!I18N.fr.tuto.y0, 'y0 texts exist in EN+FR');
 ok(typeof maybeTuto0==='function', 'maybeTuto0 exists');
