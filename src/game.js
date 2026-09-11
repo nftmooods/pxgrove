@@ -4440,10 +4440,11 @@ function init(){
   load();
   drawLogo();
   { const hi=$('homeImg'); hi.onload=layoutHome; hi.src=HOME_BG; layoutHome(); }
+  document.documentElement.style.setProperty('--scene-bg','url("'+SCENE_BG+'")'); // the garden art also fills, blurred, whatever the fitted scene leaves empty on a phone (see the ≤820px rules)
   window.addEventListener('resize',layoutHome);
   $('btnHomeGuest').addEventListener('click',()=>{
     $('homeOverlay').classList.remove('on');
-    if(isNarrow()&&document.documentElement.requestFullscreen){ document.documentElement.requestFullscreen().catch(()=>{}); } // best-effort: hides the browser chrome on phones that support it (mainly Android); iOS gets the same result via "Add to Home Screen" (see the manifest/meta tags in build.mjs)
+    // no requestFullscreen() here: on iPhone it wraps the page in Safari's own fullscreen box (grey surround + a native ✕ button) — chrome-free play comes from "Add to Home Screen" instead (manifest/meta tags in build.mjs)
   });
   $('btnLookup').addEventListener('click',lookup);
   $('normieId').addEventListener('keydown',e=>{ if(e.key==='Enter')lookup(); });
