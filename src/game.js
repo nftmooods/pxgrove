@@ -1241,7 +1241,7 @@ function updateCommUI(){
   $('tNoNormie').textContent=T().noTokC(C().token);
   $('tPlantP1').innerHTML=T().plantP1C(C().token,C().idMax);
   $('tRandomHint').textContent=T().randomHintC(Object.keys(commSnapshot()).length,C().token,C().apiHost);
-  $('btnSwitch').textContent=T().switchTok(C().token);
+  if($('btnSwitch')) $('btnSwitch').textContent=T().switchTok(C().token);
   $('btnResetGarden').textContent=T().resetBtn(C().name);
   $('resetMsg').textContent=''; resetArmed=0; // switching community disarms a pending reset
   $('normieId').placeholder='n° 0-'+C().idMax;
@@ -3655,7 +3655,7 @@ function setLang(l){
   $('btnLookup').textContent=t.find; $('btnRandom').textContent=t.random;
   $('tRandomHint').textContent=t.randomHintC(Object.keys(commSnapshot()).length,C().token,C().apiHost);
   $('tCommLbl').textContent=t.commLbl;
-  $('tCommLblMenu').textContent=t.commLbl;
+  if($('tCommLblMenu')) $('tCommLblMenu').textContent=t.commLbl;
   applyLangManual();
   $('btnParse').textContent=t.importBtn;
   $('tNoNormie').textContent=t.noNormie; $('btnGeneric').textContent=t.genericBtn;
@@ -4532,8 +4532,8 @@ function init(){
   $('btnHarvest').addEventListener('click',harvest);
   $('btnReplant').addEventListener('click',replant);
   $('btnUproot').addEventListener('click',uproot);
-  $('btnSwitch').addEventListener('click',switchNormie);
-  for(const id of ['commSel','commSelStart']) $(id).addEventListener('change',e=>{ switchComm(e.target.value); fillCommSelects(); });
+  if($('btnSwitch')) $('btnSwitch').addEventListener('click',switchNormie);
+  for(const id of ['commSel','commSelStart']){ const el=$(id); if(el) el.addEventListener('change',e=>{ switchComm(e.target.value); fillCommSelects(); }); }
   $('btnBack').addEventListener('click',backToGarden);
   $('btnReal').addEventListener('click',()=>setMode('real'));
   $('btnFast').addEventListener('click',()=>setMode('fast'));
