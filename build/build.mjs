@@ -58,8 +58,10 @@ if (artifact) {
     `<link rel="manifest" href="${manifestHref}">\n` +
     `<link rel="apple-touch-icon" href="${icon}">\n` +
     '<style>body{margin:0;font:14px system-ui,sans-serif;background:#333537}img{max-width:100%}[hidden]{display:none!important}</style>\n';
+  // Cloudflare Web Analytics: cookie-less visit counter for the public build, so we can see whether anyone's actually playing during the alpha
+  const cfBeacon = '<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon=\'{"token": "d226c3c752e643c7a21344d599809cc3"}\'></script>\n';
   const i = html.indexOf('<style>');
-  const out = skeleton + html.slice(0, i) + '</head>\n<body>\n' + html.slice(i) + '\n</body>\n</html>\n';
+  const out = skeleton + html.slice(0, i) + '</head>\n<body>\n' + html.slice(i) + '\n' + cfBeacon + '</body>\n</html>\n';
   writeFileSync(resolve(root, 'dist/index.html'), out);
   console.log(`dist/index.html  ${(out.length / 1024).toFixed(0)} KB  stamp ${stamp}`);
 }
