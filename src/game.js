@@ -419,6 +419,9 @@ en:{
     z3:'⏩ This is an <b>alpha</b>: time runs <b>×500</b> so you can see everything happen. The menu (☰ top right → Speed) switches to real time or ×720.',
     y0:'💧 Your plant is thirsty! <b>Click the plant</b> to water it.',
     y1:'You can follow its growth at any time by <b>clicking its growth bars</b>.',
+    x0:'🎉 <b>50 pixels!</b> Time to build: this is the <b>Crafting</b> menu. The <b>Workbench</b> comes first — it unlocks every other recipe in the game.',
+    x1:'Each recipe lists what it needs. Press <b>Craft</b> as soon as you have the materials.',
+    x2:'Missing something? The <b>Market</b> buys and sells resources. ⚠️ Careful: what you sell is always paid <b>less</b> than what the same thing costs to buy — sell only what you don’t need.',
   },
   notifBody:(nm,i)=>'💧 Your '+nm+' (pot '+(i+1)+') is down to 10% hydration — water it before it withers!',
   notifDry:(nm,i)=>'🥀 Your '+nm+' (pot '+(i+1)+') is bone dry — growth has stopped, it dies in 24h without water!',
@@ -695,6 +698,9 @@ fr:{
     z3:'⏩ Version <b>alpha</b> : le temps tourne en <b>×500</b> pour tout voir se passer. Le menu (☰ en haut à droite → Vitesse) permet de repasser en temps réel ou en ×720.',
     y0:'💧 Ta plante a soif ! <b>Clique sur la plante</b> pour l\'arroser.',
     y1:'Tu peux suivre sa croissance à tout moment en <b>cliquant sur ses barres de croissance</b>.',
+    x0:'🎉 <b>50 pixels !</b> Place à la construction : voici le menu <b>Fabrication</b>. L’<b>Établi</b> vient en premier — il débloque toutes les autres recettes du jeu.',
+    x1:'Chaque recette indique ce qu’il lui faut. Appuie sur <b>Fabriquer</b> dès que tu as les matériaux.',
+    x2:'Il te manque quelque chose ? Le <b>Marché</b> achète et revend les ressources. ⚠️ Attention : ce que tu revends est toujours payé <b>moins cher</b> que ce que la même chose coûte à l’achat — ne vends que le superflu.',
   },
   notifBody:(nm,i)=>'💧 Ta '+nm+' (pot '+(i+1)+') est à 10 % d\'hydratation — arrose-la avant qu\'elle ne flétrisse !',
   notifDry:(nm,i)=>'🥀 Ta '+nm+' (pot '+(i+1)+') est à sec — la croissance est stoppée, mort dans 24 h sans arrosage !',
@@ -825,7 +831,7 @@ function freshState(){
     dayMode:'clock', lang:'en', lastTs:Date.now(), inv:freshInv(),
     almanac:{seen:{}, totalHarvests:0, bestHarvestPx:0, plantsLost:0},
     daily:null, streak:{count:0, lastCounted:'', joker:1, jokerWeek:''},
-    stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tuto0Seen:false, tutoHydSeen:false, balV:2 };
+    stats:{}, badges:{}, strains:{}, comm:'normies', gardens:{}, tuto0Seen:false, tutoHydSeen:false, tutoPxSeen:false, balV:2 };
 }
 let S = freshState();
 const LS_KEY='pixelvalet_state_v2';
@@ -1670,6 +1676,7 @@ function harvest(){
     S.almanac.totalHarvests++; if(got>S.almanac.bestHarvestPx)S.almanac.bestHarvestPx=got;
     questBump('harvest',1); questBump('px',got);
     save(); render(true); renderResources(true);
+    maybeTutoPx();
     return;
   }
   const v=vOf(p);
@@ -1699,6 +1706,7 @@ function harvest(){
   S.almanac.totalHarvests++; if(got>S.almanac.bestHarvestPx)S.almanac.bestHarvestPx=got;
   questBump('harvest',1); questBump('px',got);
   save(); render(true); renderResources(true);
+  maybeTutoPx();
 }
 function plantHybrid(kind){ // consumes a hybrid seed, not a normal one
   ensurePlants();
@@ -3147,6 +3155,16 @@ function maybeTuto0(){ // a brand-new player, garden shown, starter seed just pl
   if($('introOverlay').classList.contains('on'))return; // let the welcome modal close first — closeIntro() retries this
   if(!$('scrGarden').classList.contains('on')||controlView)return;
   runTuto(TUTO0_STEPS,'tuto0Seen');
+}
+const TUTOPX_STEPS=[ // the first time the pixel stash reaches 50: the crafting menu on the Workbench, then where to get missing materials
+  {targetSel:'[data-rid="workbench"]', key:'x0', open:()=>{ bookFilter={q:'',owned:false,hideUndisc:false,tier:-1,cat:null}; $('bookSearch').value=''; bookPage=0; openBook(); }},
+  {targetSel:'[data-craft="workbench"]', key:'x1', close:closeBook},
+  {targetSel:'#marketOverlay .book', key:'x2', open:openMarket, close:closeMarket},
+];
+function maybeTutoPx(){ // called after every harvest
+  if(S.tutoPxSeen||tutoStep>=0||S.inv.px<50)return;
+  if(!$('scrGarden').classList.contains('on')||controlView)return;
+  setTimeout(()=>{ if(tutoStep<0&&!S.tutoPxSeen) runTuto(TUTOPX_STEPS,'tutoPxSeen'); },900); // let the harvest pop-up land first
 }
 function maybeTutoHyd(i){ // the very first time any plant's hydration hits the 10% warning: how to water it, and where to watch its growth
   if(S.tutoHydSeen||tutoStep>=0)return;

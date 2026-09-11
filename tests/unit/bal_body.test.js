@@ -113,6 +113,8 @@ ok(!!I18N.en.tuto.z0&&!!I18N.fr.tuto.z0, 'z0 texts exist in EN+FR');
 ok(!!I18N.en.tuto.y0&&!!I18N.fr.tuto.y0, 'y0 texts exist in EN+FR');
 ok(typeof maybeTuto0==='function', 'maybeTuto0 exists');
 ok(typeof maybeTutoHyd==='function', 'maybeTutoHyd exists');
+ok(TUTOPX_STEPS.length===3&&TUTOPX_STEPS[0].targetSel==='[data-rid="workbench"]', '50-pixel tuto: workbench → craft → market');
+ok(!!I18N.en.tuto.x2&&!!I18N.fr.tuto.x2, 'x2 texts exist in EN+FR');
 
 console.log(pass+' passed, '+fail+' failed');
 process.exit(fail?1:0);
