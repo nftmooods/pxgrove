@@ -104,9 +104,10 @@ S=freshState(); ensurePlants();
 }
 
 // 10. tuto steps: only the two onboarding tutorials remain (first plot, then thirst)
-ok(TUTO0_STEPS.length===4, 'TUTO0_STEPS has 4 steps, got '+TUTO0_STEPS.length);
-ok(TUTO0_STEPS.map(s=>s.key).join()==='z0,z1,z2,z3', 'TUTO0_STEPS keys are z0..z3');
-ok(TUTO0_STEPS[2].targetSel==='[data-eq="uproot"]', 'uproot step rings the uproot slot');
+ok(TUTO0_STEPS.length===5, 'TUTO0_STEPS has 5 steps, got '+TUTO0_STEPS.length);
+ok(TUTO0_STEPS.map(s=>s.key).join()==='z0,z1,z4,z2,z3', 'TUTO0_STEPS order: plant, water, hand, uproot, menu');
+ok(typeof TUTO0_STEPS[0].rect==='function'&&TUTO0_STEPS[1].targetSel==='[data-sbg="water"]'&&TUTO0_STEPS[2].targetSel==='[data-sbg="harv"]'&&TUTO0_STEPS[3].targetSel==='[data-eq="uproot"]', 'each step rings the thing it explains');
+ok(!!I18N.en.tuto.z4&&!!I18N.fr.tuto.z4, 'z4 texts exist in EN+FR');
 ok(freshState().mode==='alpha', 'a fresh game starts in alpha ×500 mode');
 { const m=S.mode; S.mode='alpha'; ok(timeMult()===500, 'alpha mode = ×500'); S.mode='fast'; ok(timeMult()===720, 'fast mode = ×720'); S.mode=m; }
 ok(!!I18N.en.tuto.z0&&!!I18N.fr.tuto.z0, 'z0 texts exist in EN+FR');

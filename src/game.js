@@ -414,7 +414,8 @@ en:{
   tuto:{
     next:'Next ▸', skip:'Skip', done:'Let\'s grow! ✓',
     z0:'🌱 Your <b>first seed is planted</b> and already growing. Watch its two bars: 💧 water and 🌱 growth.',
-    z1:'💧 <b>Click the plant</b> to water it whenever the water bar runs low — without water it stops growing, then dies.',
+    z1:'💧 This is your <b>watering gear</b> (a bowl for now — better tools come later). <b>Click the plant</b> to water it whenever its water bar runs low: without water it stops growing, then dies.',
+    z4:'✋ The <b>hand</b> harvests: once the plant is full of flowers, <b>click it</b> to collect flowers and wood — flowers grind into pixels, the resource that builds everything.',
     z2:'🪴 The <b>uproot tool</b>, in the column on the left: pick it, then click a plant to pull it out and free the plot (dead plants can only be uprooted).',
     z3:'⏩ This is an <b>alpha</b>: time runs <b>×500</b> so you can see everything happen. The menu (☰ top right → Speed) switches to real time or ×720.',
     y0:'💧 Your plant is thirsty! <b>Click the plant</b> to water it.',
@@ -693,7 +694,8 @@ fr:{
   tuto:{
     next:'Suivant ▸', skip:'Passer', done:'C\'est parti ! ✓',
     z0:'🌱 Ta <b>première graine est plantée</b> et pousse déjà. Surveille ses deux barres : 💧 l’eau et 🌱 la croissance.',
-    z1:'💧 <b>Clique sur la plante</b> pour l’arroser dès que la barre d’eau baisse — sans eau elle s’arrête de pousser, puis meurt.',
+    z1:'💧 Voici ton <b>matériel d’arrosage</b> (un bol pour l’instant — de meilleurs outils viendront). <b>Clique sur la plante</b> pour l’arroser dès que sa barre d’eau baisse : sans eau elle s’arrête de pousser, puis meurt.',
+    z4:'✋ La <b>main</b> récolte : quand la plante est pleine de fleurs, <b>clique dessus</b> pour ramasser fleurs et bois — les fleurs se broient en pixels, la ressource qui construit tout.',
     z2:'🪴 L’<b>outil arracher</b>, dans la colonne de gauche : sélectionne-le puis clique sur une plante pour la retirer et libérer la parcelle (une plante morte ne peut qu’être arrachée).',
     z3:'⏩ Version <b>alpha</b> : le temps tourne en <b>×500</b> pour tout voir se passer. Le menu (☰ en haut à droite → Vitesse) permet de repasser en temps réel ou en ×720.',
     y0:'💧 Ta plante a soif ! <b>Clique sur la plante</b> pour l\'arroser.',
@@ -3144,11 +3146,12 @@ function openIntro(){
   $('introOverlay').classList.add('on');
 }
 /* ── first-launch tutorial: spotlight steps over the real interface ── */
-const TUTO0_STEPS=[ // first launch, first seed already in the ground: the two bars, watering, the uproot tool, and the fast clock
-  {target:'plantCanvas', key:'z0'},
-  {target:'plantCanvas', key:'z1'},
+const TUTO0_STEPS=[ // first launch, first seed already in the ground — each step rings the thing it talks about: the plant, the watering slot, the hand, the uproot slot, the menu
+  {rect:()=>plantRect(0), key:'z0'},
+  {targetSel:'[data-sbg="water"]', key:'z1'},
+  {targetSel:'[data-sbg="harv"]', key:'z4'},
   {targetSel:'[data-eq="uproot"]', key:'z2', open:()=>{ sbOpen.harv=true; renderSidebar(); }, close:()=>{ sbOpen.harv=false; renderSidebar(); }},
-  {target:null, key:'z3'},
+  {target:'btnMenu', key:'z3'},
 ];
 function maybeTuto0(){ // a brand-new player, garden shown, starter seed just planted for them: the basics, once
   if(S.tuto0Seen||tutoStep>=0)return;
@@ -3170,7 +3173,7 @@ function maybeTutoHyd(i){ // the very first time any plant's hydration hits the 
   if(S.tutoHydSeen||tutoStep>=0)return;
   if(!$('scrGarden').classList.contains('on')||controlView)return;
   const steps=[
-    {target:'plantCanvas', key:'y0'},
+    {rect:()=>plantRect(i), key:'y0'},
     {targetSel:'[data-bars="'+i+'"]', key:'y1'},
   ];
   if(i!==S.sel) selectPot(i);
@@ -3179,14 +3182,25 @@ function maybeTutoHyd(i){ // the very first time any plant's hydration hits the 
 let tutoStep=-1;
 let tutoList=null, tutoFlag=null;
 let _tutoTick=null;
+function tutoTargetRect(st){ // the box a step points at: a DOM element (target / targetSel) or a computed rectangle (rect(), e.g. a plant drawn on the canvas)
+  if(st.rect){ const r=st.rect(); return r&&r.width>0?r:null; }
+  let el=st.target?$(st.target):(st.targetSel?document.querySelector(st.targetSel):null);
+  while(el&&(el.hidden||el.getBoundingClientRect().width===0)&&el.parentElement&&el!==document.body) el=el.parentElement; // hidden target (fold closed, phone layout…): its visible container instead
+  if(!el)return null;
+  const r=el.getBoundingClientRect(); return (r.width||r.height)?r:null;
+}
+function plantRect(i){ // viewport box around the plant growing in slot i — the sprite is on the canvas, so there is no element to ring
+  const k=i-curRoom*ROOM_SLOTS, cx=slotCenterX(k), gy=bedGroundY(), pitch=slotPitch();
+  const L=worldToCss(cx-pitch/2,gy), R=worldToCss(cx+pitch/2,gy), C=worldToCss(cx,gy); if(!L||!R||!C)return null;
+  const pw=R.x-L.x, w=pw*0.62, h=pw*0.95, bottom=C.y+pw*0.08;
+  return {left:C.x-w/2, top:bottom-h, width:w, height:h, right:C.x+w/2, bottom:bottom};
+}
 function refreshTutoRing(){ // the layout can move after a step is placed (toast, re-render): keep the ring glued to its target
   if(tutoStep<0||!tutoList)return;
   const st=tutoList[tutoStep]; if(!st)return;
-  let el=st.target?$(st.target):(st.targetSel?document.querySelector(st.targetSel):null);
-  while(el&&(el.hidden||el.getBoundingClientRect().width===0)&&el.parentElement&&el!==document.body) el=el.parentElement;
-  const ring=$('tutoRing'); if(!el||!ring||ring.hidden)return;
-  const r=el.getBoundingClientRect(), pad=8;
-  if(!r.width&&!r.height)return;
+  const ring=$('tutoRing'); if(!ring||ring.hidden)return;
+  const r=tutoTargetRect(st), pad=8; if(!r)return;
+  if(ring.dataset.fb==='1'){ positionTuto(st); return; } // the step was placed before its target existed (canvas not laid out yet): do the full placement now, card included
   ring.style.left=(r.left-pad)+'px'; ring.style.top=(r.top-pad)+'px';
   ring.style.width=(r.width+2*pad)+'px'; ring.style.height=(r.height+2*pad)+'px';
 }
@@ -3227,25 +3241,25 @@ function positionTuto(st){
     '<button class="btn ghost sm" id="tutoSkip" type="button">'+t.skip+'</button></div>';
   $('tutoNext').addEventListener('click',()=>{ if(st.close)st.close(); tutoStep++; renderTuto(); });
   $('tutoSkip').addEventListener('click',()=>{ if(st.close)st.close(); endTuto(); });
-  let el=st.target?$(st.target):(st.targetSel?document.querySelector(st.targetSel):null);
-  while(el&&(el.hidden||el.getBoundingClientRect().width===0)&&el.parentElement&&el!==document.body) el=el.parentElement; // hidden target (Harvest swapped for Replant…): highlight its visible slot instead
-  if(el){
-    try{ el.scrollIntoView({block:'nearest'}); }catch(_){}
-    const r=el.getBoundingClientRect(), pad=8;
-    ring.hidden=false;
+  const r=tutoTargetRect(st);
+  if(r){
+    const pad=8, vw=window.innerWidth, vh=window.innerHeight;
+    ring.hidden=false; ring.dataset.fb='';
     ring.style.left=(r.left-pad)+'px'; ring.style.top=(r.top-pad)+'px';
     ring.style.width=(r.width+2*pad)+'px'; ring.style.height=(r.height+2*pad)+'px';
-    // card below the target if room, else above
-    const ch=card.getBoundingClientRect().height||160;
-    let cy=r.bottom+pad+12;
-    if(cy+ch>window.innerHeight-10) cy=Math.max(10,r.top-pad-12-ch);
-    let cx=Math.min(Math.max(10,r.left),window.innerWidth-420);
-    card.style.left=cx+'px'; card.style.top=cy+'px';
-  }else{
-    ring.hidden=false;
-    ring.style.left='50%'; ring.style.top='0'; ring.style.width='0'; ring.style.height='0';
-    card.style.left=Math.max(10,(window.innerWidth-420)/2)+'px';
-    card.style.top='120px';
+    // the card sits right NEXT to the ringed element: beside it when it hugs a screen edge, otherwise just below (or above if no room)
+    const cb=card.getBoundingClientRect(), cw=Math.min(cb.width||400,vw-20), ch=cb.height||160, gap=pad+14;
+    let cx, cy;
+    if(r.left+r.width/2<vw*0.4&&r.right+gap+cw<=vw-10){ cx=r.right+gap; cy=r.top+r.height/2-ch/2; } // target on the left → card to its right
+    else if(r.left+r.width/2>vw*0.6&&r.left-gap-cw>=10){ cx=r.left-gap-cw; cy=r.top+r.height/2-ch/2; } // target on the right → card to its left
+    else { cx=r.left+r.width/2-cw/2; cy=r.bottom+gap; if(cy+ch>vh-10) cy=r.top-gap-ch; }
+    card.style.left=Math.min(Math.max(10,cx),vw-cw-10)+'px'; card.style.top=Math.min(Math.max(10,cy),vh-ch-10)+'px';
+  }else{ // nothing to point at: dim everything and centre the card
+    ring.hidden=false; ring.dataset.fb='1';
+    ring.style.left=Math.round(window.innerWidth/2)+'px'; ring.style.top=Math.round(window.innerHeight/2)+'px'; ring.style.width='0'; ring.style.height='0'; // px, never %: a % start value leaves the stepped CSS transition stuck when the ring later moves
+    const cb=card.getBoundingClientRect(), cw=Math.min(cb.width||400,window.innerWidth-20), ch=cb.height||160;
+    card.style.left=Math.max(10,(window.innerWidth-cw)/2)+'px';
+    card.style.top=Math.max(10,(window.innerHeight-ch)/2)+'px';
   }
 }
 function closeIntro(){
@@ -3644,7 +3658,7 @@ function setLang(l){
 }
 
 /* ── Pixel rendering of the garden (all pots side by side) ── */
-const CELL=5, GW=64, GH=80, RES=2; // RES: canvas pixels per world unit (crisper illustration & text) // taller grid: the pots area breathes, plants get headroom
+const CELL=5, GW=64, GH=80; let RES=2; // RES: canvas pixels per world unit — recomputed each frame from the displayed size × devicePixelRatio, so sprites are never upscaled (blurry) // taller grid: the pots area breathes, plants get headroom
 const isNarrow=()=>window.innerWidth<=820; // phone-width window: the top bar sits in the flow above the scene and the menus collapse into the hamburger
 const isMobile=()=>false; // the one-pot-per-screen mobile view is retired: every width shows the real illustration with its 3 plots, scaled to fit (the plot cards scale with it)
 function hexRGB(h){ h=h.replace('#',''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
@@ -3836,7 +3850,10 @@ function drawGarden(){
   _ctrlEditing=false;
   { const sb=$('stageSidebar'); if(sb) sb.hidden=false;
     for(const id of ['plantCard','journalCard','tEquip','hotbar','genSlot']){ const e=$(id); if(e) e.hidden=false; } }
-  let worldW=V*GW*CELL; cv.height=GH*CELL*RES;
+  let worldW=V*GW*CELL;
+  { const cssH=(cv.parentElement&&cv.parentElement.clientHeight)||cv.clientHeight||0, dpr=window.devicePixelRatio||1;
+    RES=Math.min(6,Math.max(2,Math.ceil(cssH*dpr/(GH*CELL)))); } // enough backing pixels for the box it is shown in
+  cv.height=GH*CELL*RES;
   _viewOffX=0;
   const scw=cv.parentElement, inWrap=scw&&scw.classList.contains('cv-scroll');
   if(isMobile()){
